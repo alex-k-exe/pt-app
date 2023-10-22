@@ -1,4 +1,4 @@
-import ListGroupProps from "./components/ListGroup";
+import ListGroup from "./components/ListGroup";
 
 function App() {
     const items = [
@@ -8,9 +8,13 @@ function App() {
     ]
     const heading = "Bad Games";
 
-    return <>
-        <ListGroupProps items={items} heading={heading} />
-    </>
+    return <div>
+        <ListGroup
+            items={items}
+            heading={heading}
+            onSelectItem={item => console.log(item)}
+        />
+    </div>
 }
 
 export default App;
