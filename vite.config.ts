@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
 
   server: {
-    open: '/docs/index.html',
+    open: 'index.html',
     watch: {
       ignored: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
     }
