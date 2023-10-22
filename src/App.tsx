@@ -1,19 +1,11 @@
-import ListGroup from "./components/ListGroup";
+import { useState } from "react";
 
 function App() {
-    const items = [
-        "Among Us",
-        "Fortnight",
-        "Bungaboo"
-    ]
-    const heading = "Bad Games";
+    const [btnPressed, setBtnPressed] = useState(false);
 
     return <div>
-        <ListGroup
-            items={items}
-            heading={heading}
-            onSelectItem={item => console.log(item)}
-        />
+        <button onClick={() => setBtnPressed(!btnPressed)}>Click me!</button>
+        {btnPressed && <p>Hi Chris (client) this is Alex</p>}
     </div>
 }
 

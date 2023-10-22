@@ -10,9 +10,9 @@ function ListGroup({ items, heading, onSelectItem }: ListGroupProps) {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   return <>
-    <p>Test pls</p>
     <h1>{heading}</h1>
-    {length === 0 && <p>No item found</p>}
+    {items.length === 0 && <p>No items found</p>}
+    {console.log(items.length)}
 
     <ul className="list-group"> {items.map((item, index) => <li
       className={selectedIndex === index ? "list-group-item active" : "list-group-item"}
