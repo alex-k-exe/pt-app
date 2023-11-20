@@ -1,55 +1,59 @@
 <script lang="ts">
-	type Task = {
-		description: String;
-		completed?: boolean;
-	};
-	let tasks: Task[] = [
-		{ description: 'Feed dog' },
-		{ description: 'Do homework', completed: true }
-	];
-
-	let newTaskDesc: string;
-
-	const createTask = () => {
-		if (!newTaskDesc) return;
-		tasks = [...tasks, { description: newTaskDesc }];
-		newTaskDesc = '';
-	};
+	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import welcome from '$lib/images/svelte-welcome.webp';
+	import Counter from './Counter.svelte';
 </script>
 
-<h1>Welcome to MyTodoApp</h1>
+<svelte:head>
+	<title>Home</title>
+	<meta name="description" content="Svelte demo app" />
+</svelte:head>
 
-{#each tasks as task}
-	<div class="task">
-		<button class="btn" on:click={() => (task.completed = !task.completed)}>
-			{task.completed ? 'Restart' : 'Complete'}</button
-		>
-		<p>
-			{#if task.completed}
-				<s>{task.description}</s>
-			{:else}
-				{task.description}
-			{/if}
-		</p>
-	</div>
-	<p />
-{/each}
+<section>
+	<h1>
+		<span class="welcome">
+			<picture>
+				<source srcset={welcome} type="image/webp" />
+				<img src={welcome_fallback} alt="Welcome" />
+			</picture>
+		</span>
 
-<div class="task">
-	<button class="btn" on:click={() => createTask()}>Create task</button>
-	<input bind:value={newTaskDesc} />
-</div>
+		to your new<br />SvelteKit app
+	</h1>
 
-<style lang="scss">
-	.btn {
-		height: fit-content;
-		min-height: 10px;
-		min-width: 50px;
-		padding: 5px;
-	}
-	.task {
-		display: inline-flex;
-		gap: 10px;
+	<h2>
+		try editing <strong>src/routes/+page.svelte</strong>
+	</h2>
+
+	<Counter />
+</section>
+
+<style>
+	section {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 		align-items: center;
+		flex: 0.6;
+	}
+
+	h1 {
+		width: 100%;
+	}
+
+	.welcome {
+		display: block;
+		position: relative;
+		width: 100%;
+		height: 0;
+		padding: 0 0 calc(100% * 495 / 2048) 0;
+	}
+
+	.welcome img {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		display: block;
 	}
 </style>
