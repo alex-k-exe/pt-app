@@ -1,34 +1,51 @@
-<script>
-	let hello = 2;
+<script context="module" lang="ts">
+	export type TReview = {
+		id: number;
+		rating: number;
+		text: string;
+	};
 </script>
 
-<style>
-	@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+<script lang="ts">
+	import FeedbackForm from '$lib/components/FeedbackForm.svelte';
 
-	:global(*) {
-		box-sizing: border-box;
-		margin: 0;
-		padding: 0;
-	}
+	import FeedbackList from '$lib/components/FeedbackList.svelte';
+	import FeedbackStats from '$lib/components/FeedbackStats.svelte';
+	import '$lib/global.css';
 
-	:global(body) {
-		font-family: 'Poppins', sans-serif;
-		background-color: #202142;
-		line-height: 1.6;
-		color: #fff;
-	}
+	$: count = feedback.length;
+	$: average = feedback.reduce((sum, { rating }) => sum + rating, 0) / count;
 
-	:global(ul) {
-		list-style: none;
-	}
+	const addFeedback = (event: CustomEvent<TReview>) => {
+		let { rating, text } = event.detail;
+		feedback = [{ id: feedback.length, rating, text }, ...feedback];
+	};
 
-	:global(a) {
-		color: orange;
-	}
+	const deleteFeedback = (event: CustomEvent<number>) => {
+		feedback = feedback.filter((item) => item.id !== event.detail);
+	};
 
-	:global(.container) {
-		max-width: 768px;
-		margin: 100px auto;
-		padding: 0 20px;
-	}
-</style>
+	let feedback: TReview[] = [
+		{
+			id: 1,
+			rating: 10,
+			text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. consequuntur vel vitae commodi alias voluptatem est voluptatum ipsa quae.'
+		},
+		{
+			id: 2,
+			rating: 9,
+			text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. consequuntur vel vitae commodi alias voluptatem est voluptatum ipsa quae.'
+		},
+		{
+			id: 3,
+			rating: 8,
+			text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. consequuntur vel vitae commodi alias voluptatem est voluptatum ipsa quae.'
+		}
+	];
+</script>
+
+<main class="container">
+	<FeedbackForm on:add-feedback={addFeedback} />
+	<FeedbackStats {count} {average} />
+	<FeedbackList {feedback} on:delete-feedback={deleteFeedback} />
+</main>
