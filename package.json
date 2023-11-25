@@ -33,6 +33,10 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@svelteuidev/composables": "^0.15.3",
+		"@svelteuidev/core": "^0.15.3",
+		"@svelteuidev/dates": "^0.15.3",
+		"dayjs": "^1.11.10",
 		"sass": "^1.69.5"
 	}
 }

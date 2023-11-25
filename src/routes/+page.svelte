@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	export type TReview = {
+	export type FeedbackItem = {
 		id: number;
 		rating: number;
 		text: string;
@@ -7,25 +7,30 @@
 </script>
 
 <script lang="ts">
-	import FeedbackForm from '$lib/components/FeedbackForm.svelte';
+	import FeedbackForm from '$lib/components/feedback/FeedbackForm.svelte';
 
-	import FeedbackList from '$lib/components/FeedbackList.svelte';
-	import FeedbackStats from '$lib/components/FeedbackStats.svelte';
+	import FeedbackList from '$lib/components/feedback/FeedbackList.svelte';
+	import FeedbackStats from '$lib/components/feedback/FeedbackStats.svelte';
 	import '$lib/global.css';
 
 	$: count = feedback.length;
 	$: average = feedback.reduce((sum, { rating }) => sum + rating, 0) / count;
 
-	const addFeedback = (event: CustomEvent<TReview>) => {
+	const addFeedback = (event: CustomEvent<FeedbackItem>) => {
 		let { rating, text } = event.detail;
-		feedback = [{ id: feedback.length, rating, text }, ...feedback];
+
+		if (!text || !rating) {
+			return;
+		}
+
+		feedback = [{ id: feedback.length, rating: rating, text: text }, ...feedback];
 	};
 
 	const deleteFeedback = (event: CustomEvent<number>) => {
 		feedback = feedback.filter((item) => item.id !== event.detail);
 	};
 
-	let feedback: TReview[] = [
+	let feedback: FeedbackItem[] = [
 		{
 			id: 1,
 			rating: 10,
