@@ -1,7 +1,0 @@
-{
-	"files.exclude": {
-		"**/.*": true,
-		"**/package*": true,
-		"**/node_modules": true
-	}
-}
