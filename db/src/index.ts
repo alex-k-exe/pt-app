@@ -17,7 +17,7 @@ export default {
 		const { pathname } = new URL(request.url);
 
 		if (pathname === '/api/children') {
-			const { results } = await env.DB.prepare('SELECT * FROM children').bind('children').all();
+			const { results } = await env.DB.prepare('SELECT * FROM children WHERE id = ?').bind('children').all();
 			return Response.json(results);
 		}
 
