@@ -16,11 +16,12 @@ export default {
 
 				// fetch the data for the children
 				// SQL limits insertions to 999 rows at a time
-				const fetchedData = await fp.chunk(fetchChildrenData(), 900);
-				for (const chunk of fetchedData) {
-					await db.insert(schema.children).values(chunk);
-				}
-				return new Response(db.query.children.findMany(), { status: 200 });
+				const fetchedData = await fetchChildrenData();
+				// for (const chunk of fp.chunk(fetchChildrenData(), 900)) {
+				// 	await db.insert(schema.children).values(chunk);
+				// }
+				await db.insert(schema.children).values(fetchedData.slice(0, 5));
+				return new Response(JSON.stringify(db.query.children.findMany()), { status: 200 });
 			default:
 				return new Response('Go to /api/children', { status: 200 });
 		}
