@@ -2,10 +2,15 @@ name = "db"
 main = "src/index.ts"
 compatibility_date = "2023-12-06"
 
-[[d1_databases]]
-binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "pt-db-dev"
-database_id = "286dad3e-7df3-4bf9-b45f-4a7cc63b7e46"
+[env.dev]
+d1_databases = [
+    { binding = "DB", database_name = "pt-db-dev", database_id = "286dad3e-7df3-4bf9-b45f-4a7cc63b7e46" },
+]
+
+[env.prod]
+d1_databases = [
+    { binding = "DB", database_name = "pt-db-prod", database_id = "795d0018-46ae-47fb-9d69-dc800a54a578" },
+]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
