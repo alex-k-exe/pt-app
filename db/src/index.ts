@@ -18,7 +18,7 @@ export default {
 				return new Response('Call /api/children to see the list of children');
 			case '/api/children':
 				const db = drizzle(env.DB, { schema });
-				await db.insert(children).values(insertChildrenData());
+				await db.insert(children).values(await insertChildrenData());
 				return await db.query.children.findMany();
 			default:
 				break;
