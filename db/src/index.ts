@@ -1,32 +1,38 @@
 import { drizzle } from 'drizzle-orm/d1';
 import * as schema from './schema';
-import { children } from './schema';
-import { ChildInsert } from './types';
+import { ChildSchema } from './types';
 
 export interface Env {
-	// If you set another name in wrangler.toml as the value for 'binding',
-	// replace "DB" with the variable name you defined.
 	DB: D1Database;
 }
 
 export default {
 	async fetch(request: Request, env: Env) {
 		const { pathname } = new URL(request.url);
-
 		switch (pathname) {
-			case '/':
-				return new Response('Call /api/children to see the list of children');
 			case '/api/children':
 				const db = drizzle(env.DB, { schema });
-				await db.insert(children).values(await insertChildrenData());
+				await db.insert(schema.children).values(await fetchChildrenData());
 				return await db.query.children.findMany();
 			default:
-				break;
+				return 'Go to /api/children';
 		}
 	},
 };
 
-async function insertChildrenData() {
-	const response = await fetch('https://advent.sveltesociety.dev/data/2023/day-three.json');
-	return (await response.json()) as ChildInsert[];
+async function fetchChildrenData() {
+	const fetchedData = await fetch('https://advent.sveltesociety.dev/data/2023/day-three.json');
+	const json = fetchedData.json;
+
+	type JSONChild = {
+		name: string;
+		weight: number;
+	};
+
+	const jsonChildren: JSONChild[] = JSON.parse(json.toString());
+	const formattedChildren: ChildSchema[] = new Array<ChildSchema>(jsonChildren.length);
+	for (let i = 0; i < jsonChildren.length; i++) {
+		formattedChildren[i] = { childName: jsonChildren[i].name, presentsWeight: jsonChildren[i].weight };
+	}
+	return formattedChildren;
 }

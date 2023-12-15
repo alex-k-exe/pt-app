@@ -20,7 +20,7 @@ devDependencies:
     specifier: ^5.0.4
     version: 5.3.3
   wrangler:
-    specifier: ^3.0.0
+    specifier: ^3.20.0
     version: 3.20.0
 
 packages:
