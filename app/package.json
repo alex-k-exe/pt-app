@@ -15,8 +15,9 @@
 	"devDependencies": {
 		"@fontsource/fira-mono": "^4.5.10",
 		"@neoconfetti/svelte": "^1.0.0",
-		"@sveltejs/adapter-auto": "^2.1.1",
-		"@sveltejs/kit": "^1.30.3",
+		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/cookie": "^0.5.4",
 		"@typescript-eslint/eslint-plugin": "^6.14.0",
 		"@typescript-eslint/parser": "^6.14.0",
@@ -33,19 +34,19 @@
 		"tailwindcss": "^3.3.6",
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.3",
-		"vitest": "^0.34.6",
+		"vitest": "^1.0.0",
 		"wrangler": "^3.20.0"
 	},
 	"type": "module",
 	"dependencies": {
 		"@internationalized/date": "^3.5.0",
-		"@sveltejs/adapter-cloudflare": "^2.3.4",
+		"@sveltejs/adapter-cloudflare": "^3.0.0",
 		"bits-ui": "^0.11.7",
 		"clsx": "^2.0.0",
 		"lucide-svelte": "^0.294.0",
 		"mode-watcher": "^0.1.2",
 		"tailwind-merge": "^2.1.0",
 		"tailwind-variants": "^0.1.18",
-		"vite": "^4.5.1"
+		"vite": "^5.0.0"
 	}
 }
