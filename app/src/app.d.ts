@@ -1,3 +1,5 @@
+import children from '$lib/server/db/schema.ts';
+
 declare namespace App {
 	interface Locals {}
 
@@ -15,4 +17,7 @@ declare namespace App {
 	interface Session {}
 
 	interface Stuff {}
+
+	type ChildSelectSchema = typeof children.$inferSelect;
+	type ChildInsertSchema = typeof children.$inferInsert;
 }

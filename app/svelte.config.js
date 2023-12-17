@@ -15,6 +15,9 @@ const config = {
 	},
 	paths: {
 		assets: 'static'
+	},
+	aliases: {
+		$routes: './src/routes'
 	}
 };
 
