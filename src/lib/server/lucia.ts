@@ -5,21 +5,21 @@ import { lucia } from 'lucia';
 import { sveltekit } from 'lucia/middleware';
 
 export function initializeLucia(db: D1Database) {
-	return lucia({
+	const auth = lucia({
 		adapter: d1(db, {
 			user: 'user',
 			key: 'user_key',
 			session: 'user_session'
 		}),
-		env: dev ? 'DEV' : 'PROD',
 		middleware: sveltekit(),
-
+		env: dev ? 'DEV' : 'PROD',
 		getUserAttributes: (data) => {
 			return {
 				username: data.username
 			};
 		}
 	});
+	return auth;
 }
 
 export type Auth = ReturnType<typeof initializeLucia>;

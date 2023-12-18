@@ -18,6 +18,10 @@ const config = {
 	},
 	aliases: {
 		$routes: './src/routes'
+	},
+	routes: {
+		include: ['/*'],
+		exclude: ['<all>']
 	}
 };
 

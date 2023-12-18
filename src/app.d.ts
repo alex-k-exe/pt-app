@@ -5,7 +5,15 @@ declare namespace App {
 
 	interface Session {}
 
-	interface Stuff {}
+	interface Platform {
+		env: {
+			DB: D1Database;
+		};
+		context: {
+			waitUntil(promise: Promise<unknown>): void;
+		};
+		caches: CacheStorage & { default: Cache };
+	}
 }
 
 /// <reference types="lucia" />
