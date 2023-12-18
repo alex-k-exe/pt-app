@@ -1,5 +1,12 @@
 import { initLucia } from '$lib/server/lucia';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	const session = await locals.auth.validate();
+	if (session) throw redirect(302, '/');
+	return {};
+};
 
 export const actions: Actions = {
 	default: async ({ request, locals, platform }) => {
