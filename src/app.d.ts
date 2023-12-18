@@ -1,25 +1,27 @@
-declare namespace App {
-	interface Locals {
-		auth: import('lucia').AuthRequest;
-	}
+import { initLucia } from '$lib/server/lucia';
 
-	interface Session {}
-
-	interface Platform {
-		env: {
-			DB: D1Database;
-		};
-		context: {
-			waitUntil(promise: Promise<unknown>): void;
-		};
-		caches: CacheStorage & { default: Cache };
+declare global {
+	namespace App {
+		interface Locals {
+			auth: import('lucia').AuthRequest;
+		}
+		interface Platform {
+			env: {
+				DB: D1Database;
+			};
+			// TODO remove context and caches if not needed
+			context: {
+				waitUntil(promise: Promise<unknown>): void;
+			};
+			caches: CacheStorage & { default: Cache };
+		}
 	}
 }
 
-/// <reference types="lucia" />
+/// <reference types="lucia-types" />
 declare global {
-	namespace Lucia {
-		type Auth = import('$lib/server/lucia').Auth;
+	namespace LuciaTypes {
+		type Auth = ReturnType<typeof initLucia>;
 		type DatabaseUserAttributes = {
 			username: string;
 		};

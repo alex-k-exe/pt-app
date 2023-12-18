@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { enhance } from "$app/forms";
+	import { enhance } from '$app/forms';
 </script>
 
-<h1>Sign up</h1>
+<h1>Sign in</h1>
 <form method="post" use:enhance>
 	<label for="username">Username</label>
 	<input name="username" id="username" /><br />
@@ -10,4 +10,4 @@
 	<input type="password" name="password" id="password" /><br />
 	<input type="submit" />
 </form>
-<a href="/login">Sign in</a>
+<a href="/signup">Create an account</a>
