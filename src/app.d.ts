@@ -1,5 +1,3 @@
-import { initLucia } from '$lib/server/lucia';
-
 declare global {
 	namespace App {
 		interface Locals {
@@ -15,17 +13,6 @@ declare global {
 			};
 			caches: CacheStorage & { default: Cache };
 		}
-	}
-}
-
-/// <reference types="lucia-types" />
-declare global {
-	namespace LuciaTypes {
-		type Auth = ReturnType<typeof initLucia>;
-		type DatabaseUserAttributes = {
-			username: string;
-		};
-		type DatabaseSessionAttributes = object;
 	}
 }
 

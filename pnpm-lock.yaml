@@ -8,21 +8,27 @@ dependencies:
   '@cloudflare/workers-types':
     specifier: ^4.20231121.0
     version: 4.20231121.0
+  '@lucia-auth/adapter-drizzle':
+    specifier: 1.0.0-beta.2
+    version: 1.0.0-beta.2(lucia@3.0.0-beta.12)
   '@lucia-auth/adapter-sqlite':
     specifier: ^2.0.1
-    version: 2.0.1(lucia@2.7.5)
+    version: 2.0.1(lucia@3.0.0-beta.12)
   bits-ui:
     specifier: ^0.11.8
     version: 0.11.8(svelte@4.2.8)
   clsx:
     specifier: ^2.0.0
     version: 2.0.0
+  drizzle-orm:
+    specifier: ^0.29.1
+    version: 0.29.1(@cloudflare/workers-types@4.20231121.0)
   formsnap:
     specifier: ^0.4.1
     version: 0.4.1(svelte@4.2.8)(sveltekit-superforms@1.12.0)(zod@3.22.4)
   lucia:
-    specifier: ^2.7.5
-    version: 2.7.5
+    specifier: 3.0.0-beta.12
+    version: 3.0.0-beta.12
   lucia-auth:
     specifier: ^1.8.0
     version: 1.8.0
@@ -427,7 +433,15 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  /@lucia-auth/adapter-sqlite@2.0.1(lucia@2.7.5):
+  /@lucia-auth/adapter-drizzle@1.0.0-beta.2(lucia@3.0.0-beta.12):
+    resolution: {integrity: sha512-GVSNO+TsXvlsklIpcsoUFx4M3G3iRdB3lwtPO/cxFVFEu3Rq3US9ilaly5FN3ECxz/m/bOBTRc/7VkuxPrp5xw==}
+    peerDependencies:
+      lucia: 3.0.0-beta.11
+    dependencies:
+      lucia: 3.0.0-beta.12
+    dev: false
+
+  /@lucia-auth/adapter-sqlite@2.0.1(lucia@3.0.0-beta.12):
     resolution: {integrity: sha512-yc7XQ4X3sWG1gyUGHqaXipJIkmvB4MOgJypnSMWy7Vjhn3AOCM2xw51xTs+dGpLOQIn2Laomg9xpmDM2/9tgqQ==}
     peerDependencies:
       '@libsql/client': ^0.3.0
@@ -439,7 +453,7 @@ packages:
       better-sqlite3:
         optional: true
     dependencies:
-      lucia: 2.7.5
+      lucia: 3.0.0-beta.12
     dev: false
 
   /@melt-ui/svelte@0.65.2(svelte@4.2.8):
@@ -1429,6 +1443,71 @@ packages:
       esutils: 2.0.3
     dev: true
 
+  /drizzle-orm@0.29.1(@cloudflare/workers-types@4.20231121.0):
+    resolution: {integrity: sha512-yItc4unfHnk8XkDD3/bdC63vdboTY7e7I03lCF1OJYABXSIfQYU9BFTQJXMMovVeb3T1/OJWwfW/70T1XPnuUA==}
+    peerDependencies:
+      '@aws-sdk/client-rds-data': '>=3'
+      '@cloudflare/workers-types': '>=3'
+      '@libsql/client': '*'
+      '@neondatabase/serverless': '>=0.1'
+      '@opentelemetry/api': ^1.4.1
+      '@planetscale/database': '>=1'
+      '@types/better-sqlite3': '*'
+      '@types/pg': '*'
+      '@types/sql.js': '*'
+      '@vercel/postgres': '*'
+      better-sqlite3: '>=7'
+      bun-types: '*'
+      knex: '*'
+      kysely: '*'
+      mysql2: '>=2'
+      pg: '>=8'
+      postgres: '>=3'
+      sql.js: '>=1'
+      sqlite3: '>=5'
+    peerDependenciesMeta:
+      '@aws-sdk/client-rds-data':
+        optional: true
+      '@cloudflare/workers-types':
+        optional: true
+      '@libsql/client':
+        optional: true
+      '@neondatabase/serverless':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+      '@planetscale/database':
+        optional: true
+      '@types/better-sqlite3':
+        optional: true
+      '@types/pg':
+        optional: true
+      '@types/sql.js':
+        optional: true
+      '@vercel/postgres':
+        optional: true
+      better-sqlite3:
+        optional: true
+      bun-types:
+        optional: true
+      knex:
+        optional: true
+      kysely:
+        optional: true
+      mysql2:
+        optional: true
+      pg:
+        optional: true
+      postgres:
+        optional: true
+      sql.js:
+        optional: true
+      sqlite3:
+        optional: true
+    dependencies:
+      '@cloudflare/workers-types': 4.20231121.0
+    dev: false
+
   /electron-to-chromium@1.4.614:
     resolution: {integrity: sha512-X4ze/9Sc3QWs6h92yerwqv7aB/uU8vCjZcrMjA8N9R1pjMFRe44dLsck5FzLilOYvcXuDn93B+bpGYyufc70gQ==}
     dev: true
@@ -2001,8 +2080,10 @@ packages:
     deprecated: Deprecated - see the docs for migrating to v2
     dev: false
 
-  /lucia@2.7.5:
-    resolution: {integrity: sha512-2e/Oezb+b2qjQLyP28CraBlad2s9GAp22bfPLn05IsXi99FEX/oTo2TGMM4Gn9nJT7ow15kEFkwL3lBUpknopA==}
+  /lucia@3.0.0-beta.12:
+    resolution: {integrity: sha512-BqazR0IVm5xfURR6G+mjcL77ttDHTdX+qWqaHP121fKIU27rYqUBTAxVYP3252W3gDblFmSYlnhxzkJzI+z/dw==}
+    dependencies:
+      oslo: 0.23.5
     dev: false
 
   /lucide-svelte@0.298.0(svelte@4.2.8):
@@ -2169,6 +2250,13 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
     dev: true
+
+  /oslo@0.23.5:
+    resolution: {integrity: sha512-G+q/MkR0IPaUA1+FpHL0pneAHJzhNpg9P4VXASy4JQy1KGFyfhi30DphVHYNKQC+C05VhDi/sTGdOX+yfcrT3g==}
+    dependencies:
+      '@node-rs/argon2': 1.5.2
+      '@node-rs/bcrypt': 1.7.3
+    dev: false
 
   /oslo@0.24.0:
     resolution: {integrity: sha512-ALOypmwQXyu7AluDqF/EySx7AjWk85gHKY+3yb2LaZ5vArc2jxxZF6tNwGKQ3Rb968ednCFf3opAOoaetRN9+g==}
