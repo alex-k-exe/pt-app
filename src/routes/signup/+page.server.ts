@@ -15,7 +15,7 @@ export const load: PageServerLoad = () => {
 };
 
 export const actions: Actions = {
-	default: async (event, Platform) => {
+	default: async (event) => {
 		// validate data
 		const form = await superValidate(event, formSchema);
 		if (!form.valid) {
@@ -29,8 +29,8 @@ export const actions: Actions = {
 		const hashedPassword = await new Argon2id().hash(form.data.password);
 
 		// setup tooling
-		const lucia = initLucia(Platform.env.DB);
-		const db = drizzle(Platform.env.DB);
+		const lucia = initLucia(event.platform.env.DB);
+		const db = drizzle(event.platform?.env.DB);
 
 		// insert user into db
 		await db
@@ -40,7 +40,7 @@ export const actions: Actions = {
 		// create new session and store in cookies
 		const session = await lucia.createSession(userId, {});
 		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+		event.cookies.set(sessionCookie.name, sessionCookie.value, { path: '/' });
 
 		throw redirect(302, '/');
 	}
