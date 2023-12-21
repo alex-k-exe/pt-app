@@ -1,5 +1,5 @@
 <script lang="ts">
-	import '../app.pcss';
+	import '../global.css';
 </script>
 
 <slot />
