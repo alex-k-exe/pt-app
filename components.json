@@ -7,7 +7,7 @@
 		"baseColor": "slate"
 	},
 	"aliases": {
-		"components": "$lib/components/ui",
+		"components": "$lib/components/",
 		"utils": "$lib/utils/shadcn-svelte"
 	}
 }

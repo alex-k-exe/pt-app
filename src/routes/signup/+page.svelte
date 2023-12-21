@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
-	import { formSchema } from '../schema';
+	import { formSchema } from '../formSchema';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -22,7 +22,9 @@
 				<Form.Validation />
 			</Form.Item>
 		</Form.Field>
-		<Form.Button>Log in</Form.Button>
+		<Form.Button>Sign up</Form.Button>
+		<p />
+		<a href="../login">Log in instead</a>
 	</Form.Root>
 {:catch error}
 	<p>{error.message}</p>

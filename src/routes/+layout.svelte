@@ -1,5 +1,13 @@
 <script lang="ts">
-	import '../global.css';
+	import Navbar from '$lib/components/Navbar.svelte';
+	import { SvelteToast } from '@zerodevx/svelte-toast';
+	import { ModeWatcher } from 'mode-watcher';
+	import '../app.pcss';
 </script>
 
-<slot />
+<SvelteToast />
+<ModeWatcher defaultMode={'dark'} />
+<div class="root">
+	<Navbar />
+	<slot />
+</div>
