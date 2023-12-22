@@ -1,8 +1,7 @@
 import type { D1Database } from '@cloudflare/workers-types';
-import { DrizzleSQLiteAdapter } from '@lucia-auth/adapter-drizzle';
 import { drizzle } from 'drizzle-orm/d1';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { Lucia, TimeSpan } from 'lucia';
+import { lucia } from 'lucia';
 
 function createAdapter(d1: D1Database) {
 	const db = drizzle(d1);
