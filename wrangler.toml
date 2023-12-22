@@ -2,3 +2,4 @@
 binding = "DB"
 database_name = "pt-db-dev"
 database_id = "286dad3e-7df3-4bf9-b45f-4a7cc63b7e46"
+preview_database_id = "DB"
