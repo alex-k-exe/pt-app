@@ -6,6 +6,8 @@
 	export let data: PageData;
 </script>
 
+<h1>Sign up</h1>
+
 {#await data.form then form}
 	<Form.Root method="POST" {form} schema={formSchema} let:config>
 		<Form.Field {config} name="username">
