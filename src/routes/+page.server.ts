@@ -1,23 +1,25 @@
 import { initLucia } from '$lib/server/lucia';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
-export function load({ locals }) {
-	if (!locals.user) throw redirect(302, '/login');
-	return { username: locals.user.username };
-}
+// return credentials if user is logged in, otherwise redirect to login
+export const load: PageServerLoad = async ({ locals }) => {
+	const session = await locals.auth.validate();
+	if (!session) throw redirect(302, '/login');
+	return {
+		userId: session.user.userId,
+		username: session.user.username
+	};
+};
 
+// logout user invalidating the session and deleting the cookie
 export const actions: Actions = {
-	default: async (event) => {
-		if (!event.locals.session) {
-			return fail(401);
-		}
+	logout: async ({ locals, platform }) => {
+		const isLoggedIn = await locals.auth.validate();
+		if (!isLoggedIn) return fail(401);
 
-		if (!event.platform) return fail(500, { message: 'Home page: Platform is undefined' });
-		const auth = initLucia(event.platform?.env.DB);
-
-		await auth.invalidateSession(event.locals.session.id);
-		const blankSessionCookie = auth.createBlankSessionCookie();
-		event.cookies.set(blankSessionCookie.name, blankSessionCookie.value, { path: '/' });
+		await initLucia(platform?.env.DB).invalidateSession(isLoggedIn.sessionId);
+		locals.auth.setSession(null); // delete cookie
 		throw redirect(302, '/login');
 	}
 };

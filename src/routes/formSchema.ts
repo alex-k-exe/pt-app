@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 export const formSchema = z.object({
 	username: z
 		.string()
@@ -7,4 +8,5 @@ export const formSchema = z.object({
 		.regex(/^[a-zA-Z0-9_-]+$/),
 	password: z.string().min(2).max(200)
 });
+
 export type FormSchema = typeof formSchema;

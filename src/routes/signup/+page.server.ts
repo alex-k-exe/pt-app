@@ -1,50 +1,32 @@
-import { users } from '$lib/server/drizzle';
 import { initLucia } from '$lib/server/lucia';
-import { fail, redirect, type Actions } from '@sveltejs/kit';
-import { drizzle } from 'drizzle-orm/d1';
-import { generateId } from 'lucia';
-import { Argon2id } from 'oslo/password';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { formSchema } from '../formSchema';
-import type { PageServerLoad } from './$types';
-
-export const load: PageServerLoad = () => {
-	return {
-		form: superValidate(formSchema)
-	};
-};
+import type { Actions } from './$types';
 
 export const actions: Actions = {
 	default: async (event) => {
-		console.log('start');
-		// validate data
 		const form = await superValidate(event, formSchema);
-		if (!form.valid) {
-			return fail(400, {
-				form
-			});
-		}
+		if (!form.valid) return fail(400, { form });
 
-		console.log('your are valid :)');
-		// create userId and hash password
-		const userId = generateId(15);
-		const hashedPassword = await new Argon2id().hash(form.data.password);
+		const auth = initLucia(event.platform!.env.DB);
 
-		// setup tooling
-		if (!event.platform) throw new Error('Platform is undefined');
-		const lucia = initLucia(event.platform.env.DB);
-		const db = drizzle(event.platform.env.DB);
-
-		// insert user into db
-		await db
-			.insert(users)
-			.values({ id: userId, username: form.data.username, password: hashedPassword });
-
-		console.log("it's in");
-		// create new session and store in cookies
-		const session = await lucia.createSession(userId, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		event.cookies.set(sessionCookie.name, sessionCookie.value, { path: '/' });
+		const newUser = await auth.createUser({
+			key: {
+				providerId: 'username',
+				// TODO check if d1 is case sensitive
+				providerUserId: form.data.username.toLowerCase(),
+				password: form.data.password // hashed by Lucia
+			},
+			attributes: {
+				username: form.data.username
+			}
+		});
+		const newSession = await auth.createSession({
+			userId: newUser.userId,
+			attributes: {}
+		});
+		event.locals.auth.setSession(newSession);
 
 		throw redirect(302, '/');
 	}

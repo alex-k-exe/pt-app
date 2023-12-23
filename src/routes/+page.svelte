@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <form method="post" use:enhance>
-	<button>Sign out</button>
+	<Button>Sign out</Button>
 </form>
