@@ -3,15 +3,20 @@ declare global {
 		interface Locals {
 			/* see https://github.com/sveltejs/kit/issues/4292
 			platform.env is undefined in local development with sveltekit
-			in hooks.server.ts:
-			in prod is assigned env.DB, in dev is assigned new DB with wrangler-proxy */
-			DB: D1Database;
+			in hooks.server.ts, real or simulated platform is assigned to locals.platform*/
+			platform: Platform;
 		}
 		interface Platform {
 			env: {
-				// locals.DB should be used instead
 				DB: D1Database;
+				GOOGLE_ID: string;
+				GOOGLE_SECRET: string;
+				AUTHJS_SECRET: string;
 			};
+			context: {
+				waitUntil(promise: Promise<unknown>): void;
+			};
+			caches: CacheStorage & { default: Cache };
 		}
 	}
 }
