@@ -48,6 +48,7 @@
 		"@internationalized/date": "^3.5.1",
 		"@jridgewell/sourcemap-codec": "^1.4.15",
 		"@rollup/plugin-inject": "^5.0.5",
+		"@tanstack/svelte-query": "^5.20.1",
 		"bits-ui": "^0.11.8",
 		"clsx": "^2.0.0",
 		"dotenv": "^16.4.1",
@@ -56,11 +57,13 @@
 		"lucide-svelte": "^0.298.0",
 		"mode-watcher": "^0.1.2",
 		"pnpm": "^8.14.1",
+		"svelecte": "^3.17.3",
 		"sveltekit-superforms": "^1.12.0",
 		"tailwind-merge": "^2.1.0",
 		"tailwind-variants": "^0.1.19",
 		"wrangler": "^3.22.1",
 		"wrangler-proxy": "^2.2.2",
+		"wretch": "^2.8.0",
 		"zod": "^3.22.4"
 	}
 }

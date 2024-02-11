@@ -16,23 +16,23 @@ const platformHandle: Handle = async ({ event, resolve }) => {
 		script: '',
 		d1Databases: ['DB']
 	});
-	const db = await mf.getD1Database('DB');
-	event.platform = {
-		env: {
-			DB: db,
-			GOOGLE_ID: process.env.GOOGLE_ID!,
-			GOOGLE_SECRET: process.env.GOOGLE_SECRET!,
-			AUTHJS_SECRET: process.env.AUTHJS_SECRET!
-		},
-		context: {
-			waitUntil: function (): void {
-				throw new Error('Function not implemented.');
-			}
-		},
-		caches: (await mf.getCaches()) satisfies CacheStorage & {
-			default: Cache;
-		}
-	};
+
+	event.locals.DRIZZLE_DB = drizzle(await mf.getD1Database('DB'));
+
+	// event.platform = {
+	// 	env: {
+	// 		DB: db,
+	// 		GOOGLE_ID: process.env.GOOGLE_ID!,
+	// 		GOOGLE_SECRET: process.env.GOOGLE_SECRET!,
+	// 		AUTHJS_SECRET: process.env.AUTHJS_SECRET!
+	// 	},
+	// 	context: {
+	// 		waitUntil: function (): void {
+	// 			throw new Error('Function not implemented.');
+	// 		}
+	// 	},
+	// 	caches: await mf.getCaches()
+	// };
 
 	return await resolve(event);
 };
