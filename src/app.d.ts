@@ -9,6 +9,7 @@ declare global {
 			env: {
 				DB: D1Database;
 				GOOGLE_ID: string;
+        // hello!
 				GOOGLE_SECRET: string;
 				AUTHJS_SECRET: string;
 			};
