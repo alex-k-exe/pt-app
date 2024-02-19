@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
+	import { createEventDispatcher } from 'svelte';
 
-	let { clientName, title, onDelete, onEdit } = $props();
+	const dispatch = createEventDispatcher();
+
+	let { clientName, title } = $props();
 
 	type Weekday = {
 		initial: string;
@@ -31,7 +34,7 @@
 		</div>
 	</Card.Content>
 	<Card.Footer class="flex gap-[5px]">
-		<Button variant="outline">Edit</Button>
-		<Button variant="outline">Delete</Button>
+		<Button variant="outline" onclick={() => dispatch('edit')}>Edit</Button>
+		<Button variant="outline" onclick={() => dispatch('delete')}>Delete</Button>
 	</Card.Footer>
 </Card.Root>

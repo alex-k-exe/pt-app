@@ -1,15 +1,25 @@
 <script>
+	import { Button } from '$lib/components/ui/button';
 	import DailyCard from './DailyCard.svelte';
+
+	let color = $state('black');
 </script>
 
 <div class="header">
-	<h1>Dailies</h1>
+	<h1 style={'color:' + color}>Dailies</h1>
 	<Button>New daily</Button>
 </div>
 
 <div class="dailies">
 	{#each [1, 2, 3, 4, 5] as { }}
-		<DailyCard {'Alex'} title={'Running'} />
+		<DailyCard
+			clientName={'Alex'}
+			title={'Running'}
+			on:delete={() => (color = 'red')}
+			on:edit={() => {
+				color = 'blue';
+			}}
+		/>
 	{/each}
 </div>
 
