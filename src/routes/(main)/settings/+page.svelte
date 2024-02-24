@@ -2,20 +2,21 @@
 	import * as Select from '$lib/components/ui/select';
 	import { setMode } from 'mode-watcher';
 
-	let;
+	// Define the theme options
+	const themeOptions = {
+		light: 'Light',
+		dark: 'Dark',
+		system: 'System'
+	};
 </script>
 
-<Select.Root onSelectedChange={() => setMode()}>
+<Select.Root onSelectedChange={() => setMode}>
 	<Select.Trigger class="w-[180px]">
-		<Select.Value placeholder="App theme" />
+		<Select.Value placeholder="Theme" />
 	</Select.Trigger>
 	<Select.Content>
-		<Select.Group>
-			<Select.Label>Theme options</Select.Label>
-			{#each themeOptions as option}
-				<Select.Item value={option.value} label={option.label}>{option.label}</Select.Item>
-			{/each}
-		</Select.Group>
+		{#each Object.entries(themeOptions) as [value, label]}
+			<Select.Item {value} {label}>{label}</Select.Item>
+		{/each}
 	</Select.Content>
-	<Select.Input name="chosenTheme" />
 </Select.Root>

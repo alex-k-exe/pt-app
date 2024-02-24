@@ -1,7 +1,7 @@
 <script>
-	import Navbar from '$lib/components/Navbar.svelte';
 	import { ModeWatcher } from 'mode-watcher';
 	import '../app.pcss';
+	import Navbar from './Navbar.svelte';
 </script>
 
 <ModeWatcher defaultMode="light" />
