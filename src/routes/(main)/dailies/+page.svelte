@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import DailyCard from './DailyCard.svelte';
 
-	let color = $state('black');
+	let color = 'black';
 </script>
 
 <div class="header">
