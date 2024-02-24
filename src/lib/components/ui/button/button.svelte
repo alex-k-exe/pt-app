@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button as ButtonPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils/shadcn-svelte";
+	import { cn } from "$lib/utils/shadcn";
 	import { buttonVariants, type Props, type Events } from ".";
 
 	type $$Props = Props;

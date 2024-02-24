@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { cn } from "$lib/utils/shadcn-svelte";
 	import { Calendar as CalendarPrimitive } from "bits-ui";
 	import * as Calendar from ".";
+	import { cn } from "$lib/utils/shadcn";
 
 	type $$Props = CalendarPrimitive.Props;
 
