@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Calendar as CalendarPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils/shadcn-svelte";
+	import { cn } from "$lib/utils/shadcn";
 
 	type $$Props = CalendarPrimitive.HeadCellProps;
 
@@ -9,10 +9,7 @@
 </script>
 
 <CalendarPrimitive.HeadCell
-	class={cn(
-		"text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-		className
-	)}
+	class={cn("text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]", className)}
 	{...$$restProps}
 >
 	<slot />
