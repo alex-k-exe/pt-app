@@ -1,4 +1,4 @@
-// this file was copied and pasted from https://www.shadcn-svelte.com/docs/components/
+// this file was copied and pasted from https://www.shadcn-svelte.com/docs/installation/sveltekit
 
 import { clsx, type ClassValue } from 'clsx';
 import { cubicOut } from 'svelte/easing';

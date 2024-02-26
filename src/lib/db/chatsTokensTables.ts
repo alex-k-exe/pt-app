@@ -1,6 +1,8 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { trainers, users } from './usersTables';
 
+// Drizzle ensures type safety in the queried data from the DB
+// The 9 tables defined with sqliteTable() are converted to SQL code by drizzle-kit in the CLI
 export const chats = sqliteTable('chats', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 	userId1: text('userId1')

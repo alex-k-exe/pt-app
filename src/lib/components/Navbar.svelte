@@ -1,5 +1,5 @@
 <script lang="ts">
-	import logo from '$lib/assets/logo.png';
+	import logo from '/logo.png';
 	const urls = ['Workouts', 'Dailies', 'Clients', 'Chats', 'Settings'];
 </script>
 

@@ -7,6 +7,7 @@ class Node<T> {
 	}
 }
 
+//
 export class LinkedList<T> {
 	head: Node<T> | null = null;
 
@@ -32,9 +33,9 @@ export class LinkedList<T> {
 	}
 
 	/**
-	 * Delete a Node
+	 * Remove a Node
 	 * @param predicate A function that checks if a Node satisfies a condition.
-	 * @returns The deleted Node
+	 * @returns The removed Node
 	 */
 	remove(predicate: (value: T) => boolean): Node<T> | null {
 		if (!this.head) return null;
@@ -44,11 +45,10 @@ export class LinkedList<T> {
 
 		while (currentNode !== null) {
 			if (predicate(currentNode.value)) {
-				// x x x
-				if (!previousNode) {
-					this.head = currentNode.next;
-				} else {
+				if (previousNode) {
 					previousNode.next = currentNode.next;
+				} else {
+					this.head = currentNode.next;
 				}
 				return currentNode;
 			}
