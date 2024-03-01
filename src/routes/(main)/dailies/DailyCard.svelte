@@ -38,7 +38,7 @@
 		</div>
 	</Card.Content>
 	<Card.Footer class="flex gap-[5px]">
-		<a href="/editor">Edit</a>
+		<a href="/editor" style="padding-right: 10px">Edit</a>
 		<Button variant="outline" on:click={() => dispatch('delete')}>Delete</Button>
 	</Card.Footer>
 </Card.Root>
