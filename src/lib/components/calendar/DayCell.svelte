@@ -4,4 +4,4 @@
 	export let day: dayjs.Dayjs;
 </script>
 
-{day.get('D')}
+{day.format(day.date() === 1 ? 'MMM D' : 'D')}

@@ -7,10 +7,17 @@
 		light: 'Light',
 		dark: 'Dark',
 		system: 'System'
-	};
+	} as const;
+
+	function handleSelectTheme(selected: unknown) {
+		const validModes = ['light', 'dark', 'system'] as const;
+		if (validModes.includes(selected as keyof typeof themeOptions)) {
+			setMode(selected as keyof typeof themeOptions);
+		}
+	}
 </script>
 
-<Select.Root onSelectedChange={() => setMode}>
+<Select.Root onSelectedChange={(selected) => handleSelectTheme(selected)}>
 	<Select.Trigger class="w-[180px]">
 		<Select.Value placeholder="Theme" />
 	</Select.Trigger>

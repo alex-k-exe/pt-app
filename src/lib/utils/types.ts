@@ -7,7 +7,6 @@ class Node<T> {
 	}
 }
 
-//
 export class LinkedList<T> {
 	head: Node<T> | null = null;
 

@@ -6,15 +6,22 @@
 
 <ModeWatcher defaultMode="light" />
 <div class="container">
-	<Navbar />
-	<slot />
+	<div class="navbar">
+		<Navbar />
+	</div>
+	<slot class="slot" />
 </div>
 
 <style>
 	.container {
 		display: flex;
 		flex-direction: column;
-		padding: 10px;
+		height: 100vh;
+		padding: 15px;
 		column-gap: 20px;
+	}
+
+	.navbar {
+		max-height: 15%;
 	}
 </style>
