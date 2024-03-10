@@ -15,17 +15,17 @@
 
 <div class="buttons">
 	<Input placeholder="Client's name" />
-	<Button variant="outline" size="icon" style="margin-left: 3vh">
+	<Button variant="outline" size="icon" style="margin-left: 2%">
 		<ChevronLeft />
 	</Button>
 	<Input placeholder="Month" />
-	<Button variant="outline" size="icon" style="margin-right: 3vh">
+	<Button variant="outline" size="icon" style="margin-right: 2%">
 		<ChevronRight />
 	</Button>
-	<Input placeholder="Year" style="margin-right: 3vh" class="hidden md:block" />
+	<Input placeholder="Year" style="margin-right: 2%" class="hidden md:block" />
 	<Button>Today</Button>
 	<Select.Root onSelectedChange={() => {}}>
-		<Select.Trigger class="w-[180px]">
+		<Select.Trigger>
 			<Select.Value placeholder="View" />
 		</Select.Trigger>
 		<Select.Content>

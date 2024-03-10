@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as ContextMenu from '$lib/components/ui/context-menu';
 	import type { Workout } from '$lib/db/workoutsTables';
 	import type dayjs from 'dayjs';
 	import DayCell from './DayCell.svelte';
@@ -31,7 +30,7 @@
 			<b>{heading.substring(0, 3)}</b>
 		</div>
 	{/each}
-	<ContextMenu.Root>
+	<!-- <ContextMenu.Root>
 		<ContextMenu.Trigger>Context menu</ContextMenu.Trigger>
 		<ContextMenu.Content>
 			<ContextMenu.Item>Profile</ContextMenu.Item>
@@ -39,7 +38,7 @@
 			<ContextMenu.Item>Team</ContextMenu.Item>
 			<ContextMenu.Item>Subscription</ContextMenu.Item>
 		</ContextMenu.Content>
-	</ContextMenu.Root>
+	</ContextMenu.Root> -->
 	{#each month as week, weekIndex (weekIndex)}
 		{#each week as day, dayIndex (dayIndex)}
 			<div style={createDayCellStyle(dayIndex, weekIndex)}>
