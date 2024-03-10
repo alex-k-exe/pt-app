@@ -1,28 +1,16 @@
 <script lang="ts">
-	import * as Select from '$lib/components/ui/select';
-	import { setMode } from 'mode-watcher';
-
-	const themeOptions = {
-		light: 'Light',
-		dark: 'Dark',
-		system: 'System'
-	} as const;
-
-	function handleSelectTheme(selected: unknown) {
-		const validModes = ['light', 'dark', 'system'] as const;
-		if (validModes.includes(selected as keyof typeof themeOptions)) {
-			setMode(selected as keyof typeof themeOptions);
-		}
-	}
+	import { Button } from '$lib/components/ui/button/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { resetMode, setMode } from 'mode-watcher';
 </script>
 
-<Select.Root onSelectedChange={(selected) => handleSelectTheme(selected)}>
-	<Select.Trigger class="w-[180px]">
-		<Select.Value placeholder="Theme" />
-	</Select.Trigger>
-	<Select.Content>
-		{#each Object.entries(themeOptions) as [value, label]}
-			<Select.Item {value} {label}>{label}</Select.Item>
-		{/each}
-	</Select.Content>
-</Select.Root>
+<DropdownMenu.Root>
+	<DropdownMenu.Trigger asChild let:builder>
+		<Button builders={[builder]} variant="outline">Change theme</Button>
+	</DropdownMenu.Trigger>
+	<DropdownMenu.Content align="end">
+		<DropdownMenu.Item on:click={() => setMode('light')}>Light</DropdownMenu.Item>
+		<DropdownMenu.Item on:click={() => setMode('dark')}>Dark</DropdownMenu.Item>
+		<DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
+	</DropdownMenu.Content>
+</DropdownMenu.Root>

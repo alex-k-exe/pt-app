@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { CalendarDays, MessageCircle, Repeat, Settings, Users } from 'lucide-svelte';
-	import { ModeWatcher } from 'mode-watcher';
 
 	const urls = [
 		{ name: 'Workouts', icon: CalendarDays },
@@ -11,7 +10,6 @@
 	];
 </script>
 
-<ModeWatcher defaultMode="light" />
 <div class="container">
 	<nav class="hidden md:flex">
 		<enhanced:img src="$lib/assets/logo.png" alt="App logo" style="width: 50px" />
@@ -40,6 +38,6 @@
 	nav {
 		justify-content: space-evenly;
 		align-items: center;
-		max-height: 15%;
+		height: 15vh;
 	}
 </style>
