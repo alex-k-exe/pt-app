@@ -2,7 +2,6 @@
 	import * as Select from '$lib/components/ui/select';
 	import { setMode } from 'mode-watcher';
 
-	// Define the theme options
 	const themeOptions = {
 		light: 'Light',
 		dark: 'Dark',
