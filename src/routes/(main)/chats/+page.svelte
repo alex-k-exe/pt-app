@@ -2,6 +2,11 @@
 	import ChatList from './ChatList.svelte';
 </script>
 
+<svelte:head>
+	<title>Chats</title>
+	<meta name="chats" content="Your chats and messages with other trainers and clients" />
+</svelte:head>
+
 <div class="chats">
 	<div class="chatList"><ChatList chats={[]} /></div>
 	<div class="chatHeader">chatHeader</div>

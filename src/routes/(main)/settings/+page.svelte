@@ -4,6 +4,11 @@
 	import { resetMode, setMode } from 'mode-watcher';
 </script>
 
+<svelte:head>
+	<title>Settings</title>
+	<meta name="settings" content="Change your settings like the app theme" />
+</svelte:head>
+
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button builders={[builder]} variant="outline">Change theme</Button>
