@@ -8,7 +8,15 @@ export const users = sqliteTable('users', {
 	name: text('name').notNull()
 });
 export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
+
+export const sessions = sqliteTable('session', {
+	id: text('id').notNull().primaryKey(),
+	userId: text('userId')
+		.notNull()
+		.references(() => users.id),
+	expiresAt: integer('expires_at').notNull()
+});
+export type Session = typeof sessions.$inferSelect;
 
 export const clients = sqliteTable('clients', {
 	id: text('id')
@@ -19,7 +27,6 @@ export const clients = sqliteTable('clients', {
 		.notNull()
 });
 export type Client = typeof clients.$inferSelect;
-export type InsertClient = typeof clients.$inferInsert;
 
 export const trainers = sqliteTable('trainers', {
 	id: text('id')
@@ -27,7 +34,6 @@ export const trainers = sqliteTable('trainers', {
 		.primaryKey()
 });
 export type Trainer = typeof clients.$inferSelect;
-export type InsertTrainer = typeof clients.$inferInsert;
 
 export const chats = sqliteTable('chats', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -39,7 +45,6 @@ export const chats = sqliteTable('chats', {
 		.references(() => users.id)
 });
 export type Chat = typeof chats.$inferSelect;
-export type InsertChat = typeof chats.$inferInsert;
 
 export const messages = sqliteTable('messages', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -52,13 +57,13 @@ export const messages = sqliteTable('messages', {
 	text: text('text').notNull()
 });
 export type Message = typeof messages.$inferSelect;
-export type InsertMessage = typeof messages.$inferInsert;
 
 export const signupTokens = sqliteTable('signupTokens', {
 	id: text('id').primaryKey(),
 	trainerId: text('trainerId').references(() => trainers.id),
 	creationTimestamp: text('creationTimestamp').notNull()
 });
+export type SignupToken = typeof messages.$inferSelect;
 
 export const workouts = sqliteTable('workouts', {
 	id: text('id').primaryKey(),
@@ -78,7 +83,6 @@ export const workouts = sqliteTable('workouts', {
 	remindMinsTrainer: integer('remindMinsTrainer')
 });
 export type Workout = typeof workouts.$inferSelect;
-export type InsertWorkout = typeof workouts.$inferInsert;
 
 export const series = sqliteTable('series', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -88,7 +92,6 @@ export const series = sqliteTable('series', {
 	reps: integer('reps').notNull()
 });
 export type Series = typeof series.$inferSelect;
-export type InsertSeries = typeof series.$inferInsert;
 
 export const sets = sqliteTable('sets', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
@@ -103,4 +106,3 @@ export const sets = sqliteTable('sets', {
 	rpe: text('rpe')
 });
 export type Set = typeof series.$inferSelect;
-export type InsertSet = typeof series.$inferInsert;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Workout } from '$lib/db/workoutsTables';
+	import type { Workout } from '$lib/server/drizzleTables';
 	import type dayjs from 'dayjs';
 	import type { Dayjs } from 'dayjs';
 	import DayCell from './DayCell.svelte';
