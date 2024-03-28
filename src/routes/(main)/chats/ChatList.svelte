@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { Chat } from '$lib/db/chatsTokensTables';
+	import type { Chat } from '$lib/server/drizzleTables';
 	import { MessageCirclePlus } from 'lucide-svelte';
 
 	export let chats: Chat[];

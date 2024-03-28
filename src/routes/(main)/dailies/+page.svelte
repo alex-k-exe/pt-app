@@ -1,3 +1,8 @@
+<svelte:head>
+	<title>Dailies</title>
+	<meta name="dailies" content="View and manage recurring workouts" />
+</svelte:head>
+
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { type Workout } from '$lib/db/workoutsTables';

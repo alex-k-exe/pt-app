@@ -1,10 +1,4 @@
 import dayjs, { Dayjs } from 'dayjs';
-import updateLocale from 'dayjs/plugin/updateLocale';
-
-dayjs.extend(updateLocale);
-dayjs.updateLocale('en', {
-	weekStart: 1
-});
 
 /**
  * Generates a matrix of Dayjs objects representing the days of a given month, plus the days before and after to fill the grid.
@@ -16,10 +10,9 @@ export function getDaysForCalendar(month: number): Dayjs[][] {
 	const year: number = dayjs().year();
 
 	// Find the weekday of the first day of the month (0-6)
-	const firstDayOfMonth: number =
-		dayjs(new Date(year, month, 1))
-			.startOf('month')
-			.day() - 1;
+	const firstDayOfMonth: number = dayjs(new Date(year, month, 1))
+		.startOf('month')
+		.day();
 
 	let currentDay: number = 0 - firstDayOfMonth;
 

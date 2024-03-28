@@ -13,6 +13,11 @@
 	} as const;
 </script>
 
+<svelte:head>
+	<title>Workouts</title>
+	<meta name="workouts" content="View and manage one-time workouts" />
+</svelte:head>
+
 <div class="buttons">
 	<Input placeholder="Client's name" />
 	<Button variant="outline" size="icon" style="margin-left: 2%">
