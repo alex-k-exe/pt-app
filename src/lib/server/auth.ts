@@ -6,13 +6,16 @@ import type { GoogleResponse } from './lucia';
 
 export function getAuthVariables({ url, cookies }: RequestEvent) {
 	const variables = {
-		codeVerifier: url.searchParams.get('code'),
 		state: url.searchParams.get('state'),
-		storedState: cookies.get('google_oauth_state')
+		storedState: cookies.get('google_oauth_state'),
+		codeVerifier: url.searchParams.get('code'),
+		storedCodeVerifier: cookies.get('code_verifier')
 	};
 
 	const aVariableIsNull = Object.values(variables).some((variable) => variable === null);
-	const urlMatchesCookies = variables.state === variables.storedState;
+	const urlMatchesCookies =
+		variables.state === variables.storedState &&
+		variables.codeVerifier === variables.storedCodeVerifier;
 
 	if (aVariableIsNull || !urlMatchesCookies) {
 		console.log('Variable is null or URL does not match variables', variables);

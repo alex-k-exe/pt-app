@@ -1,17 +1,15 @@
 import { google } from '$lib/server/lucia';
+import { setCookie } from '$lib/server/utils';
 import { redirect } from '@sveltejs/kit';
 import { generateCodeVerifier, generateState } from 'arctic';
 
 export async function GET({ cookies }): Promise<Response> {
 	const state = generateState();
+	const codeVerifier = generateCodeVerifier();
 
-	cookies.set('google_oauth_state', state, {
-		path: '/',
-		secure: import.meta.env.PROD,
-		httpOnly: true,
-		maxAge: 60 * 10
-	});
+	setCookie(cookies, 'google_oauth_state', state);
+	setCookie(cookies, 'code_verifier', codeVerifier);
 
-	const url = await google.createAuthorizationURL(state, generateCodeVerifier());
+	const url = await google.createAuthorizationURL(state, codeVerifier);
 	redirect(302, url.toString());
 }
