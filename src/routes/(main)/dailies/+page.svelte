@@ -1,11 +1,6 @@
-<svelte:head>
-	<title>Dailies</title>
-	<meta name="dailies" content="View and manage recurring workouts" />
-</svelte:head>
-
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { type Workout } from '$lib/db/workoutsTables';
+	import { type Workout } from '$lib/drizzleTables.ts';
 	import { LinkedList } from '$lib/utils/types';
 	import DailyCard from './DailyCard.svelte';
 
@@ -32,6 +27,11 @@
 		dailies.add(generateDaily(i));
 	}
 </script>
+
+<svelte:head>
+	<title>Dailies</title>
+	<meta name="dailies" content="View and manage recurring workouts" />
+</svelte:head>
 
 <div class="header">
 	<h1 style={'color:' + color}>Dailies</h1>

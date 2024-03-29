@@ -1,33 +1,31 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
 import wretch from 'wretch';
-import type { User } from './drizzleTables';
+import type { User } from '../drizzleTables';
 import type { GoogleResponse } from './lucia';
 
 export function getAuthVariables({ url, cookies }: RequestEvent) {
 	const variables = {
 		state: url.searchParams.get('state'),
-		storedState: cookies.get('google_oauth_state'),
+		stateCookie: cookies.get('google_oauth_state'),
 		codeVerifier: url.searchParams.get('code'),
-		storedCodeVerifier: cookies.get('code_verifier')
+		codeVerifierCookie: cookies.get('code_verifier')
 	};
 
 	const aVariableIsNull = Object.values(variables).some((variable) => variable === null);
 	const urlMatchesCookies =
-		variables.state === variables.storedState &&
-		variables.codeVerifier === variables.storedCodeVerifier;
+		variables.state === variables.stateCookie &&
+		variables.codeVerifier === variables.codeVerifierCookie;
 
 	if (aVariableIsNull || !urlMatchesCookies) {
-		console.log('Variable is null or URL does not match variables', variables);
-		return new Response(null, {
-			status: 400
-		});
+		console.log('Atleast one ariable is null or URL does not match variables', variables);
+		return null;
 	}
 	return variables as { [T in keyof typeof variables]: NonNullable<(typeof variables)[T]> };
 }
 
 export async function getGoogleUser(accessToken: string) {
-	const googleResponse = (await wretch('https://www.googleapis.com/auth/userinfo.email', {
+	const googleResponse = (await wretch('https://openidconnect.googleapis.com/v1/userinfo', {
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
 			'User-Agent': 'request'

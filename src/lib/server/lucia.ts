@@ -3,7 +3,7 @@ import { GOOGLE_ID, GOOGLE_SECRET } from '$env/static/private';
 import { D1Adapter } from '@lucia-auth/adapter-sqlite';
 import { Google } from 'arctic';
 import { Lucia } from 'lucia';
-import * as schema from './drizzleTables';
+import * as schema from '../drizzleTables';
 
 export function instantiateLucia(DB: D1Database) {
 	const luciaAdapter = new D1Adapter(DB, {

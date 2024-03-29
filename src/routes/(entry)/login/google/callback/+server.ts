@@ -1,5 +1,5 @@
+import * as schema from '$lib/drizzleTables';
 import { getAuthVariables, getGoogleUser } from '$lib/server/auth';
-import * as schema from '$lib/server/drizzleTables.ts';
 import { google } from '$lib/server/lucia';
 import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -8,7 +8,7 @@ import { generateId } from 'lucia';
 
 export async function GET(event: RequestEvent): Promise<Response> {
 	const authVariables = getAuthVariables(event);
-	if (authVariables instanceof Response) return authVariables;
+	if (authVariables === null) return new Response(null, { status: 400 });
 
 	const tokens = await google.validateAuthorizationCode(
 		authVariables.state,

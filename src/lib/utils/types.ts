@@ -101,3 +101,9 @@ export interface GoogleResponse {
 	email_verified: boolean;
 	locale: string;
 }
+
+export const locations: { label: string; value: string }[] = [
+	{ label: 'West End', value: 'WEST_END' },
+	{ label: 'Albion', value: 'ALBION' },
+	{ label: 'Remote', value: 'REMOTE' }
+];

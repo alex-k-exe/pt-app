@@ -1,11 +1,11 @@
 <script lang="ts">
-	import MonthGrid from '$lib/components/calendar/MonthGrid.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { getDaysForCalendar } from '$lib/utils/dates';
 	import dayjs from 'dayjs';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import MonthGrid from './MonthGrid.svelte';
 
 	const viewOptions = {
 		week: 'Week',

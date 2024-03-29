@@ -3,7 +3,7 @@ import { Lucia, Session, User } from 'lucia';
 declare global {
 	namespace App {
 		interface Locals {
-			DB: import('drizzle-orm/d1').DrizzleD1Database<typeof import('$lib/server/drizzleTables.ts')>;
+			DB: import('drizzle-orm/d1').DrizzleD1Database<typeof import('$lib/drizzleTables')>;
 			user: User | null;
 			session: Session | null;
 			lucia: Lucia;

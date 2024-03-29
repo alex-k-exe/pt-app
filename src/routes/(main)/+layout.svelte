@@ -11,14 +11,14 @@
 </script>
 
 <div class="container">
-	<nav class="hidden md:flex">
+	<nav class="top-0 hidden bg-background md:flex">
 		<enhanced:img src="$lib/assets/logo.png" alt="App logo" style="width: 50px" />
 		{#each urls as { name }}
 			<a href={'/' + name.toLowerCase()}>{name}</a>
 		{/each}
 	</nav>
 	<slot />
-	<nav class="flex md:hidden">
+	<nav class="bottom-0 flex bg-background md:hidden">
 		{#each urls as { name, icon }}
 			<a href={'/' + name.toLowerCase()}>
 				<svelte:component this={icon} />
@@ -39,5 +39,7 @@
 		justify-content: space-evenly;
 		align-items: center;
 		height: 15vh;
+		position: sticky;
+		padding: 10px 0px 10px 0px;
 	}
 </style>
