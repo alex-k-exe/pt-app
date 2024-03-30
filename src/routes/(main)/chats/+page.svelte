@@ -1,4 +1,7 @@
 <script>
+	import { Button } from '$lib/components/ui/button/index.ts';
+	import { Input } from '$lib/components/ui/input/index.ts';
+	import { Send } from 'lucide-svelte';
 	import ChatList from './ChatList.svelte';
 </script>
 
@@ -11,14 +14,17 @@
 	<div class="chatList"><ChatList chats={[]} /></div>
 	<div class="chatHeader">chatHeader</div>
 	<div class="messageList">messageList</div>
-	<div class="messageBox">messageBox</div>
+	<div class="messageBox">
+		<Input placeholder="Type a message" />
+		<Button variant="outline" size="icon">
+			<Send />
+		</Button>
+	</div>
 </div>
 
 <style>
 	.chats {
-		max-width: 100%;
 		display: grid;
-		border-color: black;
 		grid-template-columns: 1fr 3fr;
 		grid-template-rows: 2fr 5fr 1fr;
 		overflow-y: scroll;
@@ -32,5 +38,9 @@
 	.chatHeader {
 		grid-column: 2;
 		grid-row: 0;
+	}
+
+	.messageBox {
+		display: flex;
 	}
 </style>

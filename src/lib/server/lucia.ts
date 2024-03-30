@@ -29,17 +29,6 @@ export const google = new Google(
 		: 'https://pt-app.pages.dev/login/google/callback'
 );
 
-export interface GoogleResponse {
-	sub: string;
-	name: string;
-	given_name: string;
-	family_name: string;
-	picture: string;
-	email: string;
-	email_verified: boolean;
-	locale: string;
-}
-
 declare module 'lucia' {
 	interface Register {
 		Lucia: Lucia<Record<never, never>, schema.User>;

@@ -1,13 +1,12 @@
 import * as schema from '$lib/drizzleTables';
 import { getAuthVariables, getGoogleUser } from '$lib/server/auth';
 import { google } from '$lib/server/lucia';
-import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import { generateId } from 'lucia';
 
-export async function GET(event: RequestEvent): Promise<Response> {
-	const authVariables = getAuthVariables(event);
+export async function GET({ url, cookies, platform, locals }): Promise<Response> {
+	const authVariables = getAuthVariables(url, cookies);
 	if (authVariables === null) return new Response(null, { status: 400 });
 
 	const tokens = await google.validateAuthorizationCode(
@@ -15,9 +14,10 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		authVariables.codeVerifier
 	);
 	const googleUser = await getGoogleUser(tokens.accessToken);
+	googleUser.refreshToken = tokens.refreshToken ?? '';
 
-	if (!event.platform?.env.DB) throw new Error('DB is undefined');
-	const db = drizzle(event.platform?.env.DB, { schema });
+	if (!platform?.env.DB) throw new Error('DB is undefined');
+	const db = drizzle(platform?.env.DB, { schema });
 
 	let dbUser = (
 		await db.select().from(schema.users).where(eq(schema.users.email, googleUser.email))
@@ -27,12 +27,15 @@ export async function GET(event: RequestEvent): Promise<Response> {
 		googleUser.id = generateId(15);
 		dbUser = (await db.insert(schema.users).values(googleUser).returning())[0];
 	}
-	const session = await event.locals.lucia.createSession(dbUser.id, {});
-	const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
-	event.cookies.set(sessionCookie.name, sessionCookie.value, {
+	const session = await locals.lucia.createSession(dbUser.id, {});
+	const sessionCookie = locals.lucia.createSessionCookie(session.id);
+	cookies.set(sessionCookie.name, sessionCookie.value, {
 		path: '.',
 		...sessionCookie.attributes
 	});
+	locals.user = dbUser;
+	locals.session = session;
+
 	return new Response(null, {
 		status: 302,
 		headers: {

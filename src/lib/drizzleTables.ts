@@ -5,11 +5,12 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 export const users = sqliteTable('users', {
 	id: text('id').primaryKey(),
 	email: text('email').notNull().unique(),
-	name: text('name').notNull()
+	name: text('name').notNull(),
+	refreshToken: text('refreshToken').unique()
 });
 export type User = typeof users.$inferSelect;
 
-export const sessions = sqliteTable('session', {
+export const sessions = sqliteTable('sessions', {
 	id: text('id').notNull().primaryKey(),
 	userId: text('userId')
 		.notNull()
@@ -78,9 +79,7 @@ export const workouts = sqliteTable('workouts', {
 	startTimeDate: text('startTimeDate'),
 	endTimeDate: text('endTimeDate'),
 	recurringDays: text('recurringDays'),
-	location: text('location'),
-	remindMinsClient: integer('remindMinsClient'),
-	remindMinsTrainer: integer('remindMinsTrainer')
+	location: text('location')
 });
 export type Workout = typeof workouts.$inferSelect;
 
@@ -93,16 +92,16 @@ export const series = sqliteTable('series', {
 });
 export type Series = typeof series.$inferSelect;
 
-export const sets = sqliteTable('sets', {
+export const exercises = sqliteTable('exercises', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 	workoutId: text('id')
 		.references(() => workouts.id)
 		.notNull(),
 	seriesId: integer('seriesId').notNull(),
-	exerciseName: text('exerciseName').notNull(),
+	name: text('name').notNull(),
 	reps: text('reps'),
 	weight: text('weight'),
 	duration: text('duration'),
 	rpe: text('rpe')
 });
-export type Set = typeof series.$inferSelect;
+export type Exercise = typeof exercises.$inferSelect;

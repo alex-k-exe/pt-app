@@ -1,21 +1,17 @@
-import type { RequestEvent } from '@sveltejs/kit';
+import type { Cookies } from '@sveltejs/kit';
 import { OAuth2RequestError } from 'arctic';
 import wretch from 'wretch';
 import type { User } from '../drizzleTables';
-import type { GoogleResponse } from './lucia';
 
-export function getAuthVariables({ url, cookies }: RequestEvent) {
+export function getAuthVariables(url: URL, cookies: Cookies) {
 	const variables = {
 		state: url.searchParams.get('state'),
 		stateCookie: cookies.get('google_oauth_state'),
-		codeVerifier: url.searchParams.get('code'),
-		codeVerifierCookie: cookies.get('code_verifier')
+		codeVerifier: url.searchParams.get('code')
 	};
 
 	const aVariableIsNull = Object.values(variables).some((variable) => variable === null);
-	const urlMatchesCookies =
-		variables.state === variables.stateCookie &&
-		variables.codeVerifier === variables.codeVerifierCookie;
+	const urlMatchesCookies = variables.state === variables.stateCookie;
 
 	if (aVariableIsNull || !urlMatchesCookies) {
 		console.log('Atleast one ariable is null or URL does not match variables', variables);
@@ -25,7 +21,7 @@ export function getAuthVariables({ url, cookies }: RequestEvent) {
 }
 
 export async function getGoogleUser(accessToken: string) {
-	const googleResponse = (await wretch('https://openidconnect.googleapis.com/v1/userinfo', {
+	const googleResponse = (await wretch('https://www.googleapis.com/auth/userinfo.profile', {
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
 			'User-Agent': 'request'
@@ -47,6 +43,17 @@ export async function getGoogleUser(accessToken: string) {
 	return {
 		id: '',
 		email: googleResponse.email,
-		name: googleResponse.name
+		name: googleResponse.name,
+		refreshToken: ''
 	} satisfies User;
+}
+
+export interface GoogleResponse {
+	username: string;
+	email: string;
+	name: string;
+	firstname: string;
+	lastname: string;
+	avatar: unknown;
+	email_verified: number;
 }

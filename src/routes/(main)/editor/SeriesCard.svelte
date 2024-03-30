@@ -2,23 +2,35 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import type { Exercise } from '$lib/drizzleTables';
+	import ExerciseComponent from './ExerciseComponent.svelte';
+
+	export let name: string;
+	export let exercises: Exercise[];
+
+	const exampleExercise: Exercise = {
+		id: 2,
+		name: 'Run',
+		workoutId: 'string',
+		seriesId: 3,
+		reps: 'A lot',
+		weight: null,
+		duration: 'string',
+		rpe: 'Among us'
+	};
 </script>
 
 <Card.Root class="w-fit">
 	<Card.Header>
-		<Card.Title class="flex w-fit items-center">Series <Input placeholder="Name" /></Card.Title>
+		<Card.Title class="flex w-fit items-center">Series {name}</Card.Title>
 		<Card.Description class="flex w-fit items-center"
 			>Repeat <Input placeholder="n" /> times
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<div class="grid w-full items-center gap-4">
-			<div class="flex flex-col space-y-1.5">
-				<Label for="name">Name</Label>
-				<Input id="name" placeholder="Name of your project" />
-			</div>
-		</div>
+		{#each exercises as exercise}
+			<ExerciseComponent {exercise} comparisonExercise={exampleExercise} />
+		{/each}
 	</Card.Content>
 	<Card.Footer class="flex justify-between">
 		<Button variant="outline">Cancel</Button>

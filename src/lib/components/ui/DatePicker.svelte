@@ -4,6 +4,7 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { cn } from '$lib/utils/shadcn';
 	import { DateFormatter, getLocalTimeZone, type DateValue } from '@internationalized/date';
+	import dayjs from 'dayjs';
 	import { CalendarDays } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
 
@@ -14,7 +15,7 @@
 	let value: DateValue | undefined = undefined;
 	const dispatch = createEventDispatcher();
 	$: {
-		dispatch('dateSelected', value);
+		dispatch('dateSelected', dayjs(value?.toString()));
 	}
 </script>
 

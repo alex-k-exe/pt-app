@@ -8,6 +8,7 @@
 // 	// TODO: add URL parameter to /login for the page they were trying to visit
 // 	if (!sessionId) throw redirect(302, '/login');
 
+// // TODO: is this part needed?
 // 	const { session, user } = await lucia.validateSession(sessionId);
 // 	const sessionCookie = session
 // 		? lucia.createSessionCookie(session.id)
