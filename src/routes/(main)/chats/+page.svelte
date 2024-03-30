@@ -1,8 +1,10 @@
-<script>
+<script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import { Send } from 'lucide-svelte';
 	import ChatList from './ChatList.svelte';
+
+	export let data;
 </script>
 
 <svelte:head>

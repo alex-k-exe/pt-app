@@ -20,6 +20,9 @@ dependencies:
   '@sveltejs/enhanced-img':
     specifier: ^0.1.9
     version: 0.1.9(svelte@4.2.12)
+  '@tanstack/svelte-query':
+    specifier: ^5.28.9
+    version: 5.28.9(svelte@4.2.12)
   arctic:
     specifier: ^1.5.0
     version: 1.5.0
@@ -2320,6 +2323,19 @@ packages:
     resolution: {integrity: sha512-aYX01Ke9hunpoCexYAgQucEpARGQ5w/cqHFrIR+e9gdKb1QWTsVJuTJ2ozQzIAxLyRQe/m+2RqzkyOOGiMKRQA==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@tanstack/query-core@5.28.9:
+    resolution: {integrity: sha512-hNlfCiqZevr3GRVPXS3MhaGW5hjcxvCsIQ4q6ff7EPlvFwYZaS+0d9EIIgofnegDaU2BbCDlyURoYfRl5rmzow==}
+    dev: false
+
+  /@tanstack/svelte-query@5.28.9(svelte@4.2.12):
+    resolution: {integrity: sha512-vz0k5wZyRp7jXtwc+asonp2eDq9k/RkyfqQfh+efHSvl462KA63URae2E1aEAQNycAIUKwaac/J6qyLJvcOy9Q==}
+    peerDependencies:
+      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
+    dependencies:
+      '@tanstack/query-core': 5.28.9
+      svelte: 4.2.12
     dev: false
 
   /@tybys/wasm-util@0.8.1:
