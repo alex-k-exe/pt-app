@@ -2,28 +2,27 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.ts';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
+	import { dayOnlyFormat } from '$lib/utils/types/other.js';
 	import dayjs from 'dayjs';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	export let data;
-	let newDate = dayjs(data.date);
+	const date = data.date;
+	const workouts = data.workouts;
 </script>
 
-{newDate.format('D MMMM YYYY')}
+{date.format('D MMMM YYYY')}
 
 <Button>
-	<a href={`/editor/workout?date="${newDate.format('DD-MM-YYYY')}"`}>Make a new workout</a>
+	<a href={`/editor/workout?date="${date.format(dayOnlyFormat)}"`}>Make a new workout</a>
 </Button>
 
 <div class="workouts">
-	{#each data.workouts as workout (workout.id)}
+	{#each workouts as workout (workout.id)}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title
-					>{dayjs(workout.startTimeDate).format('h:ma') +
-						' to ' +
-						dayjs(workout.endTimeDate).format('h:ma') +
-						'\n'}
+					>{date.format('h:ma') + ' to ' + dayjs(workout.date).format('h:ma') + '\n'}
 				</Card.Title>
 				<Card.Description>{workout.clientName + ' - ' + workout.title}</Card.Description>
 			</Card.Header>
@@ -37,7 +36,7 @@
 	{/each}
 </div>
 
-<Pagination.Root {data.} {perPage} {siblingCount} let:pages let:currentPage>
+<Pagination.Root count={workouts.length} perPage={10} let:pages let:currentPage>
 	<Pagination.Content>
 		<Pagination.Item>
 			<Pagination.PrevButton>
@@ -61,7 +60,7 @@
 		<Pagination.Item>
 			<Pagination.NextButton>
 				<span class="hidden sm:block">Next</span>
-				<ChevronRight class="h-4 w-4" />
+				<ChevronRight />
 			</Pagination.NextButton>
 		</Pagination.Item>
 	</Pagination.Content>

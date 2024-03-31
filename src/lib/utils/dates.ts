@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
+import { dayOnlyFormat } from './types/other';
 
 /**
  * Generates a matrix of Dayjs objects representing the days of a given month, plus the days before and after to fill the grid.
@@ -29,6 +30,6 @@ export function datesAreSameDay(...dates: (dayjs.Dayjs | string)[]) {
 		date = date instanceof dayjs.Dayjs ? date : dayjs(date);
 		let previousDate = dates[i - 1];
 		previousDate = previousDate instanceof dayjs.Dayjs ? previousDate : dayjs(previousDate);
-		return date.format('DD-MM-YYYY') === previousDate.format('DD-MM-YYYY');
+		return date.format(dayOnlyFormat) === previousDate.format(dayOnlyFormat);
 	});
 }

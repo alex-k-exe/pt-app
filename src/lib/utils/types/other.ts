@@ -1,3 +1,5 @@
+import type { ActivityInsert, Series, Set } from '$lib/drizzleTables';
+
 export interface GoogleResponse {
 	sub: string;
 	name: string;
@@ -19,3 +21,8 @@ export const UserType = {
 	CLIENT: 'CLIENT',
 	TRAINER: 'TRAINER'
 } as const;
+
+export const dayOnlyFormat = 'DD-MM-YYYY';
+
+export type SeriesWithSets = Series & { sets?: Set[] };
+export type WorkoutWithSeries = ActivityInsert & { series?: SeriesWithSets[]; sets?: Set[] };

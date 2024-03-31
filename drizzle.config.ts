@@ -2,7 +2,7 @@ import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
 	out: './drizzle',
-	schema: './src/lib/server/drizzleTables.ts',
+	schema: './src/lib/drizzleTables.ts',
 	driver: 'd1',
 	dbCredentials: {
 		wranglerConfigPath: './wrangler.toml',

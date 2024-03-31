@@ -7,19 +7,16 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { numberToLetter } from '$lib/utils/other';
 	import { locations } from '$lib/utils/types/other';
-	import { dndzone } from 'svelte-dnd-action';
+	import { dndzone, type DndEvent } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import SeriesCard from '../SeriesCard.svelte.js';
 
-	export let data../$types.js;
+	export let data;
+	const workout = data.workout;
 
 	const flipDurationMs = 300;
-	function handleDndChange(e: any) {
-		items = e.detail.items;
-	}
-	function handleAddElement(name: string) {
-		items = [...items, { id: items[items.length - 1].id + 1, name: name }];
-		console.log('items', items);
+	function handleDndChange(e: CustomEvent<DndEvent>) {
+		workout.series = e.detail.items as SeriesWithSets[];
 	}
 </script>
 
@@ -56,17 +53,10 @@
 			<Button variant="outline" on:click={() => handleAddElement('Series')}
 				>Add another Series</Button
 			>
-			<Button variant="outline" on:click={() => handleAddElement('Exercise')}
-				>Add another Exercise</Button
-			>
+			<Button variant="outline">Add another Exercise</Button>
 		</div>
-		<div
-			class="createdWorkout"
-			use:dndzone={{ items, flipDurationMs }}
-			on:consider={handleDndChange}
-			on:finalize={handleDndChange}
-		>
-			{#each items as item, i (item.id)}
+		<div class="createdWorkout" use:dndzone={{ items: workout.series ?? [], flipDurationMs }}>
+			{#each workout.series ?? [] as item, i (item.id)}
 				<div animate:flip={{ duration: flipDurationMs }}>
 					<SeriesCard exercises={[]} name={numberToLetter(i + 1)} />
 				</div>
@@ -76,7 +66,7 @@
 </form>
 
 <style>
-	.date-time-picker {
+	.dateTimePicker {
 		width: fit-content;
 		display: inline-flex;
 		column-gap: 5px;
