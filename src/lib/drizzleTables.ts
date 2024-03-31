@@ -1,7 +1,7 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 // Drizzle ensures type safety in the queried data from the DB
-// The 9 tables defined with sqliteTable() are converted to SQL code by drizzle-kit in the CLI
+// The tables defined here are converted to SQL code by drizzle-kit in the CLI
 export const users = sqliteTable('users', {
 	id: text('id').primaryKey(),
 	email: text('email').notNull().unique(),
@@ -66,8 +66,8 @@ export const signupTokens = sqliteTable('signupTokens', {
 });
 export type SignupToken = typeof messages.$inferSelect;
 
-export const workouts = sqliteTable('workouts', {
-	id: text('id').primaryKey(),
+export const activities = sqliteTable('activities', {
+	id: integer('id').primaryKey(),
 	clientId: text('clientId')
 		.notNull()
 		.references(() => clients.id),
@@ -76,26 +76,41 @@ export const workouts = sqliteTable('workouts', {
 		.references(() => trainers.id),
 	title: text('name'),
 	notes: text('notes'),
-	startTimeDate: text('startTimeDate'),
-	endTimeDate: text('endTimeDate'),
-	recurringDays: text('recurringDays'),
-	location: text('location')
+	location: text('location'),
+	startTimeDate: text('startTimeDate').notNull(),
+	endTimeDate: text('endTimeDate').notNull()
 });
-export type Workout = typeof workouts.$inferSelect;
+export type Activity = typeof activities.$inferSelect;
+
+export const dailies = sqliteTable('dailies', {
+	activityId: integer('activityId')
+		.references(() => activities.id)
+		.primaryKey(),
+	// 7 digit binary string indicating which days the daily is on
+	recurringDays: text('recurringDays').notNull()
+});
+export type Daily = typeof dailies.$inferSelect;
+
+export const workouts = sqliteTable('workouts', {
+	activityId: integer('activityId')
+		.references(() => activities.id)
+		.primaryKey()
+});
+export type Workout = typeof activities.$inferSelect;
 
 export const series = sqliteTable('series', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 	workoutId: text('workoutId')
-		.references(() => workouts.id)
+		.references(() => activities.id)
 		.notNull(),
 	reps: integer('reps').notNull()
 });
 export type Series = typeof series.$inferSelect;
 
-export const exercises = sqliteTable('exercises', {
+export const sets = sqliteTable('sets', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 	workoutId: text('id')
-		.references(() => workouts.id)
+		.references(() => activities.id)
 		.notNull(),
 	seriesId: integer('seriesId').notNull(),
 	name: text('name').notNull(),
@@ -104,4 +119,4 @@ export const exercises = sqliteTable('exercises', {
 	duration: text('duration'),
 	rpe: text('rpe')
 });
-export type Exercise = typeof exercises.$inferSelect;
+export type Set = typeof sets.$inferSelect;

@@ -2,13 +2,13 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Input } from '$lib/components/ui/input';
-	import type { Exercise } from '$lib/drizzleTables';
+	import type { Set } from '$lib/drizzleTables';
 	import ExerciseComponent from './ExerciseComponent.svelte';
 
 	export let name: string;
-	export let exercises: Exercise[];
+	export let exercises: Set[];
 
-	const exampleExercise: Exercise = {
+	const exampleSet: Set = {
 		id: 2,
 		name: 'Run',
 		workoutId: 'string',
@@ -29,7 +29,7 @@
 	</Card.Header>
 	<Card.Content>
 		{#each exercises as exercise}
-			<ExerciseComponent {exercise} comparisonExercise={exampleExercise} />
+			<ExerciseComponent {exercise} comparisonExercise={exampleSet} />
 		{/each}
 	</Card.Content>
 	<Card.Footer class="flex justify-between">

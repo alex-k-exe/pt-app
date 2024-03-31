@@ -1,45 +1,47 @@
-import * as schema from '$lib/drizzleTables';
+import { activities, users, workouts } from '$lib/drizzleTables';
+import { initDrizzle } from '$lib/server/utils';
+import { datesAreSameDay } from '$lib/utils/dates.js';
 import dayjs from 'dayjs';
-import { and, eq, or } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/d1';
+import { eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform, url }) {
 	const date = dayjs(url.searchParams.get('date'), 'DD-MM-YYYY');
 
-	if (!platform?.env.DB) throw new Error('Database is undefined');
-	const db = drizzle(platform?.env.DB);
+	const db = initDrizzle(platform);
 
-	const workouts = await db
+	let foundWorkouts = await db
 		.select()
-		.from(schema.workouts)
+		.from(activities)
+		.leftJoin(workouts, eq(activities.id, workouts.activityId))
 		.where(
-			and(
-				or(
-					eq(schema.workouts.clientId, locals.user?.id ?? ''),
-					eq(schema.workouts.trainerId, locals.user?.id ?? '')
-				),
-				eq(schema.workouts.startTimeDate, date.toString())
-				// TODO: exclude workouts that are actually dailies
+			or(
+				eq(activities.clientId, locals.user?.id ?? ''),
+				eq(activities.trainerId, locals.user?.id ?? '')
 			)
-		);
+		)
+		.orderBy(activities.startTimeDate);
+	foundWorkouts = foundWorkouts.filter(({ activities: workout }) =>
+		datesAreSameDay(workout.startTimeDate, date)
+	);
 
-	const workoutsWithClientNames = await Promise.all(
-		workouts.map(async (workout) => {
+	const combinedDetails = await Promise.all(
+		foundWorkouts.map(async ({ activities }) => {
 			const clientName = (
 				await db
-					.select({ name: schema.users.name })
-					.from(schema.users)
-					.where(eq(schema.users.id, workout.clientId))
+					.select({ name: users.name })
+					.from(users)
+					.limit(1)
+					.where(eq(users.id, activities.clientId))
 			)[0].name;
 
 			return {
-				workout: workout,
+				...activities,
 				clientName: clientName
 			};
 		})
 	);
+
 	return {
-		date: date.toString(),
-		workouts: workoutsWithClientNames
+		workouts: combinedDetails
 	};
 }

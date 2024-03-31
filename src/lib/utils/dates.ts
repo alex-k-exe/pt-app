@@ -23,3 +23,12 @@ export function getDaysForCalendar(month: number): Dayjs[][] {
 		});
 	});
 }
+
+export function datesAreSameDay(...dates: (dayjs.Dayjs | string)[]) {
+	return dates.slice(1).every((date, i) => {
+		date = date instanceof dayjs.Dayjs ? date : dayjs(date);
+		let previousDate = dates[i - 1];
+		previousDate = previousDate instanceof dayjs.Dayjs ? previousDate : dayjs(previousDate);
+		return date.format('DD-MM-YYYY') === previousDate.format('DD-MM-YYYY');
+	});
+}

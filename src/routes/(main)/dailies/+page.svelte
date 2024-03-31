@@ -1,30 +1,15 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { type Workout } from '$lib/drizzleTables.ts';
-	import { LinkedList } from '$lib/utils/types';
+	import { type Daily } from '$lib/drizzleTables.ts';
+	import { createExampleActivity } from '$lib/utils/other';
+	import { LinkedList } from '$lib/utils/types/linkedList';
 	import DailyCard from './DailyCard.svelte';
 
 	let color = 'black';
 
-	function generateDaily(i: number): Workout {
-		return {
-			id: i.toString(),
-			clientId: '283283',
-			trainerId: '932302',
-			title: 'Running',
-			startTimeDate: null,
-			endTimeDate: null,
-			location: 'West End',
-			remindMinsClient: null,
-			remindMinsTrainer: null,
-			notes: null,
-			recurringDays: '0100110'
-		};
-	}
-
-	let dailies = new LinkedList<Workout>();
+	let dailies = new LinkedList<Daily>();
 	for (let i of [0, 1, 2, 3, 4]) {
-		dailies.add(generateDaily(i));
+		dailies.add(createExampleActivity());
 	}
 </script>
 

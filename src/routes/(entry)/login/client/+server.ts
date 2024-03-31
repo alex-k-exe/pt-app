@@ -1,4 +1,5 @@
 import * as schema from '$lib/drizzleTables';
+import { UserType } from '$lib/utils/types/other';
 import { drizzle } from 'drizzle-orm/d1';
 import { generateId } from 'lucia';
 
@@ -31,6 +32,7 @@ export async function GET({ cookies, platform, locals }) {
 	});
 	locals.user = client;
 	locals.session = session;
+	locals.userType = UserType.CLIENT;
 
 	return new Response(null, {
 		status: 302,

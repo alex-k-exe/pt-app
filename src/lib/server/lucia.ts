@@ -5,7 +5,7 @@ import { Google } from 'arctic';
 import { Lucia } from 'lucia';
 import * as schema from '../drizzleTables';
 
-export function instantiateLucia(DB: D1Database) {
+export function initLucia(DB: D1Database) {
 	const luciaAdapter = new D1Adapter(DB, {
 		user: 'users',
 		session: 'sessions'

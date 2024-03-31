@@ -1,3 +1,5 @@
+import type { Workout } from '$lib/drizzleTables';
+
 /**
  * Convert a number to its representation as an upper-case letter
  * @param n Number, converted to absolute value and floored
@@ -9,4 +11,15 @@ export function numberToLetter(n: number) {
 	if (n > 26) return 'Z';
 	// 64 is the ASCII value of 'A' minus 1
 	return String.fromCharCode(n + 64);
+}
+
+export function createExampleActivity(): Workout {
+	return {
+		id: Math.floor(Math.random()) * 1000,
+		clientId: '283283',
+		trainerId: '932302',
+		title: 'Running',
+		location: 'West End',
+		notes: null
+	};
 }
