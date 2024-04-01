@@ -5,8 +5,9 @@ import { Google } from 'arctic';
 import { Lucia } from 'lucia';
 import * as schema from '../drizzleTables';
 
-export function initLucia(DB: D1Database) {
-	const luciaAdapter = new D1Adapter(DB, {
+export function initLucia(platform: App.Platform | undefined) {
+	if (!platform?.env.DB) throw new Error('Database is undefined');
+	const luciaAdapter = new D1Adapter(platform.env.DB, {
 		user: 'users',
 		session: 'sessions'
 	});

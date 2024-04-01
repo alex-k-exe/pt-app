@@ -97,6 +97,7 @@ export const workouts = sqliteTable('workouts', {
 	activityId: integer('activityId')
 		.references(() => activities.id)
 		.primaryKey()
+		.notNull()
 });
 export type Workout = typeof workouts.$inferSelect;
 

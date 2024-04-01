@@ -3,8 +3,7 @@ import { redirect, type Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	// setup Lucia client with D1 database
-	if (!event.platform?.env.DB) throw new Error('Database is undefined');
-	const lucia = initLucia(event.platform?.env.DB);
+	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
 
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
