@@ -3,6 +3,7 @@
 	import type { User } from '$lib/drizzleTables';
 	import { createRender, createTable, Render, Subscribe } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
+	import RemoveClientAction from './RemoveClientAction.svelte';
 	import TransferClientAction from './TransferClientAction.svelte';
 
 	export let clients: User[];
@@ -17,13 +18,16 @@
 		}),
 		table.column({
 			accessor: ({ id }) => id,
-			header: 'Remove'
+			header: 'Remove',
+			cell: ({ value }) => {
+				return createRender(RemoveClientAction, { clientId: value });
+			}
 		}),
 		table.column({
 			accessor: ({ id }) => id,
 			header: 'Transfer to another trainer',
-			cell: ({ value }) => {
-				return createRender(TransferClientAction, { id: value });
+			cell: () => {
+				return createRender(TransferClientAction, { trainers });
 			}
 		})
 	]);

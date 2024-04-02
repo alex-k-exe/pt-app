@@ -1,6 +1,6 @@
 import { clients, trainers, users, type User } from '$lib/drizzleTables.ts';
 import { initDrizzle } from '$lib/server/utils';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 export async function load({ platform, locals }) {
@@ -28,8 +28,25 @@ export async function load({ platform, locals }) {
 }
 
 export const actions = {
-	// Delete Transfer Invite
-	delete: async ({ platform }) => {
-		await initDrizzle(platform).delete(users);
+	delete: async ({ platform, request }) => {
+		const data = await request.formData();
+		const clientId = data.get('clientId')?.toString();
+		if (!clientId) return fail(500, { formData: data });
+
+		const db = initDrizzle(platform);
+		db.delete(users).where(eq(users.id, clientId));
+		await db.delete(clients).where(eq(clients.id, clientId));
+	},
+
+	transfer: async ({ platform, request }) => {
+		const data = await request.formData();
+		const trainerId = data.get('trainerId')?.toString();
+		const clientId = data.get('clientId')?.toString();
+		if (!trainerId || !clientId) return fail(500, { formData: data });
+
+		const db = initDrizzle(platform);
+		db.update(clients).set({ trainerId: trainerId }).where(eq(clients.id, clientId));
 	}
+
+	// TODO: implement invite action
 };

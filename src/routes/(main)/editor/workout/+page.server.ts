@@ -93,7 +93,7 @@ export const actions = {
 		if (!('valid' in form) || !form.data.id) return form;
 
 		const db = initDrizzle(event.platform);
-		await db.insert(activities).values(form.data);
+		db.insert(activities).values(form.data);
 		await db.insert(workouts).values({ activityId: form.data.id });
 	},
 
@@ -110,7 +110,7 @@ export const actions = {
 		if (!('valid' in form) || !form.data.id) return form;
 
 		const db = initDrizzle(event.platform);
-		await db.delete(activities).where(eq(activities.id, form.data.id));
+		db.delete(activities).where(eq(activities.id, form.data.id));
 		await db.delete(workouts).where(eq(workouts.activityId, form.data.id));
 	}
 };
