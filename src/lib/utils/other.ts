@@ -1,5 +1,3 @@
-import type { Workout } from '$lib/drizzleTables';
-
 /**
  * Convert a number to its representation as an upper-case letter
  * @param n Number, converted to absolute value and floored
@@ -13,13 +11,7 @@ export function numberToLetter(n: number) {
 	return String.fromCharCode(n + 64);
 }
 
-export function createExampleActivity(): Workout {
-	return {
-		id: Math.floor(Math.random()) * 1000,
-		clientId: '283283',
-		trainerId: '932302',
-		title: 'Running',
-		location: 'West End',
-		notes: null
-	};
-}
+export const validEmail = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+// require passwords to have one uppercase letter, one digit, and one special character
+export const validPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+export const validSignupToken = /^[a-zA-Z0-9]{6}$/;

@@ -1,12 +1,12 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 // Drizzle ensures type safety in the queried data from the DB
-// The tables defined here are converted to SQL code by drizzle-kit in the CLI
+// The tables defined here are converted to SQL code by calling pnpm generate
 export const users = sqliteTable('users', {
 	id: text('id').primaryKey(),
 	email: text('email').notNull().unique(),
-	name: text('name').notNull(),
-	refreshToken: text('refreshToken').unique()
+	password: text('password').notNull(),
+	name: text('name').notNull()
 });
 export type User = typeof users.$inferSelect;
 

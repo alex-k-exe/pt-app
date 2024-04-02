@@ -13,4 +13,5 @@
 
 <div class="container mx-auto py-10">
 	<ClientsTable clients={data.clients} trainers={data.trainers} />
+	<!-- generateId(6) for inviting client -->
 </div>

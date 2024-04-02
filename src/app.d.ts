@@ -12,8 +12,6 @@ declare global {
 		interface Platform {
 			env: {
 				DB: D1Database;
-				GOOGLE_ID: string;
-				GOOGLE_SECRET: string;
 			};
 			context: {
 				waitUntil(promise: Promise<unknown>): void;

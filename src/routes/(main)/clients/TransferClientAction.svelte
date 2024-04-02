@@ -5,10 +5,12 @@
 	import { MoveRight } from 'lucide-svelte';
 
 	export let trainers: User[];
+	export let clientId: string;
 	let selectedTrainer: User | undefined;
 </script>
 
-<div>
+<form method="POST" action="?transfer">
+	<input type="hidden" name="clientId" value={clientId} />
 	<Select.Root
 		selected={{ value: selectedTrainer?.id, label: selectedTrainer?.name }}
 		onSelectedChange={(event) =>
@@ -24,10 +26,10 @@
 				{/each}
 			</Select.Group>
 		</Select.Content>
-		<Select.Input name="location" />
+		<Select.Input name="newTrainerId" />
 	</Select.Root>
 
 	<Button variant="outline" size="icon">
 		<MoveRight />
 	</Button>
-</div>
+</form>

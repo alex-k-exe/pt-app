@@ -26,8 +26,8 @@
 		table.column({
 			accessor: ({ id }) => id,
 			header: 'Transfer to another trainer',
-			cell: () => {
-				return createRender(TransferClientAction, { trainers });
+			cell: ({ value }) => {
+				return createRender(TransferClientAction, { clientId: value, trainers });
 			}
 		})
 	]);

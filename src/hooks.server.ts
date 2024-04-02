@@ -10,7 +10,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (event.url.href.startsWith('/login')) return resolve(event);
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	// TODO: add URL parameter to /login for the page they were trying to visit
-	if (!sessionId) throw redirect(302, '/login');
+	if (!sessionId) throw redirect(302, '/login?targetHref=' + event.url.href);
 
 	const { session, user } = await lucia.validateSession(sessionId);
 	const sessionCookie = session
@@ -25,7 +25,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 
 	const clientCantVisitPage = event.url.href.startsWith('/clients');
-	if (event.locals.userType === UserType.CLIENT && clientCantVisitPage) {
+	const pageDoesntExist = event.url.href === '/';
+	if ((event.locals.userType === UserType.CLIENT && clientCantVisitPage) || pageDoesntExist) {
 		throw redirect(302, '/workouts');
 	}
 	return resolve(event);
