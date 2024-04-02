@@ -1,4 +1,5 @@
 import { initLucia } from '$lib/server/lucia';
+import { UserType } from '$lib/utils/types/other';
 import { redirect, type Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -6,6 +7,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
 
+	if (event.url.href.startsWith('/login')) return resolve(event);
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	// TODO: add URL parameter to /login for the page they were trying to visit
 	if (!sessionId) throw redirect(302, '/login');
@@ -21,5 +23,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	});
 	event.locals.user = user;
 	event.locals.session = session;
+
+	const clientCantVisitPage = event.url.href.startsWith('/clients');
+	if (event.locals.userType === UserType.CLIENT && clientCantVisitPage) {
+		throw redirect(302, '/workouts');
+	}
 	return resolve(event);
 };

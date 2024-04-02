@@ -1,5 +1,7 @@
 <script lang="ts">
 	import ClientsTable from './ClientsTable.svelte';
+
+	export let data;
 </script>
 
 <svelte:head>
@@ -10,7 +12,5 @@
 <h1>Clients</h1>
 
 <div class="container mx-auto py-10">
-	<ClientsTable />
+	<ClientsTable clients={data.clients} trainers={data.trainers} />
 </div>
-
-// TODO https://www.shadcn-svelte.com/docs/components/data-table#sorting

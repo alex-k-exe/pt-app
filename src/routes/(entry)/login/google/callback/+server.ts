@@ -1,6 +1,7 @@
 import * as schema from '$lib/drizzleTables';
 import { getAuthVariables, getGoogleUser } from '$lib/server/auth';
 import { google } from '$lib/server/lucia';
+import { UserType } from '$lib/utils/types/other.js';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import { generateId } from 'lucia';
@@ -35,6 +36,13 @@ export async function GET({ url, cookies, platform, locals }): Promise<Response>
 	});
 	locals.user = dbUser;
 	locals.session = session;
+
+	const trainer = await db
+		.select({})
+		.from(schema.trainers)
+		.limit(1)
+		.where(eq(schema.trainers.id, dbUser.id));
+	locals.userType = trainer.length > 0 ? UserType.TRAINER : UserType.CLIENT;
 
 	return new Response(null, {
 		status: 302,
