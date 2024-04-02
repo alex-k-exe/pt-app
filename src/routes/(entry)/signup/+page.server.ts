@@ -1,4 +1,4 @@
-import { signupTokens, users, type User } from '$lib/drizzleTables';
+import { clients, signupTokens, trainers, users, type User } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { validSignupToken } from '$lib/utils/other.js';
 import { fail, type ActionFailure } from '@sveltejs/kit';
@@ -49,14 +49,14 @@ export async function load({ platform, url }) {
 }
 export const actions = {
 	default: async (event) => {
-		// TODO: check if user is a trainer
 		const formData = (await validateForm(event)).data;
 		if ('form' in formData) return formData;
 		const userId = generateId(15);
 		const hashedPassword = await new Scrypt().hash(formData.user.password);
 
+		const db = initDrizzle(event.platform);
 		try {
-			await initDrizzle(event.platform).insert(users).values({
+			await db.insert(users).values({
 				id: userId,
 				email: formData.user.email,
 				password: hashedPassword,
@@ -64,6 +64,12 @@ export const actions = {
 			});
 		} catch {
 			return fail(400, { message: 'Email already used' });
+		}
+
+		if (formData.trainerId) {
+			await db.insert(clients).values({ id: userId, trainerId: formData.trainerId });
+		} else {
+			await db.insert(trainers).values({ id: userId });
 		}
 
 		const session = await event.locals.lucia.createSession(userId, {});
