@@ -10,8 +10,3 @@ export function numberToLetter(n: number) {
 	// 64 is the ASCII value of 'A' minus 1
 	return String.fromCharCode(n + 64);
 }
-
-export const validEmail = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
-// require passwords to have one uppercase letter, one digit, and one special character
-export const validPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
-export const validSignupToken = /^[a-zA-Z0-9]{6}$/;

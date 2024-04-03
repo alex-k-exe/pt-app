@@ -1,30 +1,31 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { formSchema, type FormSchema } from '../schema';
+	import { formSchema } from '../signup/[signupToken]/schema.js';
 
-	export let data: SuperValidated<Infer<FormSchema>>;
+	export let data;
 
-	const form = superForm(data, {
+	const form = superForm(data.form, {
 		validators: zodClient(formSchema)
 	});
 	const { form: formData, enhance } = form;
 </script>
 
 <form method="POST" use:enhance>
-	<Form.Field {form} name="email">
+	<input name="targetHref" type="hidden" value={data.targetHref} />
+	<Form.Field {form} name="user.email">
 		<Form.Control let:attrs>
 			<Form.Label>Email</Form.Label>
-			<Input type="email" bind:value={$formData.email} {...attrs} />
+			<Input type="email" bind:value={$formData.user.email} {...attrs} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="password">
+	<Form.Field {form} name="user.password">
 		<Form.Control let:attrs>
 			<Form.Label>Password</Form.Label>
-			<Input type="password" bind:value={$formData.email} {...attrs} />
+			<Input type="password" bind:value={$formData.user.password} {...attrs} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -33,4 +34,4 @@
 
 <!-- implement forgot password and login throttling -->
 
-<a href="/signup">Sign up instead</a>
+<a href={`/signup?targetHref=${data.targetHref}`}>Sign up instead</a>

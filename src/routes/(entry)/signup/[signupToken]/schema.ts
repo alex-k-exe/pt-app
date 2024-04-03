@@ -1,4 +1,4 @@
-import { validEmail, validPassword } from '$lib/utils/other';
+import { validEmail, validPassword } from '$lib/utils/types/other.ts';
 import { fail, type RequestEvent } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -18,7 +18,7 @@ export const formSchema = z.object({
 export type FormSchema = typeof formSchema;
 
 export async function validateForm(
-	event: RequestEvent<RouteParams, '/(entry)/signup' | '/(entry)/login'>
+	event: RequestEvent<RouteParams, '/(entry)/signup/[signupToken]'>
 ) {
 	const form = await superValidate(event, zod(formSchema));
 	if (!form.valid) return fail(400, { form });

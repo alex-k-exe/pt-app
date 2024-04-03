@@ -1,16 +1,5 @@
 import type { ActivityInsert, Series, Set } from '$lib/drizzleTables';
 
-export interface GoogleResponse {
-	sub: string;
-	name: string;
-	given_name: string;
-	family_name: string;
-	picture: string;
-	email: string;
-	email_verified: boolean;
-	locale: string;
-}
-
 export const locations: { label: string; value: string }[] = [
 	{ label: 'West End', value: 'WEST_END' },
 	{ label: 'Albion', value: 'ALBION' },
@@ -26,3 +15,8 @@ export const dayOnlyFormat = 'DD-MM-YYYY';
 
 export type SeriesWithSets = Series & { sets?: Set[] };
 export type WorkoutWithSeries = ActivityInsert & { series?: SeriesWithSets[]; sets?: Set[] };
+
+export const validEmail = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+// require passwords to have one uppercase letter, one digit, and one special character
+export const validPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+export const validSignupToken = /^[0-9]{6}$/;

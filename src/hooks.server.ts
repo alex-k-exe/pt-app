@@ -3,14 +3,16 @@ import { UserType } from '$lib/utils/types/other';
 import { redirect, type Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// setup Lucia client with D1 database
+	console.log('running hooks');
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
+	console.log('set lucia');
 
 	if (event.url.href.startsWith('/login')) return resolve(event);
+	console.log('didnt go to login');
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
-	// TODO: add URL parameter to /login for the page they were trying to visit
-	if (!sessionId) throw redirect(302, '/login?targetHref=' + event.url.href);
+	if (!sessionId) throw redirect(302, `/login?targetHref=${event.url.href}`);
+	console.log(sessionId);
 
 	const { session, user } = await lucia.validateSession(sessionId);
 	const sessionCookie = session
