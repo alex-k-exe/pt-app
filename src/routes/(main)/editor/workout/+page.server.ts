@@ -6,8 +6,8 @@ import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { formSchema } from '../schema';
 import type { RouteParams } from './$types';
-import { formSchema } from './schema';
 
 // If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
 // If User is a Trainer, find the names of their clients and attach the name of the client to the workout
@@ -39,10 +39,7 @@ export async function load({ url, locals, platform }) {
 					.where(eq(workouts.activityId, workoutId))
 			)[0].activities
 		};
-		workout.series = await db
-			.select()
-			.from(series)
-			.where(eq(series.workoutId, workoutId.toString()));
+		workout.series = await db.select().from(series).where(eq(series.workoutId, workoutId));
 		workout.series = await Promise.all(
 			workout.series.map(async (series) => {
 				return {
@@ -51,7 +48,7 @@ export async function load({ url, locals, platform }) {
 				};
 			})
 		);
-		workout.sets = await db.select().from(sets).where(eq(series.workoutId, workoutId.toString()));
+		workout.sets = await db.select().from(sets).where(eq(series.workoutId, workoutId));
 		clientOfWorkoutName = (
 			await db
 				.select({ name: users.name })
@@ -87,25 +84,23 @@ async function validateForm(event: RequestEvent<RouteParams, '/(main)/editor/wor
 }
 
 export const actions = {
-	// put fixing up the series.index things when handling the save action
-	insert: async (event) => {
+	// put fixing up the series.index things when handling the insertOrUpdate action, also assign workoutId to sets and series
+	insertOrUpdate: async (event) => {
+		console.log('insertOrUpdate');
 		const form = await validateForm(event);
-		if (!('valid' in form) || !form.data.id) return form;
+		if (!('valid' in form)) return form;
 
 		const db = initDrizzle(event.platform);
-		db.insert(activities).values(form.data);
-		await db.insert(workouts).values({ activityId: form.data.id });
-	},
-
-	update: async (event) => {
-		const form = await validateForm(event);
-		if (!('valid' in form) || !form.data.id) return form;
-
-		const db = initDrizzle(event.platform);
-		db.update(activities).set(form.data).where(eq(activities.id, form.data.id));
+		if (form.data.id) {
+			await db.update(activities).set(form.data).where(eq(activities.id, form.data.id));
+		} else {
+			const workout = (await db.insert(activities).values(form.data).returning())[0];
+			await db.insert(workouts).values({ activityId: workout.id });
+		}
 	},
 
 	delete: async (event) => {
+		console.log('delete');
 		const form = await validateForm(event);
 		if (!('valid' in form) || !form.data.id) return form;
 

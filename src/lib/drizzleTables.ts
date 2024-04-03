@@ -103,17 +103,18 @@ export type Workout = typeof workouts.$inferSelect;
 
 export const series = sqliteTable('series', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	workoutId: text('workoutId')
+	workoutId: integer('workoutId')
 		.references(() => activities.id)
 		.notNull(),
 	index: integer('index').notNull(),
 	reps: integer('reps').notNull()
 });
 export type Series = typeof series.$inferSelect;
+export type SeriesInsert = typeof series.$inferInsert;
 
 export const sets = sqliteTable('sets', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	workoutId: text('id')
+	workoutId: integer('id')
 		.references(() => activities.id)
 		.notNull(),
 	seriesId: integer('seriesId').notNull(),
@@ -125,3 +126,4 @@ export const sets = sqliteTable('sets', {
 	rpe: text('rpe')
 });
 export type Set = typeof sets.$inferSelect;
+export type SetInsert = typeof sets.$inferInsert;

@@ -9,7 +9,7 @@ export const formSchema = z.object({
 	user: z.object({
 		email: z.string().regex(validEmail).min(5).max(100),
 		password: z.string().regex(validPassword).min(12).max(100),
-		name: z.string().min(1).max(100)
+		name: z.string().max(100)
 	}),
 	trainerId: z.string().max(100),
 	targetHref: z.string().max(100)
