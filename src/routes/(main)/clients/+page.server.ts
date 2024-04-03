@@ -1,9 +1,18 @@
-import { clients, trainers, users, type User } from '$lib/drizzleTables.ts';
+import {
+	clients,
+	signupTokens,
+	trainers,
+	users,
+	type SignupToken,
+	type User
+} from '$lib/drizzleTables.ts';
 import { initDrizzle } from '$lib/server/utils';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import dayjs from 'dayjs';
+import { eq, lte } from 'drizzle-orm';
 
 export async function load({ platform, locals }) {
+	console.log('yewo');
 	if (!locals.user?.id) throw redirect(302, '/login');
 	const db = initDrizzle(platform);
 
@@ -24,11 +33,20 @@ export async function load({ platform, locals }) {
 		.map((user) => user.users)
 		.filter((trainer): trainer is User => trainer !== null);
 
-	return { clients: foundClients, trainers: foundTrainers };
+	await db
+		.delete(signupTokens)
+		.where(lte(signupTokens.creationTimeDate, dayjs().subtract(10, 'hour').toString()));
+	const foundTokens: SignupToken[] = await db
+		.select()
+		.from(signupTokens)
+		.orderBy(signupTokens.creationTimeDate)
+		.where(eq(signupTokens.trainerId, locals.user.id));
+
+	return { clients: foundClients, trainers: foundTrainers, signupTokens: foundTokens };
 }
 
 export const actions = {
-	delete: async ({ platform, request }) => {
+	deleteClient: async ({ platform, request }) => {
 		const data = await request.formData();
 		const clientId = data.get('clientId')?.toString();
 		if (!clientId) return fail(500, { formData: data });
@@ -38,7 +56,7 @@ export const actions = {
 		await db.delete(clients).where(eq(clients.id, clientId));
 	},
 
-	transfer: async ({ platform, request }) => {
+	transferClient: async ({ platform, request }) => {
 		const data = await request.formData();
 		const trainerId = data.get('trainerId')?.toString();
 		const clientId = data.get('clientId')?.toString();
@@ -46,7 +64,22 @@ export const actions = {
 
 		const db = initDrizzle(platform);
 		db.update(clients).set({ trainerId: trainerId }).where(eq(clients.id, clientId));
-	}
+	},
 
-	// TODO: implement invite action
+	addToken: async ({ platform, locals }) => {
+		const signupTokenId = (Math.random() * 10) ^ 6;
+
+		await initDrizzle(platform).insert(signupTokens).values({
+			id: signupTokenId.toString(),
+			creationTimeDate: dayjs().toString(),
+			trainerId: locals.user?.id
+		});
+	},
+
+	deleteToken: async ({ platform, request }) => {
+		const signupTokenId = (await request.formData()).get('signupToken')?.toString();
+		if (!signupTokenId) throw fail(500, { message: 'Signup token is undefined' });
+
+		await initDrizzle(platform).delete(signupTokens).where(eq(signupTokens.id, signupTokenId));
+	}
 };

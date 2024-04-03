@@ -3,19 +3,30 @@
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { cn } from '$lib/utils/shadcn';
-	import { CalendarDate, DateFormatter, getLocalTimeZone, type DateValue } from '@internationalized/date';
+	import {
+		CalendarDate,
+		DateFormatter,
+		getLocalTimeZone,
+		type DateValue
+	} from '@internationalized/date';
 	import dayjs from 'dayjs';
 	import { CalendarDays } from 'lucide-svelte';
 
+	// I prefer Dayjs because of .format() but the creator of the library prefers i8n/date
+	export let selectedDate = dayjs();
+	export let name = '';
+
+	let value: DateValue = new CalendarDate(
+		selectedDate.year(),
+		selectedDate.month(),
+		selectedDate.date()
+	);
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long'
 	});
-
-	// I prefer Dayjs because of .format() but the creator of the library prefers i8n/date
-	export let valueString = dayjs().toString();
-	let value: DateValue = new CalendarDate(valueString);
 </script>
 
+<input type="hidden" {name} value={selectedDate.toString()} />
 <Popover.Root>
 	<Popover.Trigger asChild let:builder>
 		<Button

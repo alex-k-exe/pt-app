@@ -39,9 +39,9 @@ export type Session = typeof sessions.$inferSelect;
 export const signupTokens = sqliteTable('signupTokens', {
 	id: text('id').primaryKey(),
 	trainerId: text('trainerId').references(() => trainers.id),
-	creationTimestamp: text('creationTimestamp').notNull()
+	creationTimeDate: text('creationTimestamp').notNull()
 });
-export type SignupToken = typeof messages.$inferSelect;
+export type SignupToken = typeof signupTokens.$inferSelect;
 
 export const chats = sqliteTable('chats', {
 	id: integer('id').primaryKey({ autoIncrement: true }),

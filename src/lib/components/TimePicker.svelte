@@ -5,6 +5,7 @@
 	import z from 'zod';
 
 	export let selectedTimeString = dayjs().toString();
+	export let name: string = '';
 
 	const AmOrPm = {
 		AM: 'am',
@@ -32,6 +33,7 @@
 </script>
 
 <div class="inline-block">
+	<input type="hidden" {name} bind:value={selectedTimeString} />
 	<Input
 		bind:value={selectedTime.hours}
 		on:input={(value) => handleHoursChange(value, true)}
