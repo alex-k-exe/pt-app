@@ -6,7 +6,7 @@ export default defineConfig({
 	driver: 'd1',
 	dbCredentials: {
 		wranglerConfigPath: './wrangler.toml',
-		dbName: 'pt-app-prod'
+		dbName: 'pt-app'
 	},
 	verbose: true,
 	strict: true

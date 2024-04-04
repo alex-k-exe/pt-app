@@ -12,6 +12,7 @@ export type SeriesWithSets = typeof seriesSchema;
 
 export const formSchema = createInsertSchema(activities).extend({
 	series: z.array(seriesSchema),
-	sets: z.array(setsSchema)
+	sets: z.array(setsSchema),
+	date: z.string()
 });
 export type WorkoutWithSeries = typeof formSchema;

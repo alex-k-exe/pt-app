@@ -6,7 +6,7 @@ import {
 	type SignupToken,
 	type User
 } from '$lib/drizzleTables.ts';
-import { initDrizzle } from '$lib/server/utils';
+import { generateSignupToken, initDrizzle } from '$lib/server/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq, lte } from 'drizzle-orm';
@@ -66,10 +66,10 @@ export const actions = {
 	},
 
 	addToken: async ({ platform, locals }) => {
-		const signupTokenId = (Math.random() * 10) ^ 6;
+		const signupTokenId = generateSignupToken();
 
 		await initDrizzle(platform).insert(signupTokens).values({
-			id: signupTokenId.toString(),
+			id: signupTokenId,
 			creationTimeDate: dayjs().toString(),
 			trainerId: locals.user?.id
 		});
@@ -79,6 +79,8 @@ export const actions = {
 		const signupTokenId = (await request.formData()).get('signupToken')?.toString();
 		if (!signupTokenId) throw fail(500, { message: 'Signup token is undefined' });
 
-		await initDrizzle(platform).delete(signupTokens).where(eq(signupTokens.id, signupTokenId));
+		await initDrizzle(platform)
+			.delete(signupTokens)
+			.where(eq(signupTokens.id, Number(signupTokenId)));
 	}
 };

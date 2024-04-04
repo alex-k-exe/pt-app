@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1710323097383,
-      "tag": "0000_boring_annihilus",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1710323193261,
-      "tag": "0001_simple_doctor_doom",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1712016067941,
-      "tag": "0002_careful_harry_osborn",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1712144955891,
-      "tag": "0003_colossal_mole_man",
+      "when": 1712205195898,
+      "tag": "0000_gifted_peter_quill",
       "breakpoints": true
     }
   ]

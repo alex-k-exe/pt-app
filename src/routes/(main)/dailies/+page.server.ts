@@ -1,11 +1,13 @@
-import { activities, dailies, type Activity, type Daily } from '$lib/drizzleTables';
+import { activities, clients, dailies, users, type Activity, type Daily } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
+import { UserType } from '$lib/utils/types/other';
 import { redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform }) {
 	if (!locals.user?.id) throw redirect(302, '/login?targetHref="/dailies"');
 	const db = initDrizzle(platform);
+
 	const foundDailies = (
 		await db
 			.select()
@@ -20,7 +22,27 @@ export async function load({ locals, platform }) {
 		.map((daily) => {
 			return { ...daily.activities, activeDays: daily.dailies.activeDays };
 		});
-	const dailiesWithPersonsName = foundDailies.map((daily) => await db.select());
 
-	return { dailies: foundDailies };
+	let otherPersonsNames: string[];
+	if (locals.userType === UserType.CLIENT) {
+		otherPersonsNames = await Promise.all(
+			foundDailies.map(async (daily) => {
+				return (
+					await db
+						.select({ otherPersonsName: users.name })
+						.from(users)
+						.limit(1)
+						.leftJoin(clients, eq(users.id, clients.id))
+						.where(eq(clients.id, daily.clientId))
+				)[0].otherPersonsName;
+			})
+		);
+	}
+
+	return {
+		dailies: foundDailies.map((daily, i) => {
+			return { ...daily, otherPersonsName: otherPersonsNames[i] };
+		}),
+		userType: locals.userType
+	};
 }

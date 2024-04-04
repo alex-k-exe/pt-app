@@ -11,6 +11,7 @@ declare global {
 		}
 		interface Platform {
 			env: {
+				adminPassword: string;
 				DB: D1Database;
 			};
 			context: {

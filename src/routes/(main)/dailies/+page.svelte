@@ -17,7 +17,7 @@
 
 <div class="dailies">
 	{#each data.dailies as daily (daily.id)}
-		<DailyCard {daily} />
+		<DailyCard userType={data.userType} {daily} />
 	{/each}
 </div>
 

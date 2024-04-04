@@ -8,13 +8,13 @@
 	export let data;
 
 	const form = superForm(data.form, {
-		validators: zodClient(formSchema)
+		validators: zodClient(formSchema),
+		dataType: 'json'
 	});
 	const { form: formData, enhance } = form;
 </script>
 
 <form method="POST" use:enhance>
-	<input name="targetHref" type="hidden" value={data.targetHref} />
 	<Form.Field {form} name="user.email">
 		<Form.Control let:attrs>
 			<Form.Label>Email</Form.Label>
@@ -33,5 +33,3 @@
 </form>
 
 <!-- implement forgot password and login throttling -->
-
-<a href={`/signup?targetHref=${data.targetHref}`}>Sign up instead</a>

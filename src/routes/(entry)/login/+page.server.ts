@@ -49,6 +49,6 @@ export const actions = {
 		event.locals.user = existingUser;
 		event.locals.session = session;
 
-		redirect(302, '/workouts');
+		redirect(302, event.url.searchParams.get('targetHref') ?? '/workouts');
 	}
 };

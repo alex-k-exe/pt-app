@@ -10,20 +10,22 @@ export async function load({ locals, platform, url }) {
 
 	const db = initDrizzle(platform);
 
-	let foundWorkouts = await db
-		.select()
-		.from(activities)
-		.leftJoin(workouts, eq(activities.id, workouts.activityId))
-		.where(
-			or(
-				eq(activities.clientId, locals.user?.id ?? ''),
-				eq(activities.trainerId, locals.user?.id ?? '')
+	const foundWorkouts = (
+		await db
+			.select()
+			.from(activities)
+			.leftJoin(workouts, eq(activities.id, workouts.activityId))
+			.where(
+				or(
+					eq(activities.clientId, locals.user?.id ?? ''),
+					eq(activities.trainerId, locals.user?.id ?? '')
+				)
 			)
-		)
-		.orderBy(activities.startTime);
-	foundWorkouts = foundWorkouts.filter(({ activities: workout }) =>
-		datesAreSameDay(dayjs(workout.date), date)
-	);
+			.orderBy(activities.startTime)
+	).filter(({ workouts: workout }) => {
+		if (!workout) return false;
+		datesAreSameDay(dayjs(workout.date), date);
+	});
 
 	const combinedDetails = await Promise.all(
 		foundWorkouts.map(async ({ activities: workout }) => {
@@ -43,7 +45,7 @@ export async function load({ locals, platform, url }) {
 	);
 
 	return {
-		date: date,
+		date: date.toString(),
 		workouts: combinedDetails
 	};
 }

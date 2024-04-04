@@ -1,4 +1,3 @@
-import { validSignupToken } from '$lib/utils/types/other.ts';
 import { fail, type RequestEvent } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -6,7 +5,7 @@ import { z } from 'zod';
 import type { RouteParams } from './$types';
 
 export const formSchema = z.object({
-	signupToken: z.string().regex(validSignupToken)
+	signupToken: z.string().min(1).max(6)
 });
 
 export type FormSchema = typeof formSchema;

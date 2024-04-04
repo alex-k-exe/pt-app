@@ -33,7 +33,6 @@
 </script>
 
 <div class="inline-block">
-	<input type="hidden" {name} bind:value={selectedTimeString} />
 	<Input
 		bind:value={selectedTime.hours}
 		on:input={(value) => handleHoursChange(value, true)}
@@ -46,7 +45,7 @@
 		placeholder="00"
 	/>
 
-	<Select.Root>
+	<Select.Root selected={{ value: selectedTime.amOrPm, label: selectedTime.amOrPm }}>
 		<Select.Trigger>
 			<Select.Value placeholder="AM or PM" />
 		</Select.Trigger>

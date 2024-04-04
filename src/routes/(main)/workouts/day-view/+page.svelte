@@ -7,7 +7,7 @@
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	export let data;
-	const date = data.date;
+	const date = dayjs(data.date);
 	const workouts = data.workouts;
 </script>
 
@@ -21,9 +21,7 @@
 	{#each workouts as workout (workout.id)}
 		<Card.Root>
 			<Card.Header>
-				<Card.Title
-					>{date.format('h:ma') + ' to ' + dayjs(workout.date).format('h:ma') + '\n'}
-				</Card.Title>
+				<Card.Title>{date.format('h:ma') + ' to ' + dayjs(date).format('h:ma') + '\n'}</Card.Title>
 				<Card.Description>{workout.clientName + ' - ' + workout.title}</Card.Description>
 			</Card.Header>
 			<Card.Content>

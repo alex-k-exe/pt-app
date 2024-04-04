@@ -20,7 +20,10 @@
 
 	export let data: PageData;
 
-	const form = superForm(data.form, { validators: zodClient(formSchema) });
+	const form = superForm(data.form, {
+		validators: zodClient(formSchema),
+		dataType: 'json'
+	});
 	const { form: formData, enhance } = form;
 	let date = dayjs($formData.date);
 

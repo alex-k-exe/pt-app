@@ -37,7 +37,7 @@ export const sessions = sqliteTable('sessions', {
 export type Session = typeof sessions.$inferSelect;
 
 export const signupTokens = sqliteTable('signupTokens', {
-	id: text('id').primaryKey(),
+	id: integer('id').primaryKey(),
 	trainerId: text('trainerId').references(() => trainers.id),
 	creationTimeDate: text('creationTimestamp').notNull()
 });
@@ -74,7 +74,7 @@ export const activities = sqliteTable('activities', {
 	trainerId: text('trainerId')
 		.notNull()
 		.references(() => trainers.id),
-	title: text('name'),
+	title: text('name').notNull(),
 	notes: text('notes'),
 	location: text('location'),
 	startTime: text('startTime').notNull(),

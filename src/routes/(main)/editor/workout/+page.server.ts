@@ -1,4 +1,13 @@
-import { activities, clients, series, sets, users, workouts } from '$lib/drizzleTables';
+import {
+	activities,
+	clients,
+	series,
+	sets,
+	users,
+	workouts,
+	type Activity,
+	type Workout
+} from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { UserType, type WorkoutWithSeries } from '$lib/utils/types/other';
 import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
@@ -20,6 +29,7 @@ export async function load({ url, locals, platform }) {
 	let workout: WorkoutWithSeries = {
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new workout
+		title: '',
 		date: date.toString(),
 		startTime: '',
 		endTime: ''
@@ -29,16 +39,20 @@ export async function load({ url, locals, platform }) {
 	// TODO: break this mess into some functions
 	if (workoutId) {
 		const db = initDrizzle(platform);
-		workout = {
-			...(
-				await db
-					.select()
-					.from(workouts)
-					.innerJoin(activities, eq(activities.id, workouts.activityId))
-					.limit(1)
-					.where(eq(workouts.activityId, workoutId))
-			)[0].activities
-		};
+		workout = (
+			await db
+				.select()
+				.from(workouts)
+				.leftJoin(activities, eq(activities.id, workouts.activityId))
+				.limit(1)
+				.where(eq(workouts.activityId, workoutId))
+		)
+			.filter((workout): workout is { activities: Activity; workouts: Workout } => {
+				return workout.activities !== null;
+			})
+			.map((workout) => {
+				return { date: workout.workouts.date, ...workout.activities };
+			})[0];
 		workout.series = await db.select().from(series).where(eq(series.workoutId, workoutId));
 		workout.series = await Promise.all(
 			workout.series.map(async (series) => {
@@ -95,7 +109,7 @@ export const actions = {
 			await db.update(activities).set(form.data).where(eq(activities.id, form.data.id));
 		} else {
 			const workout = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values({ activityId: workout.id });
+			await db.insert(workouts).values({ activityId: workout.id, date: form.data.date });
 		}
 	},
 

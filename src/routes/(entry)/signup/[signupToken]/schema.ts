@@ -11,8 +11,7 @@ export const formSchema = z.object({
 		password: z.string().regex(validPassword).min(12).max(100),
 		name: z.string().max(100)
 	}),
-	trainerId: z.string().max(100),
-	targetHref: z.string().max(100)
+	trainerId: z.string().max(100)
 });
 
 export type FormSchema = typeof formSchema;
