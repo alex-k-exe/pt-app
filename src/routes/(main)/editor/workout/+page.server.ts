@@ -84,7 +84,7 @@ async function validateForm(event: RequestEvent<RouteParams, '/(main)/editor/wor
 }
 
 export const actions = {
-	// put fixing up the series.index things when handling the insertOrUpdate action, also assign workoutId to sets and series
+	// TODO: put fixing up the series.index things when handling the insertOrUpdate action, also assign workoutId to sets and series
 	insertOrUpdate: async (event) => {
 		console.log('insertOrUpdate');
 		const form = await validateForm(event);

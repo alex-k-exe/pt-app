@@ -12,7 +12,6 @@ import dayjs from 'dayjs';
 import { eq, lte } from 'drizzle-orm';
 
 export async function load({ platform, locals }) {
-	console.log('yewo');
 	if (!locals.user?.id) throw redirect(302, '/login');
 	const db = initDrizzle(platform);
 

@@ -1,5 +1,6 @@
 [[d1_databases]]
 binding = "DB"
-database_name = "pt-db-prod"
-database_id = "795d0018-46ae-47fb-9d69-dc800a54a578"
+database_name = "pt-db"
+database_id = "e55e85a3-10e3-4a33-84f5-da40f30b9383"
 preview_database_id = "DB"
+migrations_dir = "./drizzle"

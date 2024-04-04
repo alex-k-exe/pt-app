@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import type { Workout } from '$lib/db/workoutsTables.ts';
-	import { createEventDispatcher } from 'svelte';
+	import type { Activity } from '$lib/drizzleTables.ts';
 
-	export let daily: Workout;
-	export let clientName: string;
+	export let daily: Activity & { activeDays: string; clientName: string };
 
 	const daysOfWeek = [
 		'monday',
@@ -17,13 +15,11 @@
 		'sunday'
 	] as const;
 	const activeDays = Object.fromEntries(daysOfWeek.map((day) => [day, false]));
-
-	const dispatch = createEventDispatcher();
 </script>
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title>{clientName}</Card.Title>
+		<Card.Title>{daily.clientName}</Card.Title>
 		<Card.Description>{daily.title}</Card.Description>
 	</Card.Header>
 	<Card.Content>
@@ -39,6 +35,10 @@
 	</Card.Content>
 	<Card.Footer class="flex gap-[5px]">
 		<a href="/editor" style="padding-right: 10px">Edit</a>
-		<Button variant="outline" on:click={() => dispatch('delete')}>Delete</Button>
+		<form action="?edit">
+			<input type="hidden" name="activeDays" value={activeDays} />
+			<Button>Edit</Button>
+		</form>
+		<form action="?delete"><Button variant="outline">Delete</Button></form>
 	</Card.Footer>
 </Card.Root>

@@ -77,7 +77,6 @@ export const activities = sqliteTable('activities', {
 	title: text('name'),
 	notes: text('notes'),
 	location: text('location'),
-	date: text('date').notNull(),
 	startTime: text('startTime').notNull(),
 	endTime: text('endTime').notNull()
 });
@@ -89,7 +88,7 @@ export const dailies = sqliteTable('dailies', {
 		.references(() => activities.id)
 		.primaryKey(),
 	// 7 digit binary string indicating which days the daily is on
-	recurringDays: text('recurringDays').notNull()
+	activeDays: text('activeDays').notNull()
 });
 export type Daily = typeof dailies.$inferSelect;
 
@@ -97,7 +96,8 @@ export const workouts = sqliteTable('workouts', {
 	activityId: integer('activityId')
 		.references(() => activities.id)
 		.primaryKey()
-		.notNull()
+		.notNull(),
+	date: text('date').notNull()
 });
 export type Workout = typeof workouts.$inferSelect;
 
