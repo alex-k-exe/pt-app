@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 // Drizzle ensures type safety in the queried data from the DB
@@ -39,7 +40,7 @@ export type Session = typeof sessions.$inferSelect;
 export const signupTokens = sqliteTable('signupTokens', {
 	id: integer('id').primaryKey(),
 	trainerId: text('trainerId').references(() => trainers.id),
-	creationTimeDate: text('creationTimestamp').notNull()
+	creationTimeDate: text('creationTimestamp').notNull().default(dayjs().toISOString())
 });
 export type SignupToken = typeof signupTokens.$inferSelect;
 

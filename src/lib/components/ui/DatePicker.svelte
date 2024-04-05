@@ -14,7 +14,6 @@
 
 	// I prefer Dayjs because of .format() but the creator of the library prefers i8n/date
 	export let selectedDate = dayjs();
-	export let name = '';
 
 	let value: DateValue = new CalendarDate(
 		selectedDate.year(),
@@ -26,7 +25,6 @@
 	});
 </script>
 
-<input type="hidden" {name} value={selectedDate.toString()} />
 <Popover.Root>
 	<Popover.Trigger asChild let:builder>
 		<Button

@@ -45,7 +45,7 @@ export async function load({ locals, platform, url }) {
 	);
 
 	return {
-		date: date.toString(),
+		date: date.toISOString(),
 		workouts: combinedDetails
 	};
 }

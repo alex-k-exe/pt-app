@@ -65,7 +65,7 @@
 <form method="POST" action="?insertOrUpdate" use:enhance>
 	<div class="flex">
 		<div class="items-start">
-			<Select.Root>
+			<Select.Root selected={{ value: $formData.location }}>
 				<Select.Trigger class="w-[180px]">
 					<Select.Value placeholder="Select a location" />
 				</Select.Trigger>
@@ -89,8 +89,8 @@
 	</div>
 
 	From <TimePicker name="startTime" bind:selectedTimeString={$formData.startTime} />
-	to <TimePicker name="endTime" bind:selectedTimeString={$formData.endTime} />
-	on <DatePicker name="date" bind:selectedDate={date} />
+	to <TimePicker bind:selectedTimeString={$formData.endTime} />
+	on <DatePicker bind:selectedDate={date} />
 
 	<Textarea name="notes" placeholder="Notes" bind:value={$formData.notes} />
 

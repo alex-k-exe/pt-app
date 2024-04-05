@@ -70,7 +70,6 @@ export const actions = {
 
 		await initDrizzle(platform).insert(signupTokens).values({
 			id: signupTokenId,
-			creationTimeDate: dayjs().toString(),
 			trainerId: locals.user?.id
 		});
 	},

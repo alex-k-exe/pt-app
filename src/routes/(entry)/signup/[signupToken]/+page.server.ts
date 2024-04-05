@@ -23,7 +23,7 @@ export async function load({ platform, url, params }) {
 	await db
 		.delete(signupTokens)
 		// TODO: this is wrong
-		.where(lte(signupTokens.creationTimeDate, dayjs().subtract(10, 'hour').toString()));
+		.where(lte(signupTokens.creationTimeDate, dayjs().subtract(10, 'hour').toISOString()));
 	const signupToken = (
 		await db.select().from(signupTokens).limit(1).where(eq(signupTokens.id, signupTokenId))
 	)[0];

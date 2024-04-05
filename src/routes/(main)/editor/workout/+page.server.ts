@@ -30,7 +30,7 @@ export async function load({ url, locals, platform }) {
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new workout
 		title: '',
-		date: date.toString(),
+		date: date.toISOString(),
 		startTime: '',
 		endTime: ''
 	};

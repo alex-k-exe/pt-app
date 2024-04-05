@@ -4,7 +4,7 @@
 	import dayjs from 'dayjs';
 	import z from 'zod';
 
-	export let selectedTimeString = dayjs().toString();
+	export let selectedTimeString = dayjs().toISOString();
 	export let name: string = '';
 
 	const AmOrPm = {
@@ -20,7 +20,7 @@
 	$: selectedTimeString = dayjs(
 		`${selectedTime.hours}-${selectedTime.minutes}-${selectedTime.amOrPm}`,
 		'h-m-A'
-	).toString();
+	).toISOString();
 
 	const hourSchema = z.number().int().gte(0).lte(12);
 	const minutesSchema = z.number().int().gte(0).lt(60);
@@ -33,6 +33,7 @@
 </script>
 
 <div class="inline-block">
+	<input type="hidden" {name} value={selectedTimeString} />
 	<Input
 		bind:value={selectedTime.hours}
 		on:input={(value) => handleHoursChange(value, true)}
@@ -45,7 +46,7 @@
 		placeholder="00"
 	/>
 
-	<Select.Root selected={{ value: selectedTime.amOrPm, label: selectedTime.amOrPm }}>
+	<Select.Root selected={{ value: selectedTime.amOrPm }}>
 		<Select.Trigger>
 			<Select.Value placeholder="AM or PM" />
 		</Select.Trigger>
