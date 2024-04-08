@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import type { RouteParams } from './$types';
 
-export const formSchema = z.object({ message: z.string().min(1).max(1000) });
+export const formSchema = z.object({ message: z.string().max(1000) });
 
 export type FormSchema = typeof formSchema;
 

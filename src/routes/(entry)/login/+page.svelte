@@ -3,7 +3,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { formSchema } from '../signup/[signupToken]/schema.js';
+	import { formSchema } from './schema.ts';
 
 	export let data;
 
@@ -15,17 +15,17 @@
 </script>
 
 <form method="POST" use:enhance>
-	<Form.Field {form} name="user.email">
+	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
 			<Form.Label>Email</Form.Label>
-			<Input type="email" bind:value={$formData.user.email} {...attrs} />
+			<Input type="email" bind:value={$formData.email} {...attrs} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="user.password">
+	<Form.Field {form} name="password">
 		<Form.Control let:attrs>
 			<Form.Label>Password</Form.Label>
-			<Input type="password" bind:value={$formData.user.password} {...attrs} />
+			<Input type="password" bind:value={$formData.password} {...attrs} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

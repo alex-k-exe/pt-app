@@ -4,13 +4,10 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Eye, EyeOff } from 'lucide-svelte';
 	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { formSchema } from './schema.js';
 
 	export let data;
 
 	const form = superForm(data.form, {
-		validators: zodClient(formSchema),
 		dataType: 'json'
 	});
 	const { form: formData, enhance } = form;
@@ -29,25 +26,25 @@
 
 <form method="POST" use:enhance>
 	<input type="hidden" name="targetHref" value={data.targetHref} />
-	<Form.Field {form} name="user.name">
+	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
 			<Form.Label>Name</Form.Label>
-			<Input {...attrs} bind:value={$formData.user.name} />
+			<Input {...attrs} bind:value={$formData.name} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="user.email">
+	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
 			<Form.Label>Email</Form.Label>
-			<Input {...attrs} type="email" bind:value={$formData.user.email} />
+			<Input {...attrs} type="email" bind:value={$formData.email} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="user.password">
+	<Form.Field {form} name="password">
 		<Form.Control let:attrs>
 			<Form.Label>Password</Form.Label>
 			<div class="flex">
-				<Input {...attrs} type={passwordInputType} bind:value={$formData.user.password} />
+				<Input {...attrs} type={passwordInputType} bind:value={$formData.password} />
 				<Button
 					on:click={() => (passwordInputType = passwordInputType === 'password' ? '' : 'password')}
 				>
@@ -64,4 +61,4 @@
 	<Form.Button type="submit">Submit</Form.Button>
 </form>
 
-<a href={`/login?targetHref="${data.targetHref}"`}>Log in instead</a>
+<a href={'/login' + data.targetHref ? `?targetHref=${data.targetHref}` : ''}>Log in instead</a>

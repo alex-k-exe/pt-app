@@ -5,8 +5,8 @@ import { eq } from 'drizzle-orm';
 import { Scrypt } from 'lucia';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { formSchema } from '../signup/[signupToken]/schema';
 import type { RouteParams } from './$types';
+import { formSchema } from './schema.ts';
 
 export async function load({ url }) {
 	return {
@@ -32,12 +32,12 @@ export const actions = {
 				.select()
 				.from(users)
 				.limit(1)
-				.where(eq(users.email, formData.user.email))
+				.where(eq(users.email, formData.email))
 		)[0];
 
 		if (!existingUser) return fail(400, { message: 'Incorrect username or password' });
 
-		const validPassword = await new Scrypt().verify(existingUser.password, formData.user.password);
+		const validPassword = await new Scrypt().verify(existingUser.password, formData.password);
 		if (!validPassword) return fail(400, { message: 'Incorrect username or password' });
 
 		const session = await event.locals.lucia.createSession(existingUser.id, {});

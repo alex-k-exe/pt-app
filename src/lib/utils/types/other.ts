@@ -20,10 +20,5 @@ export type WorkoutWithSeries = ActivityInsert & {
 	sets?: Set[];
 };
 
-export const validEmail = /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/;
 // require passwords to have one uppercase letter, one digit, and one special character
 export const validPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
-
-export function isSignupTokenValid(token: number) {
-	return token >= 100000 && token <= 999999;
-}
