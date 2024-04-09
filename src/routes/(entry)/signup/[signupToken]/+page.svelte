@@ -11,13 +11,11 @@
 		dataType: 'json'
 	});
 	const { form: formData, enhance } = form;
-
-	let passwordInputType: 'password' | '' = 'password';
 </script>
 
 <div class="inline-block">
 	Your signup token is <b>{data.signupTokenId}.</b>
-	<a href={`/signup?targetHref=${data.targetHref}`}>Change your token</a>
+	<a href={`/signup?targetHref=${data.targetHref}`}><u>Change your token</u></a>
 </div>
 
 {#if data.trainer}
@@ -25,6 +23,7 @@
 {/if}
 
 <form method="POST" use:enhance>
+	<input type="hidden" name="signupTokenId" value={data.signupTokenId} />
 	<input type="hidden" name="targetHref" value={data.targetHref} />
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
@@ -36,15 +35,18 @@
 	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
 			<Form.Label>Email</Form.Label>
-			<Input {...attrs} type="email" bind:value={$formData.email} />
+			<Input {...attrs} type="email" />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="password">
+	<Form.Field {form} name="password.password">
+		<Form.FieldErrors />
+	</Form.Field>
+	<Form.Field {form} name="password.confirmPassword">
 		<Form.Control let:attrs>
-			<Form.Label>Password</Form.Label>
+			<Form.Label>Confirm password</Form.Label>
 			<div class="flex">
-				<Input {...attrs} type={passwordInputType} bind:value={$formData.password} />
+				<Input {...attrs} type={passwordInputType} />
 				<Button
 					on:click={() => (passwordInputType = passwordInputType === 'password' ? '' : 'password')}
 				>
@@ -60,5 +62,3 @@
 	</Form.Field>
 	<Form.Button type="submit">Submit</Form.Button>
 </form>
-
-<a href={'/login' + data.targetHref ? `?targetHref=${data.targetHref}` : ''}>Log in instead</a>

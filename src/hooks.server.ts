@@ -3,11 +3,13 @@ import { UserType } from '$lib/utils/types/other';
 import { type Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	console.log('yay');
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
 
-	if (event.url.href.startsWith('/admin') || event.url.href.startsWith('/login'))
+	if (event.url.href.startsWith('/admin') || event.url.href.startsWith('/login')) {
 		return resolve(event);
+	}
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
 		return new Response(null, {

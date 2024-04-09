@@ -1,7 +1,4 @@
 import { validPassword } from '$lib/utils/types/other.ts';
-import { fail, type RequestEvent } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 
 export const formSchema = z.object({
@@ -11,10 +8,3 @@ export const formSchema = z.object({
 });
 
 export type FormSchema = typeof formSchema;
-
-type Event = RequestEvent<Params extends Partial<Record<string, string>>
-export async function validateForm<T extends Event>(event: T) {
-	const form = await superValidate(event, zod(formSchema));
-	if (!form.valid) return fail(400, { form });
-	return form;
-}

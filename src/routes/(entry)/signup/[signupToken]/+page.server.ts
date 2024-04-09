@@ -1,12 +1,12 @@
 import { clients, signupTokens, trainers, users, type User } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
+import { initDrizzle, validateForm } from '$lib/server/utils';
 import { redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { Scrypt, generateId } from 'lucia';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema as signupTokenSchema } from '../schema.ts';
-import { formSchema, validateForm } from './schema';
+import { formSchema } from './schema';
 
 export async function load(event) {
 	const signupTokenId = Number(event.params.signupToken);
@@ -33,7 +33,6 @@ export async function load(event) {
 			await db.select().from(users).limit(1).where(eq(users.id, signupToken.trainerId))
 		)[0];
 	}
-	await db.delete(signupTokens).where(eq(signupTokens.id, signupTokenId));
 
 	return {
 		signupTokenId,
@@ -45,12 +44,14 @@ export async function load(event) {
 
 export const actions = {
 	default: async (event) => {
-		const formData = (await validateForm(event)).data;
+		const db = initDrizzle(event.platform);
+		const formData = (await validateForm(event, await formSchema(db))).data;
 		if ('form' in formData) return formData;
+
+		console.log(formData);
 		const userId = generateId(15);
 		const hashedPassword = await new Scrypt().hash(formData.password.password);
 
-		const db = initDrizzle(event.platform);
 		await db.insert(users).values({
 			id: userId,
 			email: formData.email,
@@ -62,6 +63,7 @@ export const actions = {
 		} else {
 			await db.insert(trainers).values({ id: userId });
 		}
+		await db.delete(signupTokens).where(eq(signupTokens.id, formData.signupTokenId));
 
 		const session = await event.locals.lucia.createSession(userId, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);

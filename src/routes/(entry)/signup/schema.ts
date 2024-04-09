@@ -1,13 +1,8 @@
 import { signupTokens } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
-import { fail, type RequestEvent } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import type { RouteParams } from './$types';
 
 export async function formSchema(db: DrizzleD1Database) {
 	return z.object({
@@ -28,9 +23,3 @@ export async function formSchema(db: DrizzleD1Database) {
 }
 
 export type FormSchema = typeof formSchema;
-
-export async function validateForm(event: RequestEvent<RouteParams, '/(entry)/login'>) {
-	const form = await superValidate(event, zod(await formSchema(initDrizzle(event.platform))));
-	if (!form.valid) return fail(400, { form });
-	return form;
-}

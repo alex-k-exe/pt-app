@@ -76,7 +76,7 @@ export const actions = {
 
 	deleteToken: async ({ platform, request }) => {
 		const signupTokenId = (await request.formData()).get('signupToken')?.toString();
-		if (!signupTokenId) throw fail(500, { message: 'Signup token is undefined' });
+		if (!signupTokenId) return fail(500, { message: 'Signup token is undefined' });
 
 		await initDrizzle(platform)
 			.delete(signupTokens)

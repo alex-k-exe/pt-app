@@ -1,8 +1,8 @@
-import type { RequestEvent } from '@sveltejs/kit';
-import { drizzle } from 'drizzle-orm/d1';
+import { fail, type RequestEvent } from '@sveltejs/kit';
+import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import type { z } from 'zod';
+import { z, type ZodRawShape } from 'zod';
 
 export function initDrizzle(platform: Readonly<App.Platform> | undefined) {
 	if (!platform?.env.DB) throw new Error('Database is undefined');
@@ -15,12 +15,13 @@ export function generateSignupToken() {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-type Event = RequestEvent<Params extends Partial<Record<string, string>>, string>;
-
-export async function validateForm<T extends Event>(
-	event: T, formSchema: (db: DrizzleD1Database) => Promise<z.ZodObject>
+export async function validateForm<T extends ZodRawShape>(
+	event: RequestEvent<Partial<Record<string, string>>>,
+	formSchema: z.ZodObject<T> | ((db: DrizzleD1Database) => Promise<z.ZodObject<T>>)
 ) {
-	const form = await superValidate(event, zod(formSchema));
+	let form;
+	if (formSchema instanceof z.ZodObject) form = await superValidate(event, zod(formSchema));
+	else form = await superValidate(event, zod(await formSchema(initDrizzle(event.platform))));
 	if (!form.valid) return fail(400, { form });
 	return form;
 }
