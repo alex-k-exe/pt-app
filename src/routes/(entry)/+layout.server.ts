@@ -1,5 +1,5 @@
 export async function load({ url }) {
 	return {
-		targetHref: url.searchParams.get('targetHref')
+		targetPath: url.searchParams.get('targetPath')
 	};
 }

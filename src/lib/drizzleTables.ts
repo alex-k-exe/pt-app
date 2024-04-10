@@ -59,13 +59,14 @@ export type Chat = typeof chats.$inferSelect;
 
 export const messages = sqliteTable('messages', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
+	sentTimestamp: text('sentTimestamp').default(sql`(CURRENT_TIMESTAMP)`),
 	chatId: integer('chatId')
 		.notNull()
 		.references(() => chats.id),
 	senderId: text('senderId')
 		.notNull()
 		.references(() => users.id),
-	message: text('message').notNull()
+	text: text('text').notNull()
 });
 export type Message = typeof messages.$inferSelect;
 

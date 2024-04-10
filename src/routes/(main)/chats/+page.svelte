@@ -13,7 +13,7 @@
 </svelte:head>
 
 <div class="chats">
-	<div class="chatList"><ChatList chats={[]} /></div>
+	<div class="chatList"><ChatList chats={data.chats} trainers={data.trainers} /></div>
 	<div class="chatHeader">chatHeader</div>
 	<div class="messageList">messageList</div>
 	<div class="messageBox">

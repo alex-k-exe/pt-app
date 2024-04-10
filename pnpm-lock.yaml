@@ -53,6 +53,9 @@ dependencies:
   oslo:
     specifier: ^1.2.0
     version: 1.2.0
+  svelecte:
+    specifier: ^4.0.1
+    version: 4.0.1(svelte@4.2.12)
   svelte:
     specifier: 4.2.12
     version: 4.2.12
@@ -5231,6 +5234,15 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  /svelecte@4.0.1(svelte@4.2.12):
+    resolution: {integrity: sha512-J7OZcRFZ3JY4RxxF2UZazKsTVJid3yb12M/as3Pl/TBeDhT5pSFa8eeF10HCJbA4m6FO/3xJz6MXK3VG9FhtAw==}
+    peerDependencies:
+      svelte: ^3.43.0 || ^4.0.0
+    dependencies:
+      svelte: 4.2.12
+      svelte-tiny-virtual-list: 2.0.5
+    dev: false
+
   /svelte-check@3.6.9(postcss-load-config@5.0.3)(postcss@8.4.38)(svelte@4.2.12):
     resolution: {integrity: sha512-hDQrk3L0osX07djQyMiXocKysTLfusqi8AriNcCiQxhQR49/LonYolcUGMtZ0fbUR8HTR198Prrgf52WWU9wEg==}
     hasBin: true
@@ -5382,6 +5394,10 @@ packages:
     dependencies:
       svelte: 4.2.12
     dev: true
+
+  /svelte-tiny-virtual-list@2.0.5:
+    resolution: {integrity: sha512-xg9ckb8UeeIme4/5qlwCrl2QNmUZ8SCQYZn3Ji83cUsoASqRNy3KWjpmNmzYvPDqCHSZjruBBsoB7t5hwuzw5g==}
+    dev: false
 
   /svelte@4.2.12:
     resolution: {integrity: sha512-d8+wsh5TfPwqVzbm4/HCXC783/KPHV60NvwitJnyTA5lWn1elhXMNWhXGCJ7PwPa8qFUnyJNIyuIRt2mT0WMug==}

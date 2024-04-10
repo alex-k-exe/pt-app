@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 export async function formSchema(db: DrizzleD1Database) {
 	return z.object({
-		targetHref: z.string().nullish(),
+		targetPath: z.string().nullish(),
 		signupTokenId: signupTokenSchema,
 		trainerId: z.string().nullish(),
 		email: z
@@ -45,20 +45,15 @@ export const signupTokenSchema = z.number().int().min(100000).max(999999);
 export async function asyncTokenSchema(db: DrizzleD1Database) {
 	return signupTokenSchema.refine(async (tokenId) => {
 		// check that signup token exists and isn't expired
-		try {
-			const token = (
-				await db.select().from(signupTokens).limit(1).where(eq(signupTokens.id, tokenId))
-			)[0];
-			if (token === undefined) return false;
+		const token = (
+			await db.select().from(signupTokens).limit(1).where(eq(signupTokens.id, tokenId))
+		)[0];
+		if (token === undefined) return false;
 
-			const tokenIsExpired = dayjs(token.creationTimestamp).diff(dayjs(), 'hours') < 10;
-			if (tokenIsExpired) {
-				await db.delete(signupTokens).where(eq(signupTokens.id, token.id));
-			}
-			return tokenIsExpired;
-		} catch {
-			console.log('false');
-			return false;
+		const tokenIsExpired = dayjs(token.creationTimestamp).diff(dayjs(), 'hours') >= 10;
+		if (tokenIsExpired) {
+			await db.delete(signupTokens).where(eq(signupTokens.id, token.id));
 		}
+		return !tokenIsExpired;
 	}, 'Signup token does not exist or is expired');
 }

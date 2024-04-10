@@ -12,7 +12,7 @@
 	const { form: formData, enhance } = form;
 
 	let passwordInputType: 'password' | '' = 'password';
-	$formData.targetHref = data.targetHref;
+	$formData.targetPath = data.targetPath;
 	$formData.signupTokenId = data.signupTokenId;
 </script>
 
@@ -20,7 +20,7 @@
 
 <div class="inline-block">
 	Your signup token is <b>{data.signupTokenId}</b>.
-	<a href={'/signup' + (data.targetHref ? `?targetHref=${data.targetHref}` : '')}
+	<a href={'/signup' + (data.targetPath ? `?targetPath=${data.targetPath}` : '')}
 		><u>Change your token</u></a
 	>.
 </div>

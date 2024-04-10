@@ -7,9 +7,8 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema.ts';
 
-export async function load({ url }) {
+export async function load() {
 	return {
-		targetHref: url.searchParams.get('targetHref'),
 		form: await superValidate(zod(formSchema))
 	};
 }
@@ -41,6 +40,9 @@ export const actions = {
 		event.locals.user = existingUser;
 		event.locals.session = session;
 
-		redirect(302, event.url.searchParams.get('targetHref') ?? '/workouts');
+		return redirect(
+			302,
+			decodeURIComponent(event.url.searchParams.get('targetPath') ?? '/workouts')
+		);
 	}
 };

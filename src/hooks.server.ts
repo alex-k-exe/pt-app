@@ -1,19 +1,26 @@
 import { initLucia } from '$lib/server/lucia';
 import { UserType } from '$lib/utils/types/other';
-import { type Handle } from '@sveltejs/kit';
 
-export const handle: Handle = async ({ event, resolve }) => {
+export async function handle({ event, resolve }) {
+	console.log('s');
 	const lucia = initLucia(event.platform);
+	console.log('inited');
 	event.locals.lucia = lucia;
+	console.log('thingo3', lucia.createBlankSessionCookie());
+	const targetPath = event.url.pathname;
 
-	if (event.url.href.startsWith('/admin') || event.url.href.startsWith('/login')) {
+	if (
+		targetPath.startsWith('/admin') ||
+		targetPath.startsWith('/login') ||
+		targetPath.startsWith('/signup')
+	) {
 		return resolve(event);
 	}
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
 		return new Response(null, {
 			status: 302,
-			headers: { location: `/login?targetHref=${event.url.href}` }
+			headers: { location: `/login?targetPath=${encodeURIComponent(targetPath)}` }
 		});
 	}
 
@@ -31,7 +38,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.user = user;
 	event.locals.session = session;
 
-	const clientCantVisitPage = event.url.href.startsWith('/clients');
+	const clientCantVisitPage = targetPath.startsWith('/clients');
 	if (event.locals.userType === UserType.CLIENT && clientCantVisitPage) {
 		return new Response(null, {
 			status: 403,
@@ -39,4 +46,4 @@ export const handle: Handle = async ({ event, resolve }) => {
 		});
 	}
 	return resolve(event);
-};
+}

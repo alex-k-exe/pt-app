@@ -19,6 +19,7 @@ export function initLucia(platform: App.Platform | undefined) {
 		},
 		getUserAttributes: (attributes) => {
 			return {
+				id: attributes.id,
 				email: attributes.email,
 				name: attributes.name
 			};

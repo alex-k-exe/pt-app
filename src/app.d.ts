@@ -1,5 +1,6 @@
+import { initLucia } from '$lib/server/lucia';
 import { UserType } from '$lib/utils/types/other';
-import { Lucia, Session, User } from 'lucia';
+import { Session, User } from 'lucia';
 
 declare global {
 	namespace App {
@@ -7,7 +8,7 @@ declare global {
 			user: User | null;
 			userType: keyof typeof UserType;
 			session: Session | null;
-			lucia: Lucia;
+			lucia: ReturnType<typeof initLucia>;
 		}
 		interface Platform {
 			env: {

@@ -9,7 +9,7 @@ import { asyncTokenSchema, formSchema, type FormSchema } from './schema';
 
 export async function load({ params, url, platform }) {
 	const signupTokenId = Number(params.signupToken);
-	const targetHref = url.searchParams.get('targetHref');
+	const targetPath = url.searchParams.get('targetPath');
 
 	const db = initDrizzle(platform);
 	const tokenValidation = await (await asyncTokenSchema(db)).safeParseAsync(signupTokenId);
@@ -18,7 +18,7 @@ export async function load({ params, url, platform }) {
 			302,
 			'/signup' +
 				`?error=${tokenValidation.error.errors[0].message}` +
-				(targetHref ? `&targetHref=${targetHref}` : '')
+				(targetPath ? `&targetPath=${targetPath}` : '')
 		);
 	}
 
@@ -27,6 +27,9 @@ export async function load({ params, url, platform }) {
 		await db.select().from(signupTokens).limit(1).where(eq(signupTokens.id, tokenValidation.data))
 	)[0];
 
+	if (!signupToken) {
+		throw redirect(302, '/signup' + (targetPath ? `?targetPath=${targetPath}` : ''));
+	}
 	if (signupToken.trainerId) {
 		trainer = (
 			await db.select().from(users).limit(1).where(eq(users.id, signupToken.trainerId))
@@ -36,7 +39,7 @@ export async function load({ params, url, platform }) {
 	return {
 		signupTokenId,
 		trainer,
-		targetHref,
+		targetPath,
 		form: await superValidate(zod(await formSchema(db)))
 	};
 }
@@ -72,7 +75,7 @@ export const actions = {
 		return new Response(null, {
 			status: 302,
 			headers: {
-				Location: event.url.searchParams.get('targetHref') ?? '/workouts',
+				Location: decodeURIComponent(event.url.searchParams.get('targetPath') ?? '/workouts'),
 				'Set-Cookie': sessionCookie.serialize()
 			}
 		});
