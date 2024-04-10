@@ -2,10 +2,10 @@ import { activities, clients, dailies, users, type Activity, type Daily } from '
 import { initDrizzle } from '$lib/server/utils';
 import { UserType } from '$lib/utils/types/other';
 import { redirect } from '@sveltejs/kit';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, sql } from 'drizzle-orm';
 
 export async function load({ locals, platform }) {
-	if (!locals.user?.id) throw redirect(302, '/login?targetHref="/dailies"');
+	if (!locals.user?.id) throw redirect(302, '/login?targetHref=/dailies');
 	const db = initDrizzle(platform);
 
 	const foundDailies = (
@@ -24,19 +24,16 @@ export async function load({ locals, platform }) {
 		});
 
 	let otherPersonsNames: string[];
+	console.log('here it comes!');
 	if (locals.userType === UserType.CLIENT) {
-		otherPersonsNames = await Promise.all(
-			foundDailies.map(async (daily) => {
-				return (
-					await db
-						.select({ otherPersonsName: users.name })
-						.from(users)
-						.limit(1)
-						.leftJoin(clients, eq(users.id, clients.id))
-						.where(eq(clients.id, daily.clientId))
-				)[0].otherPersonsName;
-			})
-		);
+		const getOtherPersonsName = db
+			.select({ otherPersonsName: users.name })
+			.from(users)
+			.limit(1)
+			.leftJoin(clients, eq(users.id, clients.id))
+			.where(eq(clients.id, sql.placeholder('clientId')));
+
+		const thing = await db.batch([getOtherPersonsName]);
 	}
 
 	return {

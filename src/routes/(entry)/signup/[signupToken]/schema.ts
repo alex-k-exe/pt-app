@@ -1,13 +1,15 @@
-import { users } from '$lib/drizzleTables';
+import { signupTokens, users } from '$lib/drizzleTables';
 import { validPassword } from '$lib/utils/types/other.ts';
+import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { z } from 'zod';
 
 export async function formSchema(db: DrizzleD1Database) {
 	return z.object({
-		signupTokenId: z.number(),
-		trainerId: z.string().optional(),
+		targetHref: z.string().nullish(),
+		signupTokenId: signupTokenSchema,
+		trainerId: z.string().nullish(),
 		email: z
 			.string()
 			.email()
@@ -15,7 +17,6 @@ export async function formSchema(db: DrizzleD1Database) {
 			.max(100)
 			.refine(
 				async (email) => {
-					// check if email hasn't already been used
 					const emails = await db
 						.select({ email: users.email })
 						.from(users)
@@ -27,12 +28,37 @@ export async function formSchema(db: DrizzleD1Database) {
 			),
 		password: z
 			.object({
-				password: z.string().regex(validPassword).min(12).max(100),
-				confirmPassword: z.string().regex(validPassword).min(12).max(100)
+				password: z.string().regex(validPassword.regex, validPassword.message).min(12).max(100),
+				confirmPassword: z
+					.string()
+					.regex(validPassword.regex, validPassword.message)
+					.min(12)
+					.max(100)
 			})
 			.refine((data) => data.password === data.confirmPassword),
 		name: z.string().max(100)
 	});
 }
+export type FormSchema = z.infer<Awaited<ReturnType<typeof formSchema>>>;
 
-export type FormSchema = typeof formSchema;
+export const signupTokenSchema = z.number().int().min(100000).max(999999);
+export async function asyncTokenSchema(db: DrizzleD1Database) {
+	return signupTokenSchema.refine(async (tokenId) => {
+		// check that signup token exists and isn't expired
+		try {
+			const token = (
+				await db.select().from(signupTokens).limit(1).where(eq(signupTokens.id, tokenId))
+			)[0];
+			if (token === undefined) return false;
+
+			const tokenIsExpired = dayjs(token.creationTimestamp).diff(dayjs(), 'hours') < 10;
+			if (tokenIsExpired) {
+				await db.delete(signupTokens).where(eq(signupTokens.id, token.id));
+			}
+			return tokenIsExpired;
+		} catch {
+			console.log('false');
+			return false;
+		}
+	}, 'Signup token does not exist or is expired');
+}

@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 // Drizzle ensures type safety in the queried data from the DB
@@ -40,7 +40,9 @@ export type Session = typeof sessions.$inferSelect;
 export const signupTokens = sqliteTable('signupTokens', {
 	id: integer('id').primaryKey(),
 	trainerId: text('trainerId').references(() => trainers.id),
-	creationTimeDate: text('creationTimestamp').notNull().default(dayjs().toISOString())
+	creationTimestamp: text('creationTimestamp')
+		.notNull()
+		.default(sql`(CURRENT_TIMESTAMP)`)
 });
 export type SignupToken = typeof signupTokens.$inferSelect;
 
@@ -63,7 +65,7 @@ export const messages = sqliteTable('messages', {
 	senderId: text('senderId')
 		.notNull()
 		.references(() => users.id),
-	text: text('text').notNull()
+	message: text('message').notNull()
 });
 export type Message = typeof messages.$inferSelect;
 
@@ -104,7 +106,7 @@ export type Workout = typeof workouts.$inferSelect;
 
 export const series = sqliteTable('series', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	workoutId: integer('workoutId')
+	activityId: integer('activityId')
 		.references(() => activities.id)
 		.notNull(),
 	index: integer('index').notNull(),
@@ -115,12 +117,12 @@ export type SeriesInsert = typeof series.$inferInsert;
 
 export const sets = sqliteTable('sets', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	workoutId: integer('id')
+	activityId: integer('activityId')
 		.references(() => activities.id)
 		.notNull(),
 	seriesId: integer('seriesId').notNull(),
-	index: integer('integer').notNull(),
-	exerciseName: text('name').notNull(),
+	index: integer('index').notNull(),
+	exerciseName: text('exerciseName').notNull(),
 	reps: text('reps'),
 	weight: text('weight'),
 	duration: text('duration'),

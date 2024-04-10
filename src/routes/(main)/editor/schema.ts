@@ -5,9 +5,7 @@ import { z } from 'zod';
 const setsSchema = createInsertSchema(sets).omit({ seriesId: true, workoutId: true });
 export type SimplifiedSet = typeof setsSchema;
 
-const seriesSchema = createInsertSchema(series)
-	.omit({ workoutId: true })
-	.extend({ sets: z.array(setsSchema) });
+const seriesSchema = createInsertSchema(series).extend({ sets: z.array(setsSchema) });
 export type SeriesWithSets = typeof seriesSchema;
 
 export const formSchema = createInsertSchema(activities).extend({

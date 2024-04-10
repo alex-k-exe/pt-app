@@ -16,9 +16,8 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import SetComponent from '../SetComponent.svelte';
 	import { formSchema } from '../schema';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	export let data;
 
 	const form = superForm(data.form, {
 		validators: zodClient(formSchema),

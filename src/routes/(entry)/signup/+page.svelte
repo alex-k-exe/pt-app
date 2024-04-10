@@ -1,25 +1,18 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
-	import { superForm } from 'sveltekit-superforms';
 
 	export let data;
-
-	const form = superForm(data.form);
-	const { form: formData, enhance } = form;
+	export let signupTokenId: string;
 </script>
 
+<h2>Sign up</h2>
+
 <form method="POST" use:enhance>
-	<Form.Field {form} name="signupToken">
-		<Form.Control let:attrs>
-			<Form.Label>Sign up token</Form.Label>
-			<Input
-				{...attrs}
-				placeholder="A 6 digit code that your trainer should give you"
-				bind:value={$formData.signupToken}
-			/>
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+	<Input name="signupToken" bind:value={signupTokenId} />
+	<p class="text-sm text-muted-foreground">A 6 digit code that your trainer should give you</p>
 	<Form.Button>Submit</Form.Button>
 </form>
+
+{data.error ?? ''}

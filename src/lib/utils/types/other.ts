@@ -21,4 +21,7 @@ export type WorkoutWithSeries = ActivityInsert & {
 };
 
 // require passwords to have one uppercase letter, one digit, and one special character
-export const validPassword = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/;
+export const validPassword = {
+	regex: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{12,}$/,
+	message: 'At least one uppercase and lowercase letter, one number and one special character'
+};

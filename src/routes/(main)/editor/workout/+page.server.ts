@@ -6,17 +6,17 @@ import {
 	users,
 	workouts,
 	type Activity,
+	type Series,
 	type Workout
 } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { UserType, type WorkoutWithSeries } from '$lib/utils/types/other';
-import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from '../schema';
-import type { RouteParams } from './$types';
 
 // If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
 // If User is a Trainer, find the names of their clients and attach the name of the client to the workout
@@ -53,16 +53,24 @@ export async function load({ url, locals, platform }) {
 			.map((workout) => {
 				return { date: workout.workouts.date, ...workout.activities };
 			})[0];
-		workout.series = await db.select().from(series).where(eq(series.workoutId, workoutId));
+		workout.series = await db
+			.select()
+			.from(series)
+			.orderBy(series.index)
+			.where(eq(series.activityId, workoutId));
 		workout.series = await Promise.all(
 			workout.series.map(async (series) => {
 				return {
 					...series,
-					sets: await db.select().from(sets).where(eq(sets.seriesId, series.id))
+					sets: await db.select().from(sets).orderBy(sets.index).where(eq(sets.seriesId, series.id))
 				};
 			})
 		);
-		workout.sets = await db.select().from(sets).where(eq(series.workoutId, workoutId));
+		workout.sets = await db
+			.select()
+			.from(sets)
+			.orderBy(sets.index)
+			.where(eq(series.activityId, workoutId));
 		clientOfWorkoutName = (
 			await db
 				.select({ name: users.name })
@@ -91,35 +99,60 @@ export async function load({ url, locals, platform }) {
 	};
 }
 
-async function validateForm(event: RequestEvent<RouteParams, '/(main)/editor/workout'>) {
-	const form = await superValidate(event, zod(formSchema));
-	if (!form.valid) return fail(form.data.id ? 400 : 500, { form });
-	return form;
-}
-
 export const actions = {
-	// TODO: put fixing up the series.index things when handling the insertOrUpdate action, also assign workoutId to sets and series
 	insertOrUpdate: async (event) => {
-		console.log('insertOrUpdate');
-		const form = await validateForm(event);
-		if (!('valid' in form)) return form;
+		const form = await superValidate(event, zod(formSchema));
+		if (!form.valid) return fail(400, { form });
 
 		const db = initDrizzle(event.platform);
+		let dbActivity: Activity;
 		if (form.data.id) {
-			await db.update(activities).set(form.data).where(eq(activities.id, form.data.id));
+			dbActivity = (
+				await db.select().from(activities).limit(1).where(eq(activities.id, form.data.id))
+			)[0];
 		} else {
-			const workout = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values({ activityId: workout.id, date: form.data.date });
+			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
+			await db.insert(workouts).values({ activityId: dbActivity.id, date: form.data.date });
 		}
+		form.data.series.forEach(async (formSeries, i) => {
+			formSeries.index = i;
+			formSeries.activityId = dbActivity.id;
+
+			let dbSeries: Series;
+			if (formSeries.id) {
+				dbSeries = (
+					await db.update(series).set(formSeries).where(eq(series.id, formSeries.id)).returning()
+				)[0];
+			} else {
+				dbSeries = (await db.insert(series).values(formSeries).returning())[0];
+			}
+
+			formSeries.sets.forEach(async (formSet, j) => {
+				formSet.index = j;
+				if (formSet.id) {
+					await db
+						.update(sets)
+						.set({ ...formSet, seriesId: dbSeries.id })
+						.where(eq(sets.id, formSet.id));
+				} else {
+					await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
+				}
+			});
+		});
 	},
 
 	delete: async (event) => {
-		console.log('delete');
-		const form = await validateForm(event);
-		if (!('valid' in form) || !form.data.id) return form;
+		const form = await superValidate(event, zod(formSchema));
+		const id = form.data.id;
+		if (!id) return fail(500, { form });
+		if (!form.valid) return fail(400, { form });
 
 		const db = initDrizzle(event.platform);
-		db.delete(activities).where(eq(activities.id, form.data.id));
-		await db.delete(workouts).where(eq(workouts.activityId, form.data.id));
+		await db.batch([
+			db.delete(activities).where(eq(activities.id, id)),
+			db.delete(workouts).where(eq(workouts.activityId, id)),
+			db.delete(series).where(eq(series.activityId, id)),
+			db.delete(sets).where(eq(sets.activityId, id))
+		]);
 	}
 };

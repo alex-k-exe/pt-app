@@ -1,24 +1,20 @@
-import { initDrizzle, validateForm } from '$lib/server/utils';
-import { redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
-import { formSchema } from './schema';
+import { fail, redirect } from '@sveltejs/kit';
 
-export async function load({ platform }) {
-	return { form: await superValidate(zod(await formSchema(initDrizzle(platform)))) };
+export async function load({ url }) {
+	return {
+		error: url.searchParams.get('error')
+	};
 }
 
 export const actions = {
 	default: async (event) => {
-		const formData = (await validateForm(event, formSchema)).data;
-		if ('form' in formData) return formData;
-
 		const targetHref = event.url.searchParams.get('targetHref')?.toString();
-		const signupToken = formData.signupToken;
+		const signupToken = (await event.request.formData()).get('signupToken')?.toString().trim();
+		if (!signupToken) return fail(400, { form: await event.request.formData() });
 
 		return redirect(
 			302,
-			`/signup/${signupToken}/` + (targetHref ? `?targetHref=${targetHref}` : '')
+			`/signup/${signupToken}/` + (targetHref === undefined ? '' : `?targetHref=${targetHref}`)
 		);
 	}
 };

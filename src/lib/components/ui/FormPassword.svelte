@@ -4,13 +4,15 @@
 	import * as Form from './form';
 	import { Input } from './input';
 
-	let passwordInputType: 'password' | '' = 'password';
+	export let passwordInputType: 'password' | '' = 'password';
+	export let value: string;
+	export let label: string = 'Password';
 </script>
 
 <Form.Control let:attrs>
-	<Form.Label>Password</Form.Label>
+	<Form.Label>{label}</Form.Label>
 	<div class="flex">
-		<Input {...attrs} type={passwordInputType} />
+		<Input {...attrs} type={passwordInputType} bind:value />
 		<Button
 			on:click={() => (passwordInputType = passwordInputType === 'password' ? '' : 'password')}
 		>
