@@ -10,6 +10,7 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
+import { arrayToTuple } from '$lib/utils/other';
 import { UserType, type WorkoutWithSeries } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
@@ -58,14 +59,15 @@ export async function load({ url, locals, platform }) {
 			.from(series)
 			.orderBy(series.index)
 			.where(eq(series.activityId, workoutId));
-		workout.series = await Promise.all(
-			workout.series.map(async (series) => {
-				return {
-					...series,
-					sets: await db.select().from(sets).orderBy(sets.index).where(eq(sets.seriesId, series.id))
-				};
-			})
-		);
+
+		const getSetsInSeries = workout.series.map((series) => {
+			return db.select().from(sets).orderBy(sets.index).where(eq(sets.seriesId, series.id));
+		});
+		const setsInSeries = (await db.batch(arrayToTuple(getSetsInSeries))).map((set) => set);
+		workout.series = workout.series.map((series, i) => {
+			return { ...series, sets: setsInSeries[i] };
+		});
+
 		workout.sets = await db
 			.select()
 			.from(sets)

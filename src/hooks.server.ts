@@ -2,18 +2,11 @@ import { initLucia } from '$lib/server/lucia';
 import { UserType } from '$lib/utils/types/other';
 
 export async function handle({ event, resolve }) {
-	console.log('s');
 	const lucia = initLucia(event.platform);
-	console.log('inited');
 	event.locals.lucia = lucia;
-	console.log('thingo3', lucia.createBlankSessionCookie());
 	const targetPath = event.url.pathname;
 
-	if (
-		targetPath.startsWith('/admin') ||
-		targetPath.startsWith('/login') ||
-		targetPath.startsWith('/signup')
-	) {
+	if (routeIsPublic(event.url.pathname)) {
 		return resolve(event);
 	}
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
@@ -46,4 +39,9 @@ export async function handle({ event, resolve }) {
 		});
 	}
 	return resolve(event);
+}
+
+export function routeIsPublic(route: string) {
+	const publicRoutes = ['/admin', '/login', 'signup'];
+	return publicRoutes.some((publicRoute) => route.startsWith(publicRoute));
 }

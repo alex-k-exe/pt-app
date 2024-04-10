@@ -10,3 +10,8 @@ export function numberToLetter(n: number) {
 	// 64 is the ASCII value of 'A' minus 1
 	return String.fromCharCode(n + 64);
 }
+
+// i dont like typescript as much now
+export function arrayToTuple<T>(array: T[]) {
+	return array as [(typeof array)[number], ...(typeof array)[number][]];
+}

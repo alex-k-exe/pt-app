@@ -1,4 +1,4 @@
-import { activities, users, workouts } from '$lib/drizzleTables';
+import { activities, workouts } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { datesAreSameDay } from '$lib/utils/dates.js';
 import { dayOnlyFormat } from '$lib/utils/types/other';
@@ -7,7 +7,6 @@ import { eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform, url }) {
 	const date = dayjs(url.searchParams.get('date'), dayOnlyFormat);
-
 	const db = initDrizzle(platform);
 
 	const foundWorkouts = (
@@ -27,25 +26,8 @@ export async function load({ locals, platform, url }) {
 		datesAreSameDay(dayjs(workout.date), date);
 	});
 
-	const combinedDetails = await Promise.all(
-		foundWorkouts.map(async ({ activities: workout }) => {
-			const clientName = (
-				await db
-					.select({ name: users.name })
-					.from(users)
-					.limit(1)
-					.where(eq(users.id, workout.clientId))
-			)[0].name;
-
-			return {
-				...workout,
-				clientName: clientName
-			};
-		})
-	);
-
 	return {
 		date: date.toISOString(),
-		workouts: combinedDetails
+		workouts: foundWorkouts
 	};
 }
