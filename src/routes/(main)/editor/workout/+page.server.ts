@@ -26,7 +26,7 @@ export async function load({ url, locals, platform }) {
 	const date = dayjs(url.searchParams.get('date'));
 	const workoutId = Number(url.searchParams.get('workoutId'));
 
-	if (!locals.user?.id) throw redirect(400, '/login');
+	if (!locals.user?.id) return redirect(400, '/login');
 	let workout: WorkoutWithSeries = {
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new workout

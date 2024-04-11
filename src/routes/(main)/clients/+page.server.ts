@@ -6,13 +6,13 @@ import {
 	type SignupToken,
 	type User
 } from '$lib/drizzleTables.ts';
-import { generateSignupToken, initDrizzle } from '$lib/server/utils';
+import { initDrizzle } from '$lib/server/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq, lte } from 'drizzle-orm';
 
 export async function load({ platform, locals }) {
-	if (!locals.user?.id) throw redirect(302, '/login');
+	if (!locals.user?.id) return redirect(302, '/login');
 	const db = initDrizzle(platform);
 
 	const foundClients: User[] = (
@@ -34,11 +34,11 @@ export async function load({ platform, locals }) {
 
 	await db
 		.delete(signupTokens)
-		.where(lte(signupTokens.creationTimeDate, dayjs().subtract(10, 'hour').toString()));
+		.where(lte(signupTokens.creationTimestamp, dayjs().subtract(10, 'hour').toString()));
 	const foundTokens: SignupToken[] = await db
 		.select()
 		.from(signupTokens)
-		.orderBy(signupTokens.creationTimeDate)
+		.orderBy(signupTokens.creationTimestamp)
 		.where(eq(signupTokens.trainerId, locals.user.id));
 
 	return { clients: foundClients, trainers: foundTrainers, signupTokens: foundTokens };
@@ -66,10 +66,7 @@ export const actions = {
 	},
 
 	addToken: async ({ platform, locals }) => {
-		const signupTokenId = generateSignupToken();
-
 		await initDrizzle(platform).insert(signupTokens).values({
-			id: signupTokenId,
 			trainerId: locals.user?.id
 		});
 	},

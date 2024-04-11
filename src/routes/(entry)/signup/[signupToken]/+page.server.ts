@@ -14,7 +14,7 @@ export async function load({ params, url, platform }) {
 	const db = initDrizzle(platform);
 	const tokenValidation = await (await asyncTokenSchema(db)).safeParseAsync(signupTokenId);
 	if (!tokenValidation.success) {
-		throw redirect(
+		return redirect(
 			302,
 			'/signup' +
 				`?error=${tokenValidation.error.errors[0].message}` +
@@ -28,7 +28,7 @@ export async function load({ params, url, platform }) {
 	)[0];
 
 	if (!signupToken) {
-		throw redirect(302, '/signup' + (targetPath ? `?targetPath=${targetPath}` : ''));
+		return redirect(302, '/signup' + (targetPath ? `?targetPath=${targetPath}` : ''));
 	}
 	if (signupToken.trainerId) {
 		trainer = (

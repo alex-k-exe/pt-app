@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "047e02cf-e00c-4b1c-8f5b-8c567166f6c3",
+  "id": "947a653a-1654-4047-bfbd-6869f9648c80",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activities": {
@@ -76,7 +76,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "activities_trainerId_trainers_id_fk": {
@@ -89,7 +89,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -133,7 +133,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "chats_userId2_users_id_fk": {
@@ -146,7 +146,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -183,7 +183,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "clients_trainerId_trainers_id_fk": {
@@ -233,7 +233,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -249,6 +249,14 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "sentTimestamp": {
+          "name": "sentTimestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
         },
         "chatId": {
           "name": "chatId",
@@ -270,6 +278,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "readByReciever": {
+          "name": "readByReciever",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         }
       },
       "indexes": {},
@@ -284,7 +300,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "messages_senderId_users_id_fk": {
@@ -297,7 +313,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -314,8 +330,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "workoutId": {
-          "name": "workoutId",
+        "activityId": {
+          "name": "activityId",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -338,17 +354,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "series_workoutId_activities_id_fk": {
-          "name": "series_workoutId_activities_id_fk",
+        "series_activityId_activities_id_fk": {
+          "name": "series_activityId_activities_id_fk",
           "tableFrom": "series",
           "tableTo": "activities",
           "columnsFrom": [
-            "workoutId"
+            "activityId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -365,8 +381,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -382,17 +398,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "sessions_userId_users_id_fk": {
-          "name": "sessions_userId_users_id_fk",
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -405,6 +421,13 @@
         "id": {
           "name": "id",
           "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "activityId": {
+          "name": "activityId",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -416,15 +439,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "integer": {
-          "name": "integer",
+        "index": {
+          "name": "index",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
+        "exerciseName": {
+          "name": "exerciseName",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -461,17 +484,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "sets_id_activities_id_fk": {
-          "name": "sets_id_activities_id_fk",
+        "sets_activityId_activities_id_fk": {
+          "name": "sets_activityId_activities_id_fk",
           "tableFrom": "sets",
           "tableTo": "activities",
           "columnsFrom": [
-            "id"
+            "activityId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -483,10 +506,11 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 922103
         },
         "trainerId": {
           "name": "trainerId",
@@ -500,7 +524,8 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
         }
       },
       "indexes": {},
@@ -515,7 +540,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -545,7 +570,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -627,7 +652,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

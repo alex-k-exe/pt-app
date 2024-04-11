@@ -1,15 +1,14 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Svelecte from 'svelecte';
-	import type { SimpleChat, SimpleUser } from './+page.server';
 
-	export let chats: SimpleChat[];
-	export let trainers: SimpleUser[];
+	export let chats: { id: number; otherUsersName: string; hasBeenRead: boolean }[];
+	export let trainers: { id: string; name: string }[];
 	export let selectedChatId: number = chats[0].id;
 </script>
 
 <form method="POST" action="?/createNewChat" style="text-align: center; margin-top: 10px">
-	<Svelecte options={trainers} valueField="id" labelField="name" name="trainerId" />
+	<Svelecte options={trainers} valueField="id" labelField="name" name="otherUserId" />
 	<Button>New chat</Button>
 </form>
 

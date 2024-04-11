@@ -2,12 +2,7 @@ import { initLucia } from '$lib/server/lucia';
 import { UserType } from '$lib/utils/types/other';
 
 export async function handle({ event, resolve }) {
-	console.log('handle');
-	if (event.request.headers.get('user-agent')?.includes('Cloudflare')) {
-		// Skip executing logic during the build process
-		return resolve(event);
-	}
-
+	console.log('handle!');
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
 	const targetPath = event.url.pathname;

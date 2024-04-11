@@ -31,7 +31,7 @@
 			</Button>
 		</form>
 	{:else}
-		Select a chat
+		<div class="place-items-center">Select a chat</div>
 	{/if}
 </div>
 
