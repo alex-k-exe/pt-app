@@ -67,7 +67,7 @@ export const messages = sqliteTable('messages', {
 		.notNull()
 		.references(() => users.id),
 	text: text('text').notNull(),
-	readByReciever: integer('readByReciever', { mode: 'boolean' }).default(false)
+	readByReciever: integer('readByReciever', { mode: 'boolean' }).notNull().default(false)
 });
 export type Message = typeof messages.$inferSelect;
 

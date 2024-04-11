@@ -2,6 +2,12 @@ import { initLucia } from '$lib/server/lucia';
 import { UserType } from '$lib/utils/types/other';
 
 export async function handle({ event, resolve }) {
+	console.log('handle');
+	if (event.request.headers.get('user-agent')?.includes('Cloudflare')) {
+		// Skip executing logic during the build process
+		return resolve(event);
+	}
+
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
 	const targetPath = event.url.pathname;
@@ -11,6 +17,8 @@ export async function handle({ event, resolve }) {
 	}
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
 	if (!sessionId) {
+		event.locals.user = null;
+		event.locals.session = null;
 		return new Response(null, {
 			status: 302,
 			headers: { location: `/login?targetPath=${encodeURIComponent(targetPath)}` }

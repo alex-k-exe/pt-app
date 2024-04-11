@@ -13,15 +13,26 @@
 </svelte:head>
 
 <div class="chats">
-	<div class="chatList"><ChatList chats={data.chats} trainers={data.trainers} /></div>
-	<div class="chatHeader">chatHeader</div>
-	<div class="messageList">messageList</div>
-	<div class="messageBox">
-		<Input placeholder="Type a message" />
-		<Button variant="outline" size="icon">
-			<Send />
-		</Button>
+	<div class="chatList">
+		<ChatList chats={data.chats} trainers={data.trainers} />
 	</div>
+	{#if data.selectedChat}
+		<form method="POST" action="/?deleteChat" class="chatHeader">
+			<input type="hidden" name="chatId" value={data.selectedChat.id} />
+			Chat with {data.selectedChat.otherUsersName}
+			<Button>Delete chat</Button>
+		</form>
+		<div class="messageList">messageList</div>
+		<form method="POST" action="?/sendMessage" class="messageBox">
+			<input type="hidden" name="chatId" value={data.selectedChat.id} />
+			<Input placeholder="Type a message" name="text" />
+			<Button variant="outline" size="icon">
+				<Send />
+			</Button>
+		</form>
+	{:else}
+		Select a chat
+	{/if}
 </div>
 
 <style>
