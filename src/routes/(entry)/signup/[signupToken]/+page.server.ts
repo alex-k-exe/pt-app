@@ -2,7 +2,7 @@ import { clients, signupTokens, trainers, users, type User } from '$lib/drizzleT
 import { initDrizzle } from '$lib/server/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { Scrypt, generateId } from 'lucia';
+import { Scrypt } from 'lucia';
 import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { asyncTokenSchema, formSchema, type FormSchema } from './schema';
@@ -46,6 +46,7 @@ export async function load({ params, url, platform }) {
 
 export const actions = {
 	default: async (event) => {
+		console.log('yo');
 		const db = initDrizzle(event.platform);
 		let form: FormSchema | SuperValidated<FormSchema> = await superValidate(
 			event,
@@ -53,24 +54,29 @@ export const actions = {
 		);
 		if (!form.valid) return fail(400, { form });
 		form = form.data;
+		console.log('you are valid :)');
 
-		const userId = generateId(15);
-		const hashedPassword = await new Scrypt().hash(form.password.password);
+		const hashedPassword = await new Scrypt().hash(form.password);
 
-		await db.insert(users).values({
-			id: userId,
-			email: form.email,
-			password: hashedPassword,
-			name: form.name
-		});
+		const user = (
+			await db
+				.insert(users)
+				.values({
+					email: form.email,
+					password: hashedPassword,
+					name: form.name
+				})
+				.returning()
+		)[0];
+		if (!user.id) return fail(500, { form });
 		if (form.trainerId) {
-			await db.insert(clients).values({ id: userId, trainerId: form.trainerId });
+			await db.insert(clients).values({ id: user.id, trainerId: form.trainerId });
 		} else {
-			await db.insert(trainers).values({ id: userId });
+			await db.insert(trainers).values({ id: user.id });
 		}
 		await db.delete(signupTokens).where(eq(signupTokens.id, form.signupTokenId));
 
-		const session = await event.locals.lucia.createSession(userId, {});
+		const session = await event.locals.lucia.createSession(user.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
 		return new Response(null, {
 			status: 302,

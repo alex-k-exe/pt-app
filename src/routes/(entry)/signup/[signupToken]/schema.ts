@@ -6,38 +6,37 @@ import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { z } from 'zod';
 
 export async function formSchema(db: DrizzleD1Database) {
-	return z.object({
-		targetPath: z.string().nullish(),
-		signupTokenId: signupTokenSchema,
-		trainerId: z.string().nullish(),
-		email: z
-			.string()
-			.email()
-			.min(5)
-			.max(100)
-			.refine(
-				async (email) => {
-					const emails = await db
-						.select({ email: users.email })
-						.from(users)
-						.limit(1)
-						.where(eq(users.email, email));
-					return emails.length === 0;
-				},
-				{ message: 'Email is already in use', path: ['email'] }
-			),
-		password: z
-			.object({
-				password: z.string().regex(validPassword.regex, validPassword.message).min(12).max(100),
-				confirmPassword: z
-					.string()
-					.regex(validPassword.regex, validPassword.message)
-					.min(12)
-					.max(100)
-			})
-			.refine((data) => data.password === data.confirmPassword),
-		name: z.string().max(100)
-	});
+	return z
+		.object({
+			targetPath: z.string().nullish(),
+			signupTokenId: signupTokenSchema,
+			trainerId: z.string().nullish(),
+			email: z
+				.string()
+				.email()
+				.min(5)
+				.max(100)
+				.refine(
+					async (email) => {
+						const emails = await db
+							.select({ email: users.email })
+							.from(users)
+							.limit(1)
+							.where(eq(users.email, email));
+						return emails.length === 0;
+					},
+					{ message: 'Email is already in use', path: ['email'] }
+				),
+
+			password: z.string().regex(validPassword.regex, validPassword.message).min(12).max(100),
+			confirmPassword: z
+				.string()
+				.regex(validPassword.regex, validPassword.message)
+				.min(12)
+				.max(100),
+			name: z.string().max(100)
+		})
+		.refine((data) => data.password === data.confirmPassword);
 }
 export type FormSchema = z.infer<Awaited<ReturnType<typeof formSchema>>>;
 

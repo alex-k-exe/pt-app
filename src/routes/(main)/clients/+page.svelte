@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ClientsTable from './clients-table/ClientsTable.svelte';
+	import TokensTable from './tokens-table/TokensTable.svelte';
 
 	export let data;
 </script>
@@ -11,7 +12,11 @@
 
 <h1>Clients and invite links</h1>
 
-<div class="">
-	<ClientsTable clients={data.clients} trainers={data.trainers} />
-	<!-- for inviting client, token should be 6 integers and hashed before storing in db -->
+<div class="flex w-full flex-row justify-around gap-10">
+	<div class="w-full">
+		<ClientsTable clients={data.clients} trainers={data.trainers} />
+	</div>
+	<div class="w-full">
+		<TokensTable signupTokens={data.signupTokens} />
+	</div>
 </div>

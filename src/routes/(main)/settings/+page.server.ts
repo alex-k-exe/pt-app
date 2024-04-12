@@ -1,4 +1,4 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export const actions: Actions = {
@@ -10,6 +10,5 @@ export const actions: Actions = {
 			path: '.',
 			...sessionCookie.attributes
 		});
-		redirect(302, 'entry/login');
 	}
 };

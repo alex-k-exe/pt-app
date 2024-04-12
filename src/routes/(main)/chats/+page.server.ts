@@ -10,9 +10,7 @@ import { formSchema } from './schema';
 
 export async function load({ platform, url, locals }) {
 	let chatId: string | number | null = url.searchParams.get('chatId');
-	if (!locals.user?.id) {
-		return redirect(302, '/login?targetPath=/chats' + (chatId ? `?chatId=${chatId}` : ''));
-	}
+	if (!locals.user?.id) return redirect(302, '/login');
 	// get first 10 chats and other user's name
 	// if chatId, get first 10 messages from that chat
 	const db = initDrizzle(platform);

@@ -40,7 +40,7 @@
 		} else {
 			$formData.sets = [
 				...$formData.sets,
-				{
+				{activityId: $formData.id
 					index: $formData.sets.length,
 					exerciseName: 'Example'
 				}

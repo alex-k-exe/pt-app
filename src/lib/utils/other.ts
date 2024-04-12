@@ -15,3 +15,8 @@ export function numberToLetter(n: number) {
 export function arrayToTuple<T>(array: T[]) {
 	return array as [(typeof array)[number], ...(typeof array)[number][]];
 }
+
+export function createPathURIComponent(targetPath: string | null, firstComponent: boolean = true) {
+	if (targetPath === null) return '';
+	return `${firstComponent ? '?' : '&'}targetPath=${targetPath}`;
+}

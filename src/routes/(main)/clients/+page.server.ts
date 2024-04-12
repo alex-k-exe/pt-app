@@ -65,7 +65,8 @@ export const actions = {
 		db.update(clients).set({ trainerId: trainerId }).where(eq(clients.id, clientId));
 	},
 
-	addToken: async ({ platform, locals }) => {
+	createToken: async ({ platform, locals }) => {
+		console.log('uh');
 		await initDrizzle(platform).insert(signupTokens).values({
 			trainerId: locals.user?.id
 		});

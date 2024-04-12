@@ -21,7 +21,7 @@
 <div class="inline-block">
 	Your signup token is <b>{data.signupTokenId}</b>.
 	<a href={'/signup' + (data.targetPath ? `?targetPath=${data.targetPath}` : '')}
-		><u>Change your token</u></a
+		>You can <u>change your token</u></a
 	>.
 </div>
 
@@ -47,14 +47,14 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="password.password">
-		<FormPassword label="Pasword" bind:value={$formData.password.password} bind:passwordInputType />
+	<Form.Field {form} name="password">
+		<FormPassword label="Password" bind:value={$formData.password} bind:passwordInputType />
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field {form} name="password.confirmPassword">
+	<Form.Field {form} name="confirmPassword">
 		<FormPassword
 			label="Confirm pasword"
-			bind:value={$formData.password.confirmPassword}
+			bind:value={$formData.confirmPassword}
 			bind:passwordInputType
 		/>
 		<Form.FieldErrors />

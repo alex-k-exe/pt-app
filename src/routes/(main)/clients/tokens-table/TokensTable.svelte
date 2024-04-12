@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DataTable from '$lib/components/ui/DataTable.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import type { SignupToken } from '$lib/drizzleTables';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
@@ -18,11 +19,16 @@
 			accessor: ({ id }) => id,
 			header: 'Delete',
 			cell: ({ value }) => {
-				return createRender(DeleteTokenAction, { signupTokenId: value });
+				return createRender(DeleteTokenAction, { signupTokenId: value.toString() });
 			}
 		})
 	]);
 </script>
 
-<h2>Sign up tokens</h2>
+<div class="flex gap-4 pb-5 align-middle">
+	<h2>Sign up tokens</h2>
+	<form method="POST" action="?/createToken">
+		<Button>Create a new token</Button>
+	</form>
+</div>
 <DataTable {table} {columns} />

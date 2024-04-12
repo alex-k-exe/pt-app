@@ -1,8 +1,18 @@
 import { initLucia } from '$lib/server/lucia';
 import { UserType } from '$lib/utils/types/other';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import timezone from 'dayjs/plugin/timezone';
+import updateLocale from 'dayjs/plugin/updateLocale';
 
 export async function handle({ event, resolve }) {
-	console.log('handle!');
+	dayjs.extend(updateLocale);
+	dayjs.extend(timezone);
+	dayjs.updateLocale('en', {
+		weekStart: 1
+	});
+	dayjs.extend(customParseFormat);
+
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
 	const targetPath = event.url.pathname;
@@ -16,7 +26,7 @@ export async function handle({ event, resolve }) {
 		event.locals.session = null;
 		return new Response(null, {
 			status: 302,
-			headers: { location: `/login?targetPath=${encodeURIComponent(targetPath)}` }
+			headers: { location: `/login?targetPath=${targetPath}` }
 		});
 	}
 
@@ -45,6 +55,7 @@ export async function handle({ event, resolve }) {
 }
 
 export function routeIsPublic(route: string) {
-	const publicRoutes = ['/admin', '/login', 'signup'];
+	route = route.charAt(0) === '/' ? route.substring(1) : route;
+	const publicRoutes = ['admin', 'login', 'signup'];
 	return publicRoutes.some((publicRoute) => route.startsWith(publicRoute));
 }

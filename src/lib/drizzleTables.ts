@@ -42,7 +42,9 @@ export const sessions = sqliteTable('sessions', {
 export type Session = typeof sessions.$inferSelect;
 
 export const signupTokens = sqliteTable('signupTokens', {
-	id: integer('id').primaryKey().default(generateSignupToken()),
+	id: integer('id')
+		.primaryKey()
+		.$defaultFn(() => generateSignupToken()),
 	trainerId: text('trainerId').references(() => trainers.id, { onDelete: 'cascade' }),
 	creationTimestamp: text('creationTimestamp')
 		.notNull()
@@ -118,7 +120,6 @@ export const series = sqliteTable('series', {
 	index: integer('index').notNull(),
 	reps: integer('reps').notNull()
 });
-export type Series = typeof series.$inferSelect;
 export type SeriesInsert = typeof series.$inferInsert;
 
 export const sets = sqliteTable('sets', {
@@ -134,5 +135,4 @@ export const sets = sqliteTable('sets', {
 	duration: text('duration'),
 	rpe: text('rpe')
 });
-export type Set = typeof sets.$inferSelect;
 export type SetInsert = typeof sets.$inferInsert;

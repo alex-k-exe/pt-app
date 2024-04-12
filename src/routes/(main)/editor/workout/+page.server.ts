@@ -6,7 +6,6 @@ import {
 	users,
 	workouts,
 	type Activity,
-	type Series,
 	type Workout
 } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
@@ -26,53 +25,54 @@ export async function load({ url, locals, platform }) {
 	const date = dayjs(url.searchParams.get('date'));
 	const workoutId = Number(url.searchParams.get('workoutId'));
 
-	if (!locals.user?.id) return redirect(400, '/login');
+	if (!locals.user?.id) return redirect(302, '/login');
 	let workout: WorkoutWithSeries = {
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new workout
 		title: '',
 		date: date.toISOString(),
 		startTime: '',
-		endTime: ''
+		endTime: '',
+		series: [],
+		sets: []
 	};
 	let clientOfWorkoutName: string = '';
 
 	// TODO: break this mess into some functions
 	if (workoutId) {
 		const db = initDrizzle(platform);
-		workout = (
-			await db
-				.select()
-				.from(workouts)
-				.leftJoin(activities, eq(activities.id, workouts.activityId))
-				.limit(1)
-				.where(eq(workouts.activityId, workoutId))
-		)
-			.filter((workout): workout is { activities: Activity; workouts: Workout } => {
-				return workout.activities !== null;
-			})
-			.map((workout) => {
-				return { date: workout.workouts.date, ...workout.activities };
-			})[0];
-		workout.series = await db
-			.select()
-			.from(series)
-			.orderBy(series.index)
-			.where(eq(series.activityId, workoutId));
+		workout = {
+			...(
+				await db
+					.select()
+					.from(workouts)
+					.leftJoin(activities, eq(activities.id, workouts.activityId))
+					.limit(1)
+					.where(eq(workouts.activityId, workoutId))
+			)
+				.filter((workout): workout is { activities: Activity; workouts: Workout } => {
+					return workout.activities !== null;
+				})
+				.map((workout) => {
+					return { date: workout.workouts.date, ...workout.activities };
+				})[0],
+			series: [],
+			sets: []
+		};
+		workout.series = (
+			await db.select().from(series).orderBy(series.index).where(eq(series.activityId, workoutId))
+		).map((series) => {
+			return { ...series, sets: [] };
+		});
 
 		const getSetsInSeries = workout.series.map((series) => {
-			return db.select().from(sets).orderBy(sets.index).where(eq(sets.seriesId, series.id));
+			return db.select().from(sets).orderBy(sets.index).where(eq(sets.seriesId, series.id!));
 		});
 		const setsInSeries = (await db.batch(arrayToTuple(getSetsInSeries))).map((set) => set);
 		workout.series = workout.series.map((series, i) => {
 			return { ...series, sets: setsInSeries[i] };
 		});
 
-		workout.sets = await db
-			.select()
-			.from(sets)
-			.orderBy(sets.index)
-			.where(eq(series.activityId, workoutId));
 		clientOfWorkoutName = (
 			await db
 				.select({ name: users.name })

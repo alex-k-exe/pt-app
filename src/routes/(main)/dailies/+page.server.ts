@@ -5,8 +5,7 @@ import { redirect } from '@sveltejs/kit';
 import { eq, or, sql } from 'drizzle-orm';
 
 export async function load({ locals, platform }) {
-	console.log(locals.user?.id);
-	if (!locals.user?.id) return redirect(302, '/login?targetHref=/dailies');
+	if (!locals.user?.id) return redirect(302, '/login');
 	const db = initDrizzle(platform);
 
 	const foundDailies = (
