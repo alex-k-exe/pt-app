@@ -46,7 +46,6 @@ export async function load({ params, url, platform }) {
 
 export const actions = {
 	default: async (event) => {
-		console.log('yo');
 		const db = initDrizzle(event.platform);
 		let form: FormSchema | SuperValidated<FormSchema> = await superValidate(
 			event,

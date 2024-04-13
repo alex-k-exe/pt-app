@@ -34,11 +34,11 @@ export async function load({ platform, locals }) {
 
 	await db
 		.delete(signupTokens)
-		.where(lte(signupTokens.creationTimestamp, dayjs().subtract(10, 'hour').toString()));
+		.where(lte(signupTokens.creationTimeDate, dayjs().subtract(10, 'hour').toDate()));
 	const foundTokens: SignupToken[] = await db
 		.select()
 		.from(signupTokens)
-		.orderBy(signupTokens.creationTimestamp)
+		.orderBy(signupTokens.creationTimeDate)
 		.where(eq(signupTokens.trainerId, locals.user.id));
 
 	return { clients: foundClients, trainers: foundTrainers, signupTokens: foundTokens };

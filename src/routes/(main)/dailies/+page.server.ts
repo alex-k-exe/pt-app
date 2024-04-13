@@ -1,8 +1,9 @@
 import { activities, clients, dailies, users, type Activity, type Daily } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { UserType } from '$lib/utils/types/other';
+import { arrayToTuple } from '$lib/utils/other.js';
+import { userTypes } from '$lib/utils/types/other.js';
 import { redirect } from '@sveltejs/kit';
-import { eq, or, sql } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform }) {
 	if (!locals.user?.id) return redirect(302, '/login');
@@ -23,22 +24,25 @@ export async function load({ locals, platform }) {
 			return { ...daily.activities, activeDays: daily.dailies.activeDays };
 		});
 
-	let otherPersonsNames: string[];
-	console.log('here it comes!');
-	if (locals.userType === UserType.CLIENT) {
-		const getOtherPersonsName = db
-			.select({ otherPersonsName: users.name })
-			.from(users)
-			.limit(1)
-			.leftJoin(clients, eq(users.id, clients.id))
-			.where(eq(clients.id, sql.placeholder('clientId')));
+	let clientsNames: string[] | null = null;
+	if (locals.userType === userTypes.CLIENT) {
+		const getOtherPersonsNames = foundDailies.map((daily) =>
+			db
+				.select({ otherPersonsName: users.name })
+				.from(users)
+				.leftJoin(clients, eq(users.id, clients.id))
+				.limit(1)
+				.where(eq(clients.id, daily.clientId))
+		);
 
-		const thing = await db.batch([getOtherPersonsName]);
+		clientsNames = (await db.batch(arrayToTuple(getOtherPersonsNames))).map(
+			(name) => name[0].otherPersonsName
+		);
 	}
 
 	return {
 		dailies: foundDailies.map((daily, i) => {
-			return { ...daily, otherPersonsName: otherPersonsNames[i] };
+			return { ...daily, clientsName: clientsNames ? clientsNames[i] : null };
 		}),
 		userType: locals.userType
 	};

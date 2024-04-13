@@ -1,40 +1,28 @@
 <script lang="ts">
-	import type { Workout } from '$lib/drizzleTables';
+	import type { Activity, Workout } from '$lib/drizzleTables';
+	import { daysOfTheWeek, userTypes, type ObjectValues } from '$lib/utils/types/other';
 	import type dayjs from 'dayjs';
-	import type { Dayjs } from 'dayjs';
 	import DayCell from './DayCell.svelte';
 
 	export let month: dayjs.Dayjs[][];
-	export let workouts: Workout[];
-
-	const daysOfTheWeek = [
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday',
-		'Sunday'
-	] as const;
-
-	function createDayCellStyle(day: Dayjs, workouts: Workout[]) {
-		let s = 'width: 100%; height: 100%';
-		// Adjusted to make Monday the first day of the week
-		s += '; grid-column:' + day.day();
-		return s;
-	}
+	export let workouts: (Activity & Workout & { clientsName: string | null })[];
+	export let userType: ObjectValues<typeof userTypes>;
 </script>
 
 <div class="month">
-	{#each daysOfTheWeek as heading, headingIndex (headingIndex)}
+	{#each Object.values(daysOfTheWeek) as heading, headingIndex (headingIndex)}
 		<div style={'grid-column:' + (headingIndex + 1) + ': grid-row: 1; padding-bottom: 10px'}>
 			<b>{heading.substring(0, 3)}</b>
 		</div>
 	{/each}
 	{#each month as week, weekIndex (weekIndex)}
 		{#each week as day, dayIndex (dayIndex)}
-			<div style={createDayCellStyle(day, workouts) + '; grid-row:' + (weekIndex + 2)}>
-				<DayCell {day} />
+			<div class="h-full w-full" style={`grid-column: ${day.day()}; grid-row:${weekIndex + 2}`}>
+				<DayCell
+					{userType}
+					workouts={workouts.filter((workout) => workout.date === day.toDate())}
+					{day}
+				/>
 			</div>
 		{/each}
 	{/each}

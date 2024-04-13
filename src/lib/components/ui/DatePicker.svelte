@@ -13,13 +13,15 @@
 	import { CalendarDays } from 'lucide-svelte';
 
 	// I prefer Dayjs because of .format() but the creator of the library prefers i8n/date
-	export let selectedDate = dayjs();
+	export let selectedDate = dayjs().toDate();
 
-	let value: DateValue = new CalendarDate(
-		selectedDate.year(),
-		selectedDate.month(),
-		selectedDate.date()
+	let value: DateValue;
+	$: value = new CalendarDate(
+		selectedDate.getFullYear(),
+		selectedDate.getMonth(),
+		selectedDate.getDate()
 	);
+
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long'
 	});

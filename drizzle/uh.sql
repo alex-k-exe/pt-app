@@ -18,8 +18,8 @@ CREATE TABLE `activities` (
 	`name` text NOT NULL,
 	`notes` text,
 	`location` text,
-	`startTime` text NOT NULL,
-	`endTime` text NOT NULL,
+	`startTime` integer NOT NULL,
+	`endTime` integer NOT NULL,
 	FOREIGN KEY (`clientId`) REFERENCES `clients`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -85,9 +85,9 @@ CREATE TABLE `sets` (
 );
 --> statement-breakpoint
 CREATE TABLE `signupTokens` (
-	`id` integer PRIMARY KEY DEFAULT 922103 NOT NULL,
+	`id` integer PRIMARY KEY NOT NULL,
 	`trainerId` text,
-	`creationTimestamp` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+	`creationTimestamp` integer DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -105,7 +105,7 @@ CREATE TABLE `users` (
 --> statement-breakpoint
 CREATE TABLE `workouts` (
 	`activityId` integer PRIMARY KEY NOT NULL,
-	`date` text NOT NULL,
+	`date` integer NOT NULL,
 	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint

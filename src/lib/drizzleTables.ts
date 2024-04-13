@@ -46,7 +46,7 @@ export const signupTokens = sqliteTable('signupTokens', {
 		.primaryKey()
 		.$defaultFn(() => generateSignupToken()),
 	trainerId: text('trainerId').references(() => trainers.id, { onDelete: 'cascade' }),
-	creationTimestamp: text('creationTimestamp')
+	creationTimeDate: integer('creationTimestamp', { mode: 'timestamp' })
 		.notNull()
 		.default(sql`(CURRENT_TIMESTAMP)`)
 });
@@ -88,8 +88,8 @@ export const activities = sqliteTable('activities', {
 	title: text('name').notNull(),
 	notes: text('notes'),
 	location: text('location'),
-	startTime: text('startTime').notNull(),
-	endTime: text('endTime').notNull()
+	startTime: integer('startTime', { mode: 'timestamp' }).notNull(),
+	endTime: integer('endTime', { mode: 'timestamp' }).notNull()
 });
 export type Activity = typeof activities.$inferSelect;
 export type ActivityInsert = typeof activities.$inferInsert;
@@ -108,7 +108,7 @@ export const workouts = sqliteTable('workouts', {
 		.references(() => activities.id, { onDelete: 'cascade' })
 		.primaryKey()
 		.notNull(),
-	date: text('date').notNull()
+	date: integer('date', { mode: 'timestamp' }).notNull()
 });
 export type Workout = typeof workouts.$inferSelect;
 
@@ -120,6 +120,7 @@ export const series = sqliteTable('series', {
 	index: integer('index').notNull(),
 	reps: integer('reps').notNull()
 });
+export type Series = typeof series.$inferSelect;
 export type SeriesInsert = typeof series.$inferInsert;
 
 export const sets = sqliteTable('sets', {

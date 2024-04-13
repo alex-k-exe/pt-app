@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
+	import { timeOnlyFormat } from '$lib/utils/types/other';
 	import dayjs from 'dayjs';
 	import z from 'zod';
 
-	export let selectedTimeString = dayjs().toISOString();
-	export let name: string = '';
+	export let selectedDate = dayjs().toDate();
 
 	const AmOrPm = {
 		AM: 'am',
@@ -17,10 +17,10 @@
 		minutes: 0,
 		amOrPm: 'AM'
 	};
-	$: selectedTimeString = dayjs(
-		`${selectedTime.hours}-${selectedTime.minutes}-${selectedTime.amOrPm}`,
-		'h-m-A'
-	).toISOString();
+	$: selectedDate = dayjs(
+		`${selectedTime.hours}:${selectedTime.minutes}-${selectedTime.amOrPm}`,
+		timeOnlyFormat
+	).toDate();
 
 	const hourSchema = z.number().int().gte(0).lte(12);
 	const minutesSchema = z.number().int().gte(0).lt(60);
@@ -33,7 +33,6 @@
 </script>
 
 <div class="inline-block">
-	<input type="hidden" {name} value={selectedTimeString} />
 	<Input
 		bind:value={selectedTime.hours}
 		on:input={(value) => handleHoursChange(value, true)}

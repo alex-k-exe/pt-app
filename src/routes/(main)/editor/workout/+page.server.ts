@@ -6,11 +6,12 @@ import {
 	users,
 	workouts,
 	type Activity,
+	type Series,
 	type Workout
 } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { arrayToTuple } from '$lib/utils/other';
-import { UserType, type WorkoutWithSeries } from '$lib/utils/types/other';
+import { userTypes, type WorkoutWithSeries } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
@@ -30,9 +31,9 @@ export async function load({ url, locals, platform }) {
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new workout
 		title: '',
-		date: date.toISOString(),
-		startTime: '',
-		endTime: '',
+		date: date.toDate(),
+		startTime: new Date(),
+		endTime: new Date(),
 		series: [],
 		sets: []
 	};
@@ -83,7 +84,7 @@ export async function load({ url, locals, platform }) {
 	}
 
 	let clientNames: { id: string; name: string }[];
-	if (locals.userType === UserType.TRAINER) {
+	if (locals.userType === userTypes.TRAINER) {
 		const db = initDrizzle(platform);
 		clientNames = await db
 			.select({ id: users.id, name: users.name })
@@ -118,15 +119,23 @@ export const actions = {
 		}
 		form.data.series.forEach(async (formSeries, i) => {
 			formSeries.index = i;
-			formSeries.activityId = dbActivity.id;
 
 			let dbSeries: Series;
 			if (formSeries.id) {
 				dbSeries = (
-					await db.update(series).set(formSeries).where(eq(series.id, formSeries.id)).returning()
+					await db
+						.update(series)
+						.set({ ...formSeries, activityId: dbActivity.id })
+						.where(eq(series.id, formSeries.id))
+						.returning()
 				)[0];
 			} else {
-				dbSeries = (await db.insert(series).values(formSeries).returning())[0];
+				dbSeries = (
+					await db
+						.insert(series)
+						.values({ ...formSeries, activityId: dbActivity.id })
+						.returning()
+				)[0];
 			}
 
 			formSeries.sets.forEach(async (formSet, j) => {
@@ -137,7 +146,9 @@ export const actions = {
 						.set({ ...formSet, seriesId: dbSeries.id })
 						.where(eq(sets.id, formSet.id));
 				} else {
-					await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
+					await db
+						.insert(sets)
+						.values({ ...formSet, activityId: dbActivity.id, seriesId: dbSeries.id });
 				}
 			});
 		});
@@ -149,12 +160,6 @@ export const actions = {
 		if (!id) return fail(500, { form });
 		if (!form.valid) return fail(400, { form });
 
-		const db = initDrizzle(event.platform);
-		await db.batch([
-			db.delete(activities).where(eq(activities.id, id)),
-			db.delete(workouts).where(eq(workouts.activityId, id)),
-			db.delete(series).where(eq(series.activityId, id)),
-			db.delete(sets).where(eq(sets.activityId, id))
-		]);
+		await initDrizzle(event.platform).delete(activities).where(eq(activities.id, id));
 	}
 };

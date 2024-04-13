@@ -1,4 +1,6 @@
-import { drizzle } from 'drizzle-orm/d1';
+import { clients, users } from '$lib/drizzleTables';
+import { eq } from 'drizzle-orm';
+import { DrizzleD1Database, drizzle } from 'drizzle-orm/d1';
 
 export function initDrizzle(platform: Readonly<App.Platform> | undefined) {
 	if (!platform?.env.DB) throw new Error('Database is undefined');
@@ -9,4 +11,13 @@ export function generateSignupToken() {
 	const min = 100000;
 	const max = 999999;
 	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {
+	return await db
+		.select()
+		.from(users)
+		.leftJoin(clients, eq(clients.id, users.id))
+		.orderBy(users.name)
+		.where(eq(clients.trainerId, trainerId));
 }

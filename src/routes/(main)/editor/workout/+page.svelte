@@ -9,7 +9,6 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
 	import { numberToLetter } from '$lib/utils/other';
 	import { locations } from '$lib/utils/types/other';
-	import dayjs from 'dayjs';
 	import { dndzone } from 'svelte-dnd-action';
 	import { flip } from 'svelte/animate';
 	import { superForm } from 'sveltekit-superforms';
@@ -24,7 +23,6 @@
 		dataType: 'json'
 	});
 	const { form: formData, enhance } = form;
-	let date = dayjs($formData.date);
 
 	const flipDurationMs = 300;
 	function handleAddElement(elementType: 'series' | 'exercise') {
@@ -40,7 +38,7 @@
 		} else {
 			$formData.sets = [
 				...$formData.sets,
-				{activityId: $formData.id
+				{
 					index: $formData.sets.length,
 					exerciseName: 'Example'
 				}
@@ -63,33 +61,16 @@
     id?: number | undefined; -->
 <form method="POST" action="?insertOrUpdate" use:enhance>
 	<div class="flex">
-		<div class="items-start">
-			<Select.Root selected={{ value: $formData.location }}>
-				<Select.Trigger class="w-[180px]">
-					<Select.Value placeholder="Select a location" />
-				</Select.Trigger>
-				<Select.Content>
-					<Select.Group>
-						{#each locations as location}
-							<Select.Item value={location.value} label={location.label}>
-								{location.label}
-							</Select.Item>
-						{/each}
-					</Select.Group>
-				</Select.Content>
-				<Select.Input name="location" />
-			</Select.Root>
-			<Input name="title" placeholder="Add a title" bind:value={$formData.title} />
-		</div>
+		<Input name="title" placeholder="Add a title" bind:value={$formData.title} />
 		<div class="items-end">
 			<Form.Button type="submit">Save</Form.Button>
 			<a href="/workouts">Cancel</a>
 		</div>
 	</div>
 
-	From <TimePicker name="startTime" bind:selectedTimeString={$formData.startTime} />
-	to <TimePicker bind:selectedTimeString={$formData.endTime} />
-	on <DatePicker bind:selectedDate={date} />
+	From <TimePicker bind:selectedDate={$formData.startTime} />
+	to <TimePicker bind:selectedDate={$formData.endTime} />
+	on <DatePicker bind:selectedDate={$formData.date} />
 
 	<Textarea name="notes" placeholder="Notes" bind:value={$formData.notes} />
 
@@ -99,10 +80,8 @@
 		</Select.Trigger>
 		<Select.Content>
 			<Select.Group>
-				{#each locations as location}
-					<Select.Item bind:value={location.value} label={location.label}
-						>{location.label}</Select.Item
-					>
+				{#each Object.values(locations) as location}
+					<Select.Item bind:value={location} label={location}>{location}</Select.Item>
 				{/each}
 			</Select.Group>
 		</Select.Content>

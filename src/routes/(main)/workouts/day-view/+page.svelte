@@ -22,7 +22,7 @@
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>{date.format('h:ma') + ' to ' + dayjs(date).format('h:ma') + '\n'}</Card.Title>
-				<Card.Description>{workout.clientName + ' - ' + workout.title}</Card.Description>
+				<Card.Description>{workout.clientsName + ' - ' + workout.title}</Card.Description>
 			</Card.Header>
 			<Card.Content>
 				<p>Card Content</p>

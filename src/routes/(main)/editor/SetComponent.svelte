@@ -2,7 +2,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import type { SetInsert } from '$lib/drizzleTables';
 
-	export let set: Omit<SetInsert, 'workoutId' | 'seriesId'>;
+	export let set: Omit<SetInsert, 'activityId' | 'seriesId'>;
 	export let comparisonSet: typeof set | null = null;
 
 	// TODO: generalise this so the trainer can add custom props

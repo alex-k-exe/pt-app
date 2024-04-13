@@ -1,5 +1,5 @@
 import { initLucia } from '$lib/server/lucia';
-import { UserType } from '$lib/utils/types/other';
+import { userTypes } from '$lib/utils/types/other';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
@@ -21,7 +21,8 @@ export async function handle({ event, resolve }) {
 		return resolve(event);
 	}
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
-	if (!sessionId) {
+	console.log('handle');
+	if (!sessionId || !event.locals.userType) {
 		event.locals.user = null;
 		event.locals.session = null;
 		return new Response(null, {
@@ -44,13 +45,15 @@ export async function handle({ event, resolve }) {
 	event.locals.user = user;
 	event.locals.session = session;
 
+	console.log('before');
 	const clientCantVisitPage = targetPath.startsWith('/clients');
-	if (event.locals.userType === UserType.CLIENT && clientCantVisitPage) {
+	if (event.locals.userType === userTypes.CLIENT && clientCantVisitPage) {
 		return new Response(null, {
 			status: 403,
 			headers: { location: `/workouts` }
 		});
 	}
+	console.log('after');
 	return resolve(event);
 }
 

@@ -2,28 +2,19 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import type { Activity } from '$lib/drizzleTables.ts';
-	import { UserType } from '$lib/utils/types/other.ts';
+	import { daysOfTheWeek, userTypes, type ObjectValues } from '$lib/utils/types/other.ts';
 
-	export let daily: Activity & { activeDays: string; otherPersonsName: string };
-	export let userType: keyof typeof UserType;
+	export let daily: Activity & { activeDays: string; clientsName: string | null };
+	export let userType: ObjectValues<typeof userTypes>;
 
-	const daysOfWeek = [
-		'monday',
-		'tuesday',
-		'wednesday',
-		'thursday',
-		'friday',
-		'saturday',
-		'sunday'
-	] as const;
-	const activeDays = Object.fromEntries(daysOfWeek.map((day) => [day, false]));
+	const activeDays = Object.fromEntries(daysOfTheWeek.map((day) => [day, false]));
 </script>
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title>{userType === UserType.CLIENT ? daily.title : daily.otherPersonsName}</Card.Title>
+		<Card.Title>{userType === userTypes.CLIENT ? daily.title : daily.clientsName}</Card.Title>
 		<Card.Description
-			>{userType === UserType.CLIENT ? daily.otherPersonsName : daily.title}</Card.Description
+			>{userType === userTypes.CLIENT ? daily.clientsName : daily.title}</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>

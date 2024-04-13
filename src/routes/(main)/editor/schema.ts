@@ -2,15 +2,17 @@ import { activities, series, sets } from '$lib/drizzleTables';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-const setsSchema = createInsertSchema(sets).omit({ seriesId: true, workoutId: true });
-export type SimplifiedSet = typeof setsSchema;
+const setsSchema = createInsertSchema(sets).omit({
+	activityId: true,
+	seriesId: true
+});
 
-const seriesSchema = createInsertSchema(series).extend({ sets: z.array(setsSchema) });
-export type SeriesWithSets = typeof seriesSchema;
+const seriesSchema = createInsertSchema(series)
+	.omit({ activityId: true })
+	.extend({ sets: z.array(setsSchema) });
 
 export const formSchema = createInsertSchema(activities).extend({
 	series: z.array(seriesSchema),
 	sets: z.array(setsSchema),
-	date: z.string()
+	date: z.date()
 });
-export type WorkoutWithSeries = typeof formSchema;
