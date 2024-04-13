@@ -5,14 +5,16 @@ import { eq } from 'drizzle-orm';
 import { Scrypt } from 'lucia';
 import { superValidate, type SuperValidated } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { asyncTokenSchema, formSchema, type FormSchema } from './schema';
+import { asyncTokenSchema, formSchema, type FormSchema } from '../schema';
 
 export async function load({ params, url, platform }) {
+	console.log('redirected');
 	const signupTokenId = Number(params.signupToken);
 	const targetPath = url.searchParams.get('targetPath');
 
 	const db = initDrizzle(platform);
 	const tokenValidation = await (await asyncTokenSchema(db)).safeParseAsync(signupTokenId);
+	console.log('final');
 	if (!tokenValidation.success) {
 		return redirect(
 			302,
