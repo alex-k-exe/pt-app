@@ -24,7 +24,7 @@ export async function load({ platform, url, locals }) {
 			return {
 				id: chat.id,
 				otherUsersName: namesOfOtherUsers[i],
-				hasBeenRead: mostRecentMessages[i].readByReciever
+				hasBeenRead: mostRecentMessages[i] ? mostRecentMessages[i].readByReciever : true
 			};
 		});
 
@@ -87,10 +87,12 @@ export const actions = {
 		const userId = locals.user?.id;
 		if (!otherUserId || !userId) return fail(500, { formData });
 
-		const createdChatId = await initDrizzle(platform)
-			.insert(chats)
-			.values({ userId1: userId, userId2: otherUserId.toString() })
-			.returning();
+		const createdChatId = (
+			await initDrizzle(platform)
+				.insert(chats)
+				.values({ userId1: userId, userId2: otherUserId.toString() })
+				.returning()
+		)[0].id;
 		return redirect(302, `/chats?chatId=${createdChatId}`);
 	},
 
@@ -125,26 +127,43 @@ async function getChats(db: DrizzleD1Database, userId: string) {
 }
 
 async function getOtherUsersNames(db: DrizzleD1Database, chats: { otherUsersId: string }[]) {
-	const queries = chats.map((chat) => {
-		return db
-			.select({ name: users.name })
-			.from(users)
-			.limit(1)
-			.where(eq(users.id, chat.otherUsersId));
-	});
-	return (await db.batch(arrayToTuple(queries))).map((name) => name[0].name);
+	// const queries = chats.map((chat) => {
+	// 	return db
+	// 		.select({ name: users.name })
+	// 		.from(users)
+	// 		.limit(1)
+	// 		.where(eq(users.id, chat.otherUsersId));
+	// });
+	// return (await db.batch(arrayToTuple(queries))).map((name) => name[0].name);
+	if (chats.length === 0) return [];
+	return [
+		(
+			await db
+				.select({ name: users.name })
+				.from(users)
+				.limit(1)
+				.where(eq(users.id, chats[0].otherUsersId))
+		)[0].name
+	];
 }
 
 async function getMostRecentMessages(db: DrizzleD1Database, chats: { id: number }[]) {
-	const queries = chats.map((chat) => {
-		return db
-			.select()
-			.from(messages)
-			.limit(1)
-			.orderBy(messages.sentTimestamp)
-			.where(eq(messages.chatId, chat.id));
-	});
-	return (await db.batch(arrayToTuple(queries))).map((message) => message[0]);
+	// const queries = chats.map((chat) => {
+	// 	return db
+	// 		.select()
+	// 		.from(messages)
+	// 		.limit(1)
+	// 		.orderBy(messages.sentTimestamp)
+	// 		.where(eq(messages.chatId, chat.id));
+	// });
+	// return (await db.batch(arrayToTuple(queries))).map((message) => message[0]);
+	if (chats.length === 0) return [];
+	return db
+		.select()
+		.from(messages)
+		.limit(1)
+		.orderBy(messages.sentTimestamp)
+		.where(eq(messages.chatId, chats[0].id));
 }
 
 /**

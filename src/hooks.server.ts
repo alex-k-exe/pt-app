@@ -15,14 +15,13 @@ export async function handle({ event, resolve }) {
 
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
-	const targetPath = event.url.pathname;
 
-	if (routeIsPublic(event.url.pathname)) {
-		return resolve(event);
-	}
+	if (routeIsPublic(event.url.pathname)) return resolve(event);
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
-	console.log('handle');
-	if (!sessionId || !event.locals.userType) {
+	const userType = event.cookies.get('userType');
+
+	const targetPath = event.url.pathname;
+	if (!sessionId || !userType) {
 		event.locals.user = null;
 		event.locals.session = null;
 		return new Response(null, {
@@ -44,8 +43,8 @@ export async function handle({ event, resolve }) {
 	}
 	event.locals.user = user;
 	event.locals.session = session;
+	event.locals.userType = userType;
 
-	console.log('before');
 	const clientCantVisitPage = targetPath.startsWith('/clients');
 	if (event.locals.userType === userTypes.CLIENT && clientCantVisitPage) {
 		return new Response(null, {
@@ -53,7 +52,6 @@ export async function handle({ event, resolve }) {
 			headers: { location: `/workouts` }
 		});
 	}
-	console.log('after');
 	return resolve(event);
 }
 

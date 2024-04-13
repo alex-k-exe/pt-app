@@ -6,15 +6,17 @@
 
 	export let trainers: User[];
 	export let clientId: string;
-	let selectedTrainer: User | undefined;
+	let selectedTrainer: { id: string; name: string } | null;
 </script>
 
 <form method="POST" action="?transfer">
 	<input type="hidden" name="clientId" value={clientId} />
 	<Select.Root
 		selected={{ value: selectedTrainer?.id, label: selectedTrainer?.name }}
-		onSelectedChange={(event) =>
-			(selectedTrainer = trainers.find((trainer) => trainer.id === event?.value))}
+		onSelectedChange={(event) => {
+			if (!event || !event.value || !event.label) return;
+			selectedTrainer = { id: event.value, name: event.label };
+		}}
 	>
 		<Select.Trigger class="w-[180px]">
 			<Select.Value placeholder="Select a trainer" />

@@ -6,14 +6,11 @@
 
 	export let data;
 
-	const form = superForm(data.form, {
-		dataType: 'json'
-	});
+	const form = superForm(data.form);
 	const { form: formData, enhance } = form;
 
 	let passwordInputType: 'password' | '' = 'password';
 	$formData.targetPath = data.targetPath;
-	$formData.signupTokenId = data.signupTokenId;
 </script>
 
 <h2>Sign up</h2>

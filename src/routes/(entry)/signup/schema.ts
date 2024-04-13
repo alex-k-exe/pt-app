@@ -9,7 +9,6 @@ export async function formSchema(db: DrizzleD1Database) {
 	return z
 		.object({
 			targetPath: z.string().nullish(),
-			signupTokenId: signupTokenSchema,
 			trainerId: z.string().nullish(),
 			email: z
 				.string()
@@ -27,7 +26,6 @@ export async function formSchema(db: DrizzleD1Database) {
 					},
 					{ message: 'Email is already in use', path: ['email'] }
 				),
-
 			password: z.string().regex(validPassword.regex, validPassword.message).min(12).max(100),
 			confirmPassword: z
 				.string()

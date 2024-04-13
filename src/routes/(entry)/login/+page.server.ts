@@ -1,5 +1,6 @@
-import { users } from '$lib/drizzleTables';
+import { clients, users } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
+import { userTypes } from '$lib/utils/types/other.ts';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { Scrypt } from 'lucia';
@@ -17,13 +18,10 @@ export const actions = {
 	default: async (event) => {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
+		const db = initDrizzle(event.platform);
 
 		const existingUser = (
-			await initDrizzle(event.platform)
-				.select()
-				.from(users)
-				.limit(1)
-				.where(eq(users.email, form.data.email))
+			await db.select().from(users).limit(1).where(eq(users.email, form.data.email))
 		)[0];
 
 		if (!existingUser) return fail(400, { message: 'Incorrect username or password' });
@@ -31,18 +29,22 @@ export const actions = {
 		const passwordIsCorrect = await new Scrypt().verify(existingUser.password, form.data.password);
 		if (!passwordIsCorrect) return fail(400, { message: 'Incorrect username or password' });
 
+		const client = await db
+			.select()
+			.from(clients)
+			.leftJoin(users, eq(users.id, clients.id))
+			.where(eq(users.id, existingUser.id));
+
 		const session = await event.locals.lucia.createSession(existingUser.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
 			path: '.',
 			...sessionCookie.attributes
 		});
-		event.locals.user = existingUser;
-		event.locals.session = session;
+		event.cookies.set('userType', client.length === 1 ? userTypes.CLIENT : userTypes.TRAINER, {
+			path: '.'
+		});
 
-		return redirect(
-			302,
-			decodeURIComponent(event.url.searchParams.get('targetPath') ?? '/workouts')
-		);
+		return redirect(302, event.url.searchParams.get('targetPath') ?? '/workouts');
 	}
 };

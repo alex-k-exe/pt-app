@@ -5,6 +5,7 @@
 	import ChatList from './ChatList.svelte';
 
 	export let data;
+	console.log('its in');
 </script>
 
 <svelte:head>
