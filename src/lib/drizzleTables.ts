@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { generateId } from 'lucia';
-import { generateSignupToken } from './server/utils';
+import { generateSignupToken } from './utils/other';
 
 // Drizzle ensures type safety in the queried data from the DB
 // The tables defined here are converted to SQL code by calling pnpm generate

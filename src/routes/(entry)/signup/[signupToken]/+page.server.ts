@@ -67,7 +67,7 @@ export const actions = {
 				})
 				.returning()
 		)[0];
-		if (!user.id) return fail(500, { form });
+		console.log('last');
 		if (form.trainerId) {
 			await db.insert(clients).values({ id: user.id, trainerId: form.trainerId });
 		} else {
