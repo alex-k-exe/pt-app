@@ -68,9 +68,11 @@
 		</div>
 	</div>
 
-	From <TimePicker bind:selectedDate={$formData.startTime} />
-	to <TimePicker bind:selectedDate={$formData.endTime} />
-	on <DatePicker bind:selectedDate={$formData.date} />
+	<div class="timeThings">
+		From <TimePicker bind:selectedDate={$formData.startTime} />
+	</div>
+	<div class="timeThings">to <TimePicker bind:selectedDate={$formData.endTime} /></div>
+	<div class="timeThings">on <DatePicker bind:selectedDate={$formData.date} /></div>
 
 	<Textarea name="notes" placeholder="Notes" bind:value={$formData.notes} />
 
@@ -136,3 +138,10 @@
 		</div>
 	</div>
 </form>
+
+<style>
+	.timeThings {
+		display: flex;
+		align-items: center;
+	}
+</style>

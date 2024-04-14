@@ -26,26 +26,33 @@
 	const minutesSchema = z.number().int().gte(0).lt(60);
 
 	function handleHoursChange(value: unknown, changingHours: boolean) {
-		if (!(changingHours ? hourSchema : minutesSchema).safeParse(value).success) return;
-		if (changingHours) selectedTime.hours = value as number;
-		else selectedTime.minutes = value as number;
+		const validatedValue = (changingHours ? hourSchema : minutesSchema).safeParse(value);
+		if (!validatedValue.success) return;
+		if (changingHours) selectedTime.hours = validatedValue.data;
+		else selectedTime.minutes = validatedValue.data;
 	}
 </script>
 
-<div class="inline-block">
+<div class="flex items-center">
 	<Input
-		bind:value={selectedTime.hours}
-		on:input={(value) => handleHoursChange(value, true)}
+		value={selectedTime.hours}
+		on:change={(value) => handleHoursChange(value, true)}
 		placeholder="00"
 	/>
 	:
 	<Input
-		bind:value={selectedTime.minutes}
-		on:input={(value) => handleHoursChange(value, false)}
+		value={selectedTime.minutes}
+		on:change={(value) => handleHoursChange(value, false)}
 		placeholder="00"
 	/>
 
-	<Select.Root selected={{ value: selectedTime.amOrPm }}>
+	<Select.Root
+		selected={{ value: selectedTime.amOrPm, label: selectedTime.amOrPm }}
+		onSelectedChange={(event) => {
+			if (!event) return;
+			selectedTime.amOrPm = event.value;
+		}}
+	>
 		<Select.Trigger>
 			<Select.Value placeholder="AM or PM" />
 		</Select.Trigger>

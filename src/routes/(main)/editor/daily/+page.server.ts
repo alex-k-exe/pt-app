@@ -1,82 +1,84 @@
 import {
 	activities,
+	clients,
+	dailies,
 	series,
 	sets,
 	users,
-	workouts,
 	type Activity,
-	type Series,
-	type Workout
+	type Daily,
+	type Series
 } from '$lib/drizzleTables';
-import { getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes, type WorkoutWithSeries } from '$lib/utils/types/other';
+import { initDrizzle } from '$lib/server/utils';
+import { userTypes } from '$lib/utils/types/other';
+import { type DailyWithSeries } from '$lib/utils/types/other.ts';
 import { fail, redirect } from '@sveltejs/kit';
-import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getSeries } from '../../../../lib/server/db.js';
-import { formSchema } from './schema.js';
+import { getSeries } from '../../../../lib/server/db';
+import { formSchema } from './schema';
 
-// If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
-// If User is a Trainer, find the names of their clients and attach the name of the client to the workout
-// Otherwise make a new workout
+// If given, use the dailyId to get daily (i.e. Activity) along with its Series and Sets
+// If User is a Trainer, find the names of their clients and attach the name of the client to the daily
+// Otherwise make a new daily
 export async function load({ url, locals, platform }) {
-	const date = dayjs(url.searchParams.get('date'));
-	const workoutId = Number(url.searchParams.get('workoutId'));
+	const dailyId = Number(url.searchParams.get('dailyId'));
 
 	if (!locals.user?.id) return redirect(302, '/login');
-	let workout: WorkoutWithSeries = {
+	let daily: DailyWithSeries = {
+		activeDays: '',
 		clientId: '',
-		trainerId: locals.user?.id, // only trainers can make a new workout
+		trainerId: locals.user?.id, // only trainers can make a new daily
 		title: '',
-		date: date.toDate(),
 		startTime: new Date(),
 		endTime: new Date(),
 		series: [],
 		sets: []
 	};
-	let clientOfWorkoutName: string = '';
 
-	const db = initDrizzle(platform);
-	if (workoutId) {
-		workout = {
+	let clientOfDailyName: string = '';
+	if (dailyId) {
+		const db = initDrizzle(platform);
+		daily = {
 			...(
 				await db
 					.select()
-					.from(workouts)
-					.leftJoin(activities, eq(activities.id, workouts.activityId))
+					.from(dailies)
+					.leftJoin(activities, eq(activities.id, dailies.activityId))
 					.limit(1)
-					.where(eq(workouts.activityId, workoutId))
+					.where(eq(dailies.activityId, dailyId))
 			)
-				.filter((workout): workout is { activities: Activity; workouts: Workout } => {
-					return workout.activities !== null;
+				.filter((daily): daily is { activities: Activity; dailies: Daily } => {
+					return daily.activities !== null;
 				})
-				.map((workout) => {
-					return { date: workout.workouts.date, ...workout.activities };
+				.map((daily) => {
+					return { ...daily.activities, activeDays: daily.dailies.activeDays };
 				})[0],
 			series: [],
 			sets: []
 		};
-		workout.series = await getSeries(db, workoutId);
+		daily.series = await getSeries(db, dailyId);
 
-		clientOfWorkoutName = (
-			await db
-				.select({ name: users.name })
-				.from(users)
-				.limit(1)
-				.where(eq(users.id, workout.clientId))
+		clientOfDailyName = (
+			await db.select({ name: users.name }).from(users).limit(1).where(eq(users.id, daily.clientId))
 		)[0].name;
 	}
 
-	let trainersClients: { id: string; name: string }[] | null = null;
+	let clientNames: { id: string; name: string }[];
 	if (locals.userType === userTypes.TRAINER) {
-		trainersClients = getTrainersClients(db, locals.user.id);
-	}
+		const db = initDrizzle(platform);
+		clientNames = await db
+			.select({ id: users.id, name: users.name })
+			.from(clients)
+			.limit(1)
+			.innerJoin(users, eq(clients.id, users.id))
+			.where(eq(clients.trainerId, locals.user?.id));
+	} else clientNames = [];
 
 	return {
-		workout: { ...workout, clientName: clientOfWorkoutName },
-		clientNames: trainersClients,
+		daily: { ...daily, clientName: clientOfDailyName },
+		clientNames: clientNames,
 		userType: locals.userType,
 		form: await superValidate(zod(formSchema))
 	};
@@ -95,7 +97,9 @@ export const actions = {
 			)[0];
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values({ activityId: dbActivity.id, date: form.data.date });
+			await db
+				.insert(dailies)
+				.values({ activityId: dbActivity.id, activeDays: form.data.activeDays });
 		}
 		form.data.series.forEach(async (formSeries, i) => {
 			formSeries.index = i;

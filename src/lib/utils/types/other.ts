@@ -1,4 +1,10 @@
-import type { ActivityInsert, SeriesInsert, SetInsert } from '$lib/drizzleTables';
+import type {
+	ActivityInsert,
+	DailyInsert,
+	SeriesInsert,
+	SetInsert,
+	WorkoutInsert
+} from '$lib/drizzleTables';
 
 export const locations = {
 	WEST_END: 'West End',
@@ -39,16 +45,22 @@ export const daysOfTheWeek = [
 
 type SimpleSet = Omit<SetInsert, 'activityId' & 'seriesId'>;
 export type SeriesWithSets = Omit<SeriesInsert, 'activityId'> & { sets: SimpleSet[] };
-export type WorkoutWithSeries = ActivityInsert & {
-	date: Date;
-	series: SeriesWithSets[];
-	sets: SimpleSet[];
-};
+export type WorkoutWithSeries = ActivityInsert &
+	WorkoutInsert & {
+		series: SeriesWithSets[];
+		sets: SimpleSet[];
+	};
+export type DailyWithSeries = ActivityInsert &
+	DailyInsert & {
+		series: SeriesWithSets[];
+		sets: SimpleSet[];
+	};
 
 // require passwords to have one uppercase letter, one digit, and one special character
 export const validPassword = {
 	regex: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{12,}$/,
 	message: 'At least one uppercase and lowercase letter, one number and one special character'
 };
+export const validActiveDays = /^[01]{7}$/;
 
 export type ObjectValues<T> = T[keyof T];

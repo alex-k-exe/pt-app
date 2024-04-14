@@ -11,8 +11,7 @@ const seriesSchema = createInsertSchema(series)
 	.omit({ activityId: true })
 	.extend({ sets: z.array(setsSchema) });
 
-export const formSchema = createInsertSchema(activities).extend({
+export const activitySchema = createInsertSchema(activities).extend({
 	series: z.array(seriesSchema),
-	sets: z.array(setsSchema),
-	date: z.date()
+	sets: z.array(setsSchema)
 });

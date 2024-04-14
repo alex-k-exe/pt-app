@@ -8,7 +8,6 @@ import {
 } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { datesAreSameDay } from '$lib/utils/dates.js';
-import { arrayToTuple } from '$lib/utils/other.js';
 import { dayOnlyFormat, userTypes } from '$lib/utils/types/other';
 import { redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
@@ -41,15 +40,18 @@ export async function load({ locals, platform, url }) {
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		const getClientsNames = foundWorkouts.map((workout) =>
-			db
-				.select({ name: users.name })
-				.from(users)
-				.leftJoin(clients, eq(clients.id, users.id))
-				.limit(1)
-				.where(eq(users.id, workout.clientId))
-		);
-		clientsNames = (await db.batch(arrayToTuple(getClientsNames))).map((name) => name[0].name);
+		if (foundWorkouts.length === 0) clientsNames = [];
+		else
+			clientsNames = [
+				(
+					await db
+						.select({ name: users.name })
+						.from(users)
+						.leftJoin(clients, eq(clients.id, users.id))
+						.limit(1)
+						.where(eq(users.id, foundWorkouts[0].clientId))
+				)[0].name
+			];
 	}
 
 	return {

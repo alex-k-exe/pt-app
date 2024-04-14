@@ -13,9 +13,9 @@
 
 {date.format('D MMMM YYYY')}
 
-<Button>
-	<a href={`/editor/workout?date="${date.format(dayOnlyFormat)}"`}>Make a new workout</a>
-</Button>
+<a href={`/editor/workout?date=${date.format(dayOnlyFormat)}`}
+	><Button>Make a new workout</Button></a
+>
 
 <div class="workouts">
 	{#each workouts as workout (workout.id)}

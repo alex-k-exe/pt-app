@@ -102,6 +102,7 @@ export const dailies = sqliteTable('dailies', {
 	activeDays: text('activeDays').notNull()
 });
 export type Daily = typeof dailies.$inferSelect;
+export type DailyInsert = typeof dailies.$inferInsert;
 
 export const workouts = sqliteTable('workouts', {
 	activityId: integer('activityId')
@@ -111,6 +112,7 @@ export const workouts = sqliteTable('workouts', {
 	date: integer('date', { mode: 'timestamp' }).notNull()
 });
 export type Workout = typeof workouts.$inferSelect;
+export type WorkoutInsert = typeof workouts.$inferInsert;
 
 export const series = sqliteTable('series', {
 	id: integer('id').primaryKey({ autoIncrement: true }),

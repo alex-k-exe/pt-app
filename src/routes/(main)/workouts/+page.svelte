@@ -1,22 +1,30 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input/index.ts';
+	import * as Select from '$lib/components/ui/select';
 	import { getDaysForCalendar } from '$lib/utils/dates';
-	import { months } from '$lib/utils/types/other';
+	import { months, type ObjectValues } from '$lib/utils/types/other.js';
 	import dayjs from 'dayjs';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
-	import Svelecte from 'svelecte';
 	import { z } from 'zod';
 	import MonthGrid from './MonthGrid.svelte';
 
 	export let data;
+
 	let year = data.month.getFullYear();
 	const yearSchema = z.number().int().positive().gt(1950).lt(3000);
-
 	function handleChangeYear(newValue: unknown) {
 		const validated = yearSchema.safeParse(newValue);
 		if (validated.success) year = validated.data;
 	}
+
+	let searchClientForm: HTMLFormElement;
+	let selectedClient: { id: string; name: string } | null = null;
+
+	let changeMonthForm: HTMLFormElement;
+	let selectedMonth: ObjectValues<typeof months> = dayjs(data.month).format('MMMM') as ObjectValues<
+		typeof months
+	>;
 </script>
 
 <svelte:head>
@@ -25,24 +33,61 @@
 </svelte:head>
 
 <div class="buttons">
-	<form method="POST" action="?/searchForClient">
-		<Svelecte
-			options={data.workouts}
-			valueField="clientId"
-			labelField="clientsName"
-			name="clientId"
-		/>
-	</form>
+	{#if data.trainersClients !== null}
+		<form method="POST" action="?/searchForClient" bind:this={searchClientForm}>
+			<Select.Root
+				selected={{ value: selectedClient?.id, label: selectedClient?.name }}
+				onSelectedChange={(event) => {
+					if (!event || !event.value || !event.label) return;
+					selectedClient = { id: event.value, name: event.label };
+					searchClientForm.requestSubmit();
+				}}
+			>
+				<Select.Trigger class="w-[180px]">
+					<Select.Value placeholder="Select a client" />
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Group>
+						{#each data.trainersClients as client}
+							<Select.Item value={client.id} label={client.name}>{client.name}</Select.Item>
+						{/each}
+					</Select.Group>
+				</Select.Content>
+				<Select.Input name="clientId" />
+			</Select.Root>
+		</form>
+	{/if}
 	<form method="POST" action="?/previousMonth">
-		<Button variant="outline" size="icon" style="margin-left: 2%">
+		<Button type="submit" variant="outline" size="icon" style="margin-left: 2%">
 			<ChevronLeft />
 		</Button>
 	</form>
-	<form method="POST" action="?/changeMonth">
-		<Svelecte options={Object.values(months)} name="newMonth" />
+	<form method="POST" action="?/changeMonth" bind:this={changeMonthForm}>
+		<Select.Root
+			selected={{ value: selectedMonth, label: selectedMonth }}
+			onSelectedChange={(event) => {
+				console.log('here bitch');
+				console.log(selectedMonth);
+				if (!event || !event.value) return;
+				selectedMonth = event.value;
+				changeMonthForm.requestSubmit();
+			}}
+		>
+			<Select.Trigger class="w-[180px]">
+				<Select.Value placeholder="Select a month" />
+			</Select.Trigger>
+			<Select.Content>
+				<Select.Group>
+					{#each Object.values(months) as month}
+						<Select.Item value={month} label={month}>{month}</Select.Item>
+					{/each}
+				</Select.Group>
+			</Select.Content>
+			<Select.Input name="newMonth" value={selectedMonth} />
+		</Select.Root>
 	</form>
 	<form method="POST" action="?/nextMonth">
-		<Button variant="outline" size="icon" style="margin-right: 2%">
+		<Button type="submit" variant="outline" size="icon" style="margin-right: 2%">
 			<ChevronRight />
 		</Button>
 	</form>
@@ -50,11 +95,14 @@
 		<Input
 			placeholder="Year"
 			style="margin-right: 2%"
+			name="newYear"
 			bind:value={year}
 			on:change={(newValue) => handleChangeYear(newValue)}
 		/>
 	</form>
-	<form method="post" action="?/today"><Button>Today</Button></form>
+	<form method="post" action="?/today">
+		<Button on:click={() => console.log('biggie')}>Today</Button>
+	</form>
 </div>
 
 <MonthGrid
