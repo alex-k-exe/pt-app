@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ClientsTable from '$lib/components/clients-table/ClientsTable.svelte';
-	import TokensTable from '$lib/components/tokens-table/TokensTable.svelte';
+	import ClientsTable from './clients-table/ClientsTable.svelte';
+	import TokensTable from './tokens-table/TokensTable.svelte';
 
 	export let data;
 </script>
