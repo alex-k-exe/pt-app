@@ -3,9 +3,9 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import { Send } from 'lucide-svelte';
 	import ChatList from './ChatList.svelte';
+	import MessageList from './MessageList.svelte';
 
 	export let data;
-	console.log('its in');
 </script>
 
 <svelte:head>
@@ -18,16 +18,17 @@
 		<ChatList chats={data.chats} trainers={data.trainers} />
 	</div>
 	{#if data.selectedChat}
-		<form method="POST" action="/?deleteChat" class="chatHeader">
-			<input type="hidden" name="chatId" value={data.selectedChat.id} />
+		<form method="POST" action="?/deleteChat" class="chatHeader">
 			Chat with {data.selectedChat.otherUsersName}
-			<Button>Delete chat</Button>
+			<Button type="submit">Delete chat</Button>
 		</form>
-		<div class="messageList">messageList</div>
+		<div class="messageList">
+			<MessageList messages={data.selectedChat.messages} />
+		</div>
 		<form method="POST" action="?/sendMessage" class="messageBox">
 			<input type="hidden" name="chatId" value={data.selectedChat.id} />
 			<Input placeholder="Type a message" name="text" />
-			<Button variant="outline" size="icon">
+			<Button type="submit" variant="outline" size="icon">
 				<Send />
 			</Button>
 		</form>
