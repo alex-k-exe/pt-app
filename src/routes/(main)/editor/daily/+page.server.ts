@@ -2,21 +2,18 @@ import {
 	activities,
 	clients,
 	dailies,
-	series,
 	sets,
 	users,
 	type Activity,
-	type Daily,
-	type Series
+	type Daily
 } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
+import { getSeries, initDrizzle, insertOrUpdateSeries } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other';
 import { type DailyWithSeries } from '$lib/utils/types/other.ts';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getSeries } from '../../../../lib/server/db';
 import { formSchema } from './schema';
 
 // If given, use the dailyId to get daily (i.e. Activity) along with its Series and Sets
@@ -27,7 +24,7 @@ export async function load({ url, locals, platform }) {
 
 	if (!locals.user?.id) return redirect(302, '/login');
 	let daily: DailyWithSeries = {
-		activeDays: '',
+		activeDays: '0000000',
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new daily
 		title: '',
@@ -89,6 +86,7 @@ export const actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
+		console.log('you are valid :)');
 		const db = initDrizzle(event.platform);
 		let dbActivity: Activity;
 		if (form.data.id) {
@@ -101,26 +99,11 @@ export const actions = {
 				.insert(dailies)
 				.values({ activityId: dbActivity.id, activeDays: form.data.activeDays });
 		}
+		console.log('inserted');
 		form.data.series.forEach(async (formSeries, i) => {
 			formSeries.index = i;
 
-			let dbSeries: Series;
-			if (formSeries.id) {
-				dbSeries = (
-					await db
-						.update(series)
-						.set({ ...formSeries, activityId: dbActivity.id })
-						.where(eq(series.id, formSeries.id))
-						.returning()
-				)[0];
-			} else {
-				dbSeries = (
-					await db
-						.insert(series)
-						.values({ ...formSeries, activityId: dbActivity.id })
-						.returning()
-				)[0];
-			}
+			const dbSeries = await insertOrUpdateSeries(db, { ...formSeries, activityId: dbActivity.id });
 
 			formSeries.sets.forEach(async (formSet, j) => {
 				formSet.index = j;
@@ -136,14 +119,15 @@ export const actions = {
 				}
 			});
 		});
+		console.log('inserted formseries sets');
 	},
 
-	delete: async (event) => {
-		const form = await superValidate(event, zod(formSchema));
-		const id = form.data.id;
-		if (!id) return fail(500, { form });
-		if (!form.valid) return fail(400, { form });
+	delete: async ({ request, platform }) => {
+		const activityId = (await request.formData()).get('activityId');
+		if (!activityId) return fail(500);
 
-		await initDrizzle(event.platform).delete(activities).where(eq(activities.id, id));
+		await initDrizzle(platform)
+			.delete(activities)
+			.where(eq(activities.id, Number(activityId.toString())));
 	}
 };

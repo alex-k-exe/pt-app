@@ -1,12 +1,12 @@
 import { initLucia } from '$lib/server/lucia';
-import { type ObjectValues } from '$lib/utils/types/other';
+import { type ObjectValues, type userTypes } from '$lib/utils/types/other';
 import { Session, User } from 'lucia';
 
 declare global {
 	namespace App {
 		interface Locals {
 			user: User | null;
-			userType: ObjectValues<userTypes> | null;
+			userType: ObjectValues<typeof userTypes> | null;
 			session: Session | null;
 			lucia: ReturnType<typeof initLucia>;
 		}

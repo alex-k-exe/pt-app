@@ -14,7 +14,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import SetComponent from '../SetComponent.svelte';
-	import { formSchema } from '../schema';
+	import { formSchema } from './schema.ts';
 
 	export let data;
 

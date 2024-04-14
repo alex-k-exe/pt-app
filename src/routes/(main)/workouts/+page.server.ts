@@ -15,7 +15,7 @@ import dayjs from 'dayjs';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function load({ url, platform, locals }) {
-	if (!locals.user?.id) return redirect(302, '/login');
+	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 	const month = url.searchParams.get('month')
 		? dayjs(url.searchParams.get('month'), 'MM-YYYY')
 		: dayjs();

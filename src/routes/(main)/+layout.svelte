@@ -1,13 +1,18 @@
 <script lang="ts">
+	import { userTypes } from '$lib/utils/types/other.js';
 	import { CalendarDays, MessageCircle, Repeat, Settings, Users } from 'lucide-svelte';
 
-	const urls = [
+	export let data;
+
+	let urls = [
 		{ name: 'Workouts', icon: CalendarDays },
 		{ name: 'Dailies', icon: Repeat },
-		{ name: 'Clients', icon: Users },
 		{ name: 'Chats', icon: MessageCircle },
 		{ name: 'Settings', icon: Settings }
 	];
+	if (data.userType === userTypes.TRAINER) {
+		urls = [...urls.slice(0, 2), { name: 'Clients', icon: Users }, ...urls.slice(2)];
+	}
 </script>
 
 <div class="container">

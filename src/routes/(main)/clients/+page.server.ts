@@ -73,11 +73,14 @@ export const actions = {
 	},
 
 	deleteToken: async ({ platform, request }) => {
-		const signupTokenId = (await request.formData()).get('signupToken')?.toString();
-		if (!signupTokenId) return fail(500, { message: 'Signup token is undefined' });
+		const signupTokenId = (await request.formData()).get('signupTokenId');
+		if (!signupTokenId) {
+			console.log('undefined');
+			return fail(500, { message: 'Signup token is undefined' });
+		}
 
 		await initDrizzle(platform)
 			.delete(signupTokens)
-			.where(eq(signupTokens.id, Number(signupTokenId)));
+			.where(eq(signupTokens.id, Number(signupTokenId.toString())));
 	}
 };

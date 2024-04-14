@@ -5,9 +5,9 @@
 	export let signupTokenId: string;
 </script>
 
-<form method="POST" action="?/delete">
+<form method="POST" action="?/deleteToken">
 	<input type="hidden" name="signupTokenId" value={signupTokenId} />
-	<Button variant="outline" size="icon">
+	<Button variant="outline" size="icon" type="submit">
 		<X />
 	</Button>
 </form>

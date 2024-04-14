@@ -8,14 +8,13 @@ import {
 	type Series,
 	type Workout
 } from '$lib/drizzleTables';
-import { getTrainersClients, initDrizzle } from '$lib/server/utils';
+import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { userTypes, type WorkoutWithSeries } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getSeries } from '../../../../lib/server/db.js';
 import { formSchema } from './schema.js';
 
 // If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
@@ -71,7 +70,7 @@ export async function load({ url, locals, platform }) {
 
 	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		trainersClients = getTrainersClients(db, locals.user.id);
+		trainersClients = await getTrainersClients(db, locals.user.id);
 	}
 
 	return {

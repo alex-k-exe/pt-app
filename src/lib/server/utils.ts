@@ -1,4 +1,4 @@
-import { clients, series, sets, users } from '$lib/drizzleTables';
+import { clients, series, sets, users, type Series, type SeriesInsert } from '$lib/drizzleTables';
 import { arrayToTuple } from '$lib/utils/other';
 import { eq } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
@@ -8,8 +8,6 @@ export function initDrizzle(platform: Readonly<App.Platform> | undefined) {
 	if (!platform?.env.DB) throw new Error('Database is undefined');
 	return drizzle(platform?.env.DB);
 }
-
-i;
 
 export async function getSeries(db: DrizzleD1Database, activityId: number) {
 	const seriesWithSets = (
@@ -29,9 +27,29 @@ export async function getSeries(db: DrizzleD1Database, activityId: number) {
 
 export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {
 	return await db
-		.select({ id: users.id, name: users.name })
+		.select()
 		.from(clients)
-		.limit(1)
 		.innerJoin(users, eq(clients.id, users.id))
 		.where(eq(clients.trainerId, trainerId));
+}
+
+export async function insertOrUpdateSeries(db: DrizzleD1Database, inputSeries: SeriesInsert) {
+	let dbSeries: Series;
+	if (inputSeries.id) {
+		dbSeries = (
+			await db
+				.update(series)
+				.set({ ...inputSeries })
+				.where(eq(series.id, inputSeries.id))
+				.returning()
+		)[0];
+	} else {
+		dbSeries = (
+			await db
+				.insert(series)
+				.values({ ...inputSeries })
+				.returning()
+		)[0];
+	}
+	return dbSeries;
 }

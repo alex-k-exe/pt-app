@@ -99,7 +99,7 @@ export const dailies = sqliteTable('dailies', {
 		.references(() => activities.id, { onDelete: 'cascade' })
 		.primaryKey(),
 	// 7 digit binary string indicating which days the daily is on
-	activeDays: text('activeDays').notNull()
+	activeDays: text('activeDays').notNull().default('0000000')
 });
 export type Daily = typeof dailies.$inferSelect;
 export type DailyInsert = typeof dailies.$inferInsert;

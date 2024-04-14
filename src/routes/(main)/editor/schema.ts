@@ -13,5 +13,8 @@ const seriesSchema = createInsertSchema(series)
 
 export const activitySchema = createInsertSchema(activities).extend({
 	series: z.array(seriesSchema),
-	sets: z.array(setsSchema)
+	sets: z.array(setsSchema),
+	clientId: z.string().min(1),
+	trainerId: z.string().min(1),
+	title: z.string().min(1)
 });

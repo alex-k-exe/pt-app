@@ -33,7 +33,7 @@
 </svelte:head>
 
 <div class="buttons">
-	{#if data.trainersClients !== null}
+	{#if data.trainersClients !== null && data.trainersClients.length > 0}
 		<form method="POST" action="?/searchForClient" bind:this={searchClientForm}>
 			<Select.Root
 				selected={{ value: selectedClient?.id, label: selectedClient?.name }}
@@ -101,7 +101,7 @@
 		/>
 	</form>
 	<form method="post" action="?/today">
-		<Button on:click={() => console.log('biggie')}>Today</Button>
+		<Button type="submit">Today</Button>
 	</form>
 </div>
 

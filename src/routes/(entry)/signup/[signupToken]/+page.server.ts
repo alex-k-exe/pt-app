@@ -81,7 +81,7 @@ export const actions = {
 
 		const session = await event.locals.lucia.createSession(user.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
-		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '.' });
+		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '/' });
 
 		return redirect(302, form.targetPath ?? '/workouts');
 	}

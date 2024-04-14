@@ -18,7 +18,7 @@
 		>
 	</Card.Header>
 	<Card.Content>
-		<div style="display: flex; flex-wrap: wrap; gap: 5px">
+		<div class="flex flex-wrap gap-2">
 			{#each Object.entries(activeDays) as [day, isActive]}
 				<Button
 					variant={isActive ? 'default' : 'outline'}

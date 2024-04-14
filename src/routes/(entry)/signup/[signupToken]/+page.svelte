@@ -24,7 +24,7 @@
 
 {#if data.trainer}
 	Your trainer's email is <b>{data.trainer?.email}</b> and their name is
-	<b>{data.trainer?.name}.</b>.
+	<b>{data.trainer?.name}</b>.
 {:else}
 	You are a trainer.
 {/if}

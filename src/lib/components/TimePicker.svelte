@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
-	import { timeOnlyFormat } from '$lib/utils/types/other';
 	import dayjs from 'dayjs';
 	import z from 'zod';
 
@@ -12,18 +11,15 @@
 		PM: 'pm'
 	} as const;
 
-	const selectedTime: { hours: number; minutes: number; amOrPm: keyof typeof AmOrPm } = {
-		hours: 0,
-		minutes: 0,
+	const selectedTime: { hours: string; minutes: string; amOrPm: keyof typeof AmOrPm } = {
+		hours: '9',
+		minutes: '05',
 		amOrPm: 'AM'
 	};
-	$: selectedDate = dayjs(
-		`${selectedTime.hours}:${selectedTime.minutes}-${selectedTime.amOrPm}`,
-		timeOnlyFormat
-	).toDate();
+	$: selectedDate = new Date(selectedTime.minutes);
 
-	const hourSchema = z.number().int().gte(0).lte(12);
-	const minutesSchema = z.number().int().gte(0).lt(60);
+	const hourSchema = z.string().min(1).max(2).regex(/\d+$/);
+	const minutesSchema = z.string().length(2).regex(/\d+$/);
 
 	function handleHoursChange(value: unknown, changingHours: boolean) {
 		const validatedValue = (changingHours ? hourSchema : minutesSchema).safeParse(value);
@@ -37,13 +33,13 @@
 	<Input
 		value={selectedTime.hours}
 		on:change={(value) => handleHoursChange(value, true)}
-		placeholder="00"
+		placeholder="9"
 	/>
 	:
 	<Input
 		value={selectedTime.minutes}
 		on:change={(value) => handleHoursChange(value, false)}
-		placeholder="00"
+		placeholder="05"
 	/>
 
 	<Select.Root
