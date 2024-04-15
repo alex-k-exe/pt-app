@@ -1,0 +1,12 @@
+DELETE FROM `signupTokens`;
+DELETE FROM `sessions`;
+DELETE FROM `messages`;
+DELETE FROM `chats`;
+DELETE FROM `sets`;
+DELETE FROM `series`;
+DELETE FROM `dailies`;
+DELETE FROM `workouts`;
+DELETE FROM `activities`;
+DELETE FROM `clients`;
+DELETE FROM `trainers`;
+DELETE FROM `users`;

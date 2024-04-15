@@ -83,10 +83,10 @@ export async function load({ url, locals, platform }) {
 
 export const actions = {
 	insertOrUpdate: async (event) => {
+		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		console.log('you are valid :)');
 		const db = initDrizzle(event.platform);
 		let dbActivity: Activity;
 		if (form.data.id) {
@@ -99,7 +99,6 @@ export const actions = {
 				.insert(dailies)
 				.values({ activityId: dbActivity.id, activeDays: form.data.activeDays });
 		}
-		console.log('inserted');
 		form.data.series.forEach(async (formSeries, i) => {
 			formSeries.index = i;
 
@@ -119,10 +118,10 @@ export const actions = {
 				}
 			});
 		});
-		console.log('inserted formseries sets');
 	},
 
-	delete: async ({ request, platform }) => {
+	delete: async ({ request, platform, locals }) => {
+		if (locals.userType !== userTypes.TRAINER) return fail(403);
 		const activityId = (await request.formData()).get('activityId');
 		if (!activityId) return fail(500);
 

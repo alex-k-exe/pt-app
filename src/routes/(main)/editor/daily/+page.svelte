@@ -54,15 +54,15 @@
 <form method="POST" action="?/insertOrUpdate" use:enhance>
 	<div class="flex">
 		<Form.Field {form} name="title">
-			<Form.Control>
+			<Form.Control let:attrs>
 				<Form.Label>Title</Form.Label>
-				<Input name="title" placeholder="Add a title" bind:value={$formData.title} />
+				<Input {...attrs} placeholder="Add a title" bind:value={$formData.title} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="clientId">
-			<Form.Control>
+			<Form.Control let:attrs>
 				<Select.Root selected={{ value: $formData.clientId }}>
 					<Select.Trigger class="w-[180px]">
 						<Select.Value placeholder="Select a client" />
@@ -74,7 +74,7 @@
 							{/each}
 						</Select.Group>
 					</Select.Content>
-					<Select.Input name="clientId" />
+					<Select.Input {...attrs} />
 				</Select.Root>
 			</Form.Control>
 			<Form.FieldErrors />

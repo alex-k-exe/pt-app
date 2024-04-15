@@ -4,18 +4,16 @@ import { userTypes } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { Scrypt } from 'lucia';
-import { superValidate, type SuperValidated } from 'sveltekit-superforms';
+import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { asyncTokenSchema, formSchema, type FormSchema } from '../schema';
+import { asyncTokenSchema, formSchema } from '../schema';
 
 export async function load({ params, url, platform }) {
-	console.log('redirected');
 	const signupTokenId = Number(params.signupToken);
 	const targetPath = url.searchParams.get('targetPath');
 
 	const db = initDrizzle(platform);
 	const tokenValidation = await (await asyncTokenSchema(db)).safeParseAsync(signupTokenId);
-	console.log('final');
 	if (!tokenValidation.success) {
 		return redirect(
 			302,
@@ -50,39 +48,35 @@ export async function load({ params, url, platform }) {
 export const actions = {
 	default: async (event) => {
 		const db = initDrizzle(event.platform);
-		let form: FormSchema | SuperValidated<FormSchema> = await superValidate(
-			event,
-			zod(await formSchema(db))
-		);
+		let form = await superValidate(event, zod(await formSchema(db)));
 		if (!form.valid) return fail(400, { form });
-		form = form.data;
 
-		const hashedPassword = await new Scrypt().hash(form.password);
+		const hashedPassword = await new Scrypt().hash(form.data.password);
 
 		const user = (
 			await db
 				.insert(users)
 				.values({
-					email: form.email,
+					email: form.data.email,
 					password: hashedPassword,
-					name: form.name
+					name: form.data.name
 				})
 				.returning()
 		)[0];
-		if (form.trainerId) {
-			await db.insert(clients).values({ id: user.id, trainerId: form.trainerId });
+		if (form.data.trainerId) {
+			await db.insert(clients).values({ id: user.id, trainerId: form.data.trainerId });
+			event.cookies.set('userType', userTypes.CLIENT, { path: '/' });
 		} else {
 			await db.insert(trainers).values({ id: user.id });
+			event.cookies.set('userType', userTypes.TRAINER, { path: '/' });
 		}
-		event.cookies.set('userType', form.trainerId ? userTypes.CLIENT : userTypes.TRAINER, {
-			path: '.'
-		});
+
 		await db.delete(signupTokens).where(eq(signupTokens.id, Number(event.params.signupToken)));
 
 		const session = await event.locals.lucia.createSession(user.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
 		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '/' });
 
-		return redirect(302, form.targetPath ?? '/workouts');
+		return redirect(302, form.data.targetPath ?? '/workouts');
 	}
 };

@@ -27,6 +27,10 @@
 
 <form method="POST" action="?/createToken" class="flex gap-4 pb-5 align-middle">
 	<h2>Sign up tokens</h2>
-	<Button type="submit" on:click={() => console.log('jsdjsd')}>Create a new token</Button>
+	<Button type="submit">Create a new token</Button>
 </form>
 <DataTable {table} {columns} />
+
+Give your client this link with the signup token at the end
+<p></p>
+<a href="https://pt-app.pages.dev/signup/"><u>https://pt-app.pages.dev/signup/</u></a>

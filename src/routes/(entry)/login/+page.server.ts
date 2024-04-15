@@ -3,32 +3,25 @@ import { initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other.ts';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { Scrypt } from 'lucia';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema.ts';
 
-export async function load() {
+export async function load({ platform }) {
 	return {
-		form: await superValidate(zod(formSchema))
+		form: await superValidate(zod(await formSchema(initDrizzle(platform))))
 	};
 }
 
 export const actions = {
 	default: async (event) => {
-		const form = await superValidate(event, zod(formSchema));
-		if (!form.valid) return fail(400, { form });
 		const db = initDrizzle(event.platform);
+		const form = await superValidate(event, zod(await formSchema(db)));
+		if (!form.valid) return fail(400, { form });
 
 		const existingUser = (
 			await db.select().from(users).limit(1).where(eq(users.email, form.data.email))
 		)[0];
-
-		if (!existingUser) return fail(400, { message: 'Incorrect username or password' });
-
-		const passwordIsCorrect = await new Scrypt().verify(existingUser.password, form.data.password);
-		if (!passwordIsCorrect) return fail(400, { message: 'Incorrect username or password' });
-
 		const client = await db
 			.select()
 			.from(clients)

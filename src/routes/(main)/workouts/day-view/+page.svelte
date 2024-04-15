@@ -11,6 +11,7 @@
 	const workouts = data.workouts;
 </script>
 
+<a href="/workouts"><Button variant="outline">Go back to month view</Button></a>
 {date.format('D MMMM YYYY')}
 
 <a href={`/editor/workout?date=${date.format(dayOnlyFormat)}`}

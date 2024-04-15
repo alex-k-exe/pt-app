@@ -13,13 +13,11 @@ export async function load({ url }) {
 
 export const actions = {
 	default: async (event) => {
-		console.log('start');
 		const targetPath = event.url.searchParams.get('targetPath')?.toString();
 		const form = await superValidate(event, zod(z.object({ signupToken: signupTokenSchema })));
 		if (!form.valid) {
 			return fail(400, { form });
 		}
-		console.log('after');
 
 		return redirect(
 			302,

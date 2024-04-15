@@ -20,22 +20,20 @@
 	<Card.Content>
 		<div class="flex flex-wrap gap-2">
 			{#each Object.entries(activeDays) as [day, isActive]}
-				<Button
-					variant={isActive ? 'default' : 'outline'}
-					size="icon"
-					on:click={() => (activeDays[day] = !isActive)}>{day[0].toUpperCase()}</Button
+				<Button variant={isActive ? 'default' : 'outline'} size="icon"
+					>{day[0].toUpperCase()}</Button
 				>
 			{/each}
 		</div>
 	</Card.Content>
 	<Card.Footer class="flex gap-[5px]">
-		<a href="/editor" style="padding-right: 10px">Edit</a>
-		<form action="?edit">
-			<input type="hidden" name="id" value={daily.id} />
-			<input type="hidden" name="activeDays" value={activeDays} />
-			<Button>Edit</Button>
-		</form>
-		<form action="?delete">
+		<a
+			href={`/editor/daily?dailyId=${daily.id}` +
+				`&activeDays=${Object.values(activeDays)
+					.map((active) => (active ? '1' : '0'))
+					.join()}`}><Button>Edit</Button></a
+		>
+		<form method="POST">
 			<input type="hidden" name="id" value={daily.id} />
 			<Button variant="outline">Delete</Button>
 		</form>

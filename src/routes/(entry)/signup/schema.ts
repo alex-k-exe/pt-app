@@ -49,7 +49,7 @@ export async function asyncTokenSchema(db: DrizzleD1Database) {
 			.where(
 				and(
 					eq(signupTokens.id, tokenId),
-					gt(signupTokens.creationTimeDate, dayjs().subtract(10, 'hours').toDate())
+					gt(signupTokens.creationTimeDate, dayjs().subtract(24, 'hours').toDate())
 				)
 			);
 		const tokenExpired = token.length !== 1;

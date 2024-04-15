@@ -2,11 +2,11 @@ import { activities, clients, dailies, users, type Activity, type Daily } from '
 import { initDrizzle } from '$lib/server/utils';
 import { arrayToTuple } from '$lib/utils/other.js';
 import { userTypes } from '$lib/utils/types/other.js';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform }) {
-	if (!locals.user?.id) return redirect(302, '/login');
+	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 	const db = initDrizzle(platform);
 
 	const foundDailies = (
@@ -47,3 +47,14 @@ export async function load({ locals, platform }) {
 		userType: locals.userType
 	};
 }
+
+export const actions = {
+	default: async ({ request, platform, locals }) => {
+		if (locals.userType !== userTypes.TRAINER) return fail(403);
+		const dailyId = (await request.formData()).get('dailyId')?.toString();
+		if (!dailyId) return fail(400);
+		await initDrizzle(platform)
+			.delete(dailies)
+			.where(eq(dailies.activityId, Number(dailyId)));
+	}
+};

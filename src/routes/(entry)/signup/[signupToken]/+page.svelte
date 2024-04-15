@@ -8,6 +8,7 @@
 
 	const form = superForm(data.form);
 	const { form: formData, enhance } = form;
+	$formData.trainerId = data.trainer?.id;
 
 	let passwordInputType: 'password' | '' = 'password';
 	$formData.targetPath = data.targetPath;

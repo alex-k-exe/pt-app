@@ -1,22 +1,24 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import * as Form from '$lib/components/ui/form/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { getDaysForCalendar } from '$lib/utils/dates';
 	import { months, type ObjectValues } from '$lib/utils/types/other.js';
 	import dayjs from 'dayjs';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
-	import { z } from 'zod';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
 	import MonthGrid from './MonthGrid.svelte';
+	import { yearSchema } from './schema.js';
 
 	export let data;
 
-	let year = data.month.getFullYear();
-	const yearSchema = z.number().int().positive().gt(1950).lt(3000);
-	function handleChangeYear(newValue: unknown) {
-		const validated = yearSchema.safeParse(newValue);
-		if (validated.success) year = validated.data;
-	}
+	const changeYearForm = superForm(data.changeYearForm, {
+		validators: zodClient(yearSchema)
+	});
+	const { form: yearFormData, enhance } = changeYearForm;
+	$yearFormData.newYear = data.month.getFullYear();
 
 	let searchClientForm: HTMLFormElement;
 	let selectedClient: { id: string; name: string } | null = null;
@@ -66,8 +68,6 @@
 		<Select.Root
 			selected={{ value: selectedMonth, label: selectedMonth }}
 			onSelectedChange={(event) => {
-				console.log('here bitch');
-				console.log(selectedMonth);
 				if (!event || !event.value) return;
 				selectedMonth = event.value;
 				changeMonthForm.requestSubmit();
@@ -91,16 +91,19 @@
 			<ChevronRight />
 		</Button>
 	</form>
-	<form class="hidden md:inline" method="POST" action="?/changeYear">
-		<Input
-			placeholder="Year"
-			style="margin-right: 2%"
-			name="newYear"
-			bind:value={year}
-			on:change={(newValue) => handleChangeYear(newValue)}
-		/>
+	<form class="hidden md:inline" method="POST" action="?/changeYear" use:enhance>
+		<Form.Field form={changeYearForm} name="newYear">
+			<Form.Control let:attrs>
+				<Input
+					{...attrs}
+					placeholder="Year"
+					style="margin-right: 2%"
+					bind:value={$yearFormData.newYear}
+				/>
+			</Form.Control>
+		</Form.Field>
 	</form>
-	<form method="post" action="?/today">
+	<form method="POST" action="?/today">
 		<Button type="submit">Today</Button>
 	</form>
 </div>

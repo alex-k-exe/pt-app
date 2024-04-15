@@ -11,9 +11,7 @@
 	const form = superForm(data.form, {
 		validators: zodClient(z.object({ signupToken: signupTokenSchema }))
 	});
-
 	const { form: formData, enhance } = form;
-	console.log('finished');
 </script>
 
 <h2>Sign up</h2>

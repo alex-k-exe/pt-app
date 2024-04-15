@@ -43,7 +43,7 @@ export async function handle({ event, resolve }) {
 	}
 	event.locals.user = user;
 	event.locals.session = session;
-	event.locals.userType = userType;
+	event.locals.userType = userType as 'Client' | 'Trainer';
 
 	const clientCantVisitPage = targetPath.startsWith('/clients');
 	if (event.locals.userType === userTypes.CLIENT && clientCantVisitPage) {

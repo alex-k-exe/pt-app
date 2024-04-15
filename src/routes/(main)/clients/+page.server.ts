@@ -66,18 +66,15 @@ export const actions = {
 	},
 
 	createToken: async ({ platform, locals }) => {
-		console.log('uh');
+		if (!locals.user?.id) return fail(400);
 		await initDrizzle(platform).insert(signupTokens).values({
-			trainerId: locals.user?.id
+			trainerId: locals.user.id
 		});
 	},
 
 	deleteToken: async ({ platform, request }) => {
 		const signupTokenId = (await request.formData()).get('signupTokenId');
-		if (!signupTokenId) {
-			console.log('undefined');
-			return fail(500, { message: 'Signup token is undefined' });
-		}
+		if (!signupTokenId) return fail(500, { message: 'Signup token is undefined' });
 
 		await initDrizzle(platform)
 			.delete(signupTokens)

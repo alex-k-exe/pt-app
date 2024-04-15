@@ -70,7 +70,7 @@ export async function load({ url, locals, platform }) {
 
 	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		trainersClients = await getTrainersClients(db, locals.user.id);
+		trainersClients = (await getTrainersClients(db, locals.user.id)).map((client) => client.users);
 	}
 
 	return {
@@ -83,6 +83,7 @@ export async function load({ url, locals, platform }) {
 
 export const actions = {
 	insertOrUpdate: async (event) => {
+		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
@@ -134,6 +135,7 @@ export const actions = {
 	},
 
 	delete: async (event) => {
+		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
 		const form = await superValidate(event, zod(formSchema));
 		const id = form.data.id;
 		if (!id) return fail(500, { form });
