@@ -46,6 +46,9 @@
 		}
 	}
 
+	let selectedClient: { id: string; name: string } | null = null;
+	$: if (selectedClient?.id) $formData.clientId = selectedClient?.id;
+
 	let activeDays = (data.daily.activeDays ?? '0000000').split('').map((active) => active === '1');
 	$: $formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join();
 	$formData.trainerId = data.daily.trainerId;
@@ -63,14 +66,20 @@
 
 		<Form.Field {form} name="clientId">
 			<Form.Control let:attrs>
-				<Select.Root selected={{ value: $formData.clientId }}>
+				<Select.Root
+					selected={{ value: selectedClient?.id, label: selectedClient?.name }}
+					onSelectedChange={(event) => {
+						if (!event || !event.value || !event.label) return;
+						selectedClient = { id: event.value, name: event.label };
+					}}
+				>
 					<Select.Trigger class="w-[180px]">
 						<Select.Value placeholder="Select a client" />
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Group>
 							{#each data.clientNames as { id, name }}
-								<Select.Item bind:value={id} label={name}>{name}</Select.Item>
+								<Select.Item value={id} label={name}>{name}</Select.Item>
 							{/each}
 						</Select.Group>
 					</Select.Content>

@@ -65,7 +65,6 @@ export const actions = {
 		await initDrizzle(event.platform)
 			.insert(messages)
 			.values({ chatId: form.data.chatId, text: form.data.text, senderId: event.locals.user?.id });
-		return redirect(302, event.url.href);
 	},
 
 	createNewChat: async ({ platform, request, locals }) => {

@@ -17,7 +17,6 @@
 <form method="POST" action="?/changeEmail" use:enhance>
 	<Form.Field {form} name="newEmail">
 		<Form.Control let:attrs>
-			<Form.Label>New email</Form.Label>
 			<Input {...attrs} placeholder="A new email" bind:value={$formData.newEmail} />
 		</Form.Control>
 		<Form.FieldErrors />

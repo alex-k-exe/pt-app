@@ -138,7 +138,7 @@ export const actions = {
 		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
 		const form = await superValidate(event, zod(formSchema));
 		const id = form.data.id;
-		if (!id) return fail(500, { form });
+		if (!id) return fail(400, { form });
 		if (!form.valid) return fail(400, { form });
 
 		await initDrizzle(event.platform).delete(activities).where(eq(activities.id, id));

@@ -4,6 +4,7 @@ import {
 	trainers,
 	users,
 	type SignupToken,
+	type Trainer,
 	type User
 } from '$lib/drizzleTables.ts';
 import { initDrizzle } from '$lib/server/utils';
@@ -29,8 +30,9 @@ export async function load({ platform, locals }) {
 	const foundTrainers: User[] = (
 		await db.select().from(trainers).leftJoin(users, eq(users.id, trainers.id)).orderBy(users.name)
 	)
-		.map((user) => user.users)
-		.filter((trainer): trainer is User => trainer !== null);
+		.filter((trainer): trainer is { users: User; trainers: Trainer } => trainer !== null)
+		.map((user) => user.users);
+	console.log(foundTrainers);
 
 	await db
 		.delete(signupTokens)

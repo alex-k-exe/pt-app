@@ -118,6 +118,7 @@ export const actions = {
 				}
 			});
 		});
+		return redirect(302, '/dailies');
 	},
 
 	delete: async ({ request, platform, locals }) => {

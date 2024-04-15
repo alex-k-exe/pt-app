@@ -45,27 +45,48 @@
 			];
 		}
 	}
+
+	let selectedClient: { id: string; name: string } | null = null;
+	$: if (selectedClient?.id) $formData.clientId = selectedClient?.id;
+	$formData.trainerId = data.workout.trainerId;
 </script>
 
-<!-- TODO: sets: {
-        index: number;
-        exerciseName: string;
-        id?: number | undefined;
-        reps?: string | null | undefined;
-        weight?: string | null | undefined;
-        duration?: string | null | undefined;
-        rpe?: string | null | undefined;
-    }[];
-    index: number;
-    reps: number;
-    id?: number | undefined; -->
 <form method="POST" action="?insertOrUpdate" use:enhance>
 	<div class="flex">
-		<Input name="title" placeholder="Add a title" bind:value={$formData.title} />
-		<div class="items-end">
-			<Form.Button type="submit">Save</Form.Button>
-			<a href="/workouts">Cancel</a>
-		</div>
+		<Form.Field {form} name="title">
+			<Form.Control let:attrs>
+				<Form.Label>Title</Form.Label>
+				<Input {...attrs} placeholder="Add a title" bind:value={$formData.title} />
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+		<Form.Field {form} name="clientId">
+			<Form.Control let:attrs>
+				<Select.Root
+					selected={{ value: selectedClient?.id, label: selectedClient?.name }}
+					onSelectedChange={(event) => {
+						if (!event || !event.value || !event.label) return;
+						selectedClient = { id: event.value, name: event.label };
+					}}
+				>
+					<Select.Trigger class="w-[180px]">
+						<Select.Value placeholder="Select a client" />
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Group>
+							{#each data.clientNames ?? [] as { id, name }}
+								<Select.Item value={id} label={name}>{name}</Select.Item>
+							{/each}
+						</Select.Group>
+					</Select.Content>
+					<Select.Input {...attrs} />
+				</Select.Root>
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+
+		<a href="/dailies">Cancel</a>
+		<Form.Button>Save</Form.Button>
 	</div>
 
 	<div class="timeThings">

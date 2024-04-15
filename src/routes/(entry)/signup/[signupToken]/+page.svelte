@@ -8,7 +8,6 @@
 
 	const form = superForm(data.form);
 	const { form: formData, enhance } = form;
-	$formData.trainerId = data.trainer?.id;
 
 	let passwordInputType: 'password' | '' = 'password';
 	$formData.targetPath = data.targetPath;
@@ -31,6 +30,7 @@
 {/if}
 
 <form method="POST" use:enhance>
+	<input type="hidden" name="trainerId" value={data.trainer?.id} />
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
 			<Form.Label>Name</Form.Label>

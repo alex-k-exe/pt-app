@@ -12,9 +12,13 @@
 
 <Card.Root>
 	<Card.Header>
-		<Card.Title>{userType === userTypes.CLIENT ? daily.title : daily.clientsName}</Card.Title>
+		<Card.Title
+			>{userType === userTypes.CLIENT
+				? `Title - ${daily.title}`
+				: `Client - ${daily.clientsName}`}</Card.Title
+		>
 		<Card.Description
-			>{userType === userTypes.CLIENT ? daily.clientsName : daily.title}</Card.Description
+			>{userType === userTypes.CLIENT ? '' : `Title - ${daily.title}`}</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>

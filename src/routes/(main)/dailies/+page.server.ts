@@ -1,6 +1,5 @@
 import { activities, clients, dailies, users, type Activity, type Daily } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { arrayToTuple } from '$lib/utils/other.js';
 import { userTypes } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
@@ -26,17 +25,18 @@ export async function load({ locals, platform }) {
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.CLIENT) {
-		const getOtherPersonsNames = foundDailies.map((daily) =>
-			db
-				.select({ otherPersonsName: users.name })
-				.from(users)
-				.leftJoin(clients, eq(users.id, clients.id))
-				.limit(1)
-				.where(eq(clients.id, daily.clientId))
-		);
-
-		clientsNames = (await db.batch(arrayToTuple(getOtherPersonsNames))).map(
-			(name) => name[0].otherPersonsName
+		clientsNames = await Promise.all(
+			foundDailies.map(
+				async (daily) =>
+					(
+						await db
+							.select({ otherPersonsName: users.name })
+							.from(users)
+							.leftJoin(clients, eq(users.id, clients.id))
+							.limit(1)
+							.where(eq(clients.id, daily.clientId))
+					)[0].otherPersonsName
+			)
 		);
 	}
 

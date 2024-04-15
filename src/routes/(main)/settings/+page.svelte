@@ -38,6 +38,7 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
+You current email is: {data.user.email}
 <ChangeEmailForm form={changeEmailForm} />
 
 <form method="POST" action="?/changePassword" use:enhance>
@@ -52,7 +53,7 @@
 		<Form.Field form={changePasswordForm} name="newPassword">
 			<Form.Control let:attrs>
 				<Form.Label>New password</Form.Label>
-				<Input {...attrs} placeholder="Make it a good one!" bind:value={$formData.newPassword} />
+				<Input {...attrs} placeholder="A new password" bind:value={$formData.newPassword} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
