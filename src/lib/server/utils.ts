@@ -28,8 +28,8 @@ export async function getSeries(db: DrizzleD1Database, activityId: number) {
 export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {
 	return await db
 		.select()
-		.from(clients)
-		.innerJoin(users, eq(clients.id, users.id))
+		.from(users)
+		.leftJoin(clients, eq(clients.id, users.id))
 		.where(eq(clients.trainerId, trainerId));
 }
 

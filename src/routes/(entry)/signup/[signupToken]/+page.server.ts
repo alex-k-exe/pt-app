@@ -41,18 +41,27 @@ export async function load({ params, url, platform }) {
 		signupTokenId,
 		trainer,
 		targetPath,
-		form: await superValidate(zod(await formSchema(db)))
+		form: await superValidate(zod(formSchema)),
+		error: url.searchParams.get('error')
 	};
 }
 
 export const actions = {
 	default: async (event) => {
 		const db = initDrizzle(event.platform);
-		let form = await superValidate(event, zod(await formSchema(db)));
+		let form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		const hashedPassword = await new Scrypt().hash(form.data.password);
+		const emails = await db
+			.select({ email: users.email })
+			.from(users)
+			.limit(1)
+			.where(eq(users.email, form.data.email));
+		if (emails.length > 0) {
+			return redirect(302, event.url.pathname + `?error=Email has already been used`);
+		}
 
+		const hashedPassword = await new Scrypt().hash(form.data.password);
 		const user = (
 			await db
 				.insert(users)
@@ -63,6 +72,7 @@ export const actions = {
 				})
 				.returning()
 		)[0];
+
 		if (form.data.trainerId) {
 			await db.insert(clients).values({ id: user.id, trainerId: form.data.trainerId });
 			event.cookies.set('userType', userTypes.CLIENT, { path: '/' });
@@ -72,11 +82,10 @@ export const actions = {
 		}
 
 		await db.delete(signupTokens).where(eq(signupTokens.id, Number(event.params.signupToken)));
-
 		const session = await event.locals.lucia.createSession(user.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
 		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '/' });
 
-		return redirect(302, form.data.targetPath ?? '/workouts');
+		return redirect(302, event.url.searchParams.get('targetPath') ?? '/workouts');
 	}
 };

@@ -9,7 +9,7 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes } from '$lib/utils/types/other.js';
+import { userTypes, validDate } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { and, eq, or } from 'drizzle-orm';
@@ -19,7 +19,8 @@ import { yearSchema } from './schema.js';
 
 export async function load(event) {
 	if (!event.locals.user?.id || !event.locals.userType) return redirect(302, '/login');
-	const month = event.url.searchParams.get('month')
+	const monthString = event.url.searchParams.get('month');
+	const month = monthString?.match(validDate)
 		? dayjs(event.url.searchParams.get('month'), 'MM-YYYY')
 		: dayjs();
 	const clientId = event.url.searchParams.get('clientId');

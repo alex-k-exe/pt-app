@@ -12,7 +12,7 @@
 <Form.Control let:attrs>
 	<Form.Label>{label}</Form.Label>
 	<div class="flex">
-		<Input {...attrs} type={passwordInputType} bind:value />
+		<Input {...attrs} class="w-fit" type={passwordInputType} bind:value />
 		<Button
 			on:click={() => (passwordInputType = passwordInputType === 'password' ? '' : 'password')}
 		>

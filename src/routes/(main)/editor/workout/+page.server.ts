@@ -9,27 +9,31 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes, type WorkoutWithSeries } from '$lib/utils/types/other';
+import { userTypes, validDate } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import type { FormActivity } from '../schema.js';
 import { formSchema } from './schema.js';
 
 // If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
 // If User is a Trainer, find the names of their clients and attach the name of the client to the workout
 // Otherwise make a new workout
 export async function load({ url, locals, platform }) {
-	const date = dayjs(url.searchParams.get('date'));
+	const dateString = url.searchParams.get('date');
+	const date = dateString?.match(validDate)
+		? dayjs(dateString, 'MM-YYYY').toDate()
+		: dayjs().toDate();
 	const workoutId = Number(url.searchParams.get('workoutId'));
 
 	if (!locals.user?.id) return redirect(302, '/login');
-	let workout: WorkoutWithSeries = {
+	let workout: FormActivity & { date: Date } = {
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new workout
 		title: '',
-		date: date.toDate(),
+		date,
 		startTime: new Date(),
 		endTime: new Date(),
 		series: [],
@@ -75,7 +79,7 @@ export async function load({ url, locals, platform }) {
 
 	return {
 		workout: { ...workout, clientName: clientOfWorkoutName },
-		clientNames: trainersClients,
+		trainersClients,
 		userType: locals.userType,
 		form: await superValidate(zod(formSchema))
 	};
@@ -132,15 +136,24 @@ export const actions = {
 				}
 			});
 		});
+
+		const date = event.url.searchParams.get('date');
+		return redirect(
+			302,
+			'/workouts' + date?.match(validDate) ? `?date=${date}` : dayjs().format('MM-YYYY')
+		);
 	},
 
-	delete: async (event) => {
-		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
-		const form = await superValidate(event, zod(formSchema));
-		const id = form.data.id;
-		if (!id) return fail(400, { form });
-		if (!form.valid) return fail(400, { form });
+	delete: async ({ locals, platform, url }) => {
+		if (locals.userType !== userTypes.TRAINER) return fail(403);
+		const id = url.searchParams.get('workoutId');
+		if (!id) return fail(400);
 
-		await initDrizzle(event.platform).delete(activities).where(eq(activities.id, id));
+		await initDrizzle(platform)
+			.delete(activities)
+			.where(eq(activities.id, Number(id)));
+
+		const date = url.searchParams.get('date');
+		return redirect(302, '/workouts' + date ? `?date=${date}` : '');
 	}
 };

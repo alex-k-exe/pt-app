@@ -3,14 +3,15 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { formSchema } from '../schema.js';
 
 	export let data;
 
-	const form = superForm(data.form);
+	const form = superForm(data.form, { validators: zodClient(formSchema) });
 	const { form: formData, enhance } = form;
 
 	let passwordInputType: 'password' | '' = 'password';
-	$formData.targetPath = data.targetPath;
 </script>
 
 <h2>Sign up</h2>
@@ -29,8 +30,12 @@
 	You are a trainer.
 {/if}
 
+<p style="color: red">{data.error ?? ''}</p>
+
 <form method="POST" use:enhance>
-	<input type="hidden" name="trainerId" value={data.trainer?.id} />
+	{#if data.trainer}
+		<input type="hidden" name="trainerId" value={data.trainer.id} />
+	{/if}
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
 			<Form.Label>Name</Form.Label>

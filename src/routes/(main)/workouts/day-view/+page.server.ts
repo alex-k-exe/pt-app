@@ -32,7 +32,7 @@ export async function load({ locals, platform, url }) {
 	)
 		.filter((workout): workout is { activities: Activity; workouts: Workout } => {
 			if (workout.workouts === null) return false;
-			return !datesAreSameDay(dayjs(workout.workouts.date), date);
+			return !datesAreSameDay(dayjs(workout.workouts.date).toString(), date.toString());
 		})
 		.map((workout) => {
 			return { ...workout.workouts, ...workout.activities };

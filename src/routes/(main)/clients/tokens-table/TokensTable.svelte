@@ -31,6 +31,6 @@
 </form>
 <DataTable {table} {columns} />
 
-Give your client this link with the signup token at the end
-<p></p>
+<p>Tokens expire 24 hours after they've been created</p>
+<p>Give your client this link with the signup token at the end:</p>
 <a href="https://pt-app.pages.dev/signup/"><u>https://pt-app.pages.dev/signup/</u></a>

@@ -1,5 +1,5 @@
 import { users } from '$lib/drizzleTables';
-import { validPassword } from '$lib/utils/types/other';
+import { validEmail, validPassword } from '$lib/utils/types/other';
 import { eq } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { Scrypt } from 'lucia';
@@ -9,7 +9,7 @@ export async function changeEmailSchema(db: DrizzleD1Database) {
 	return z.object({
 		newEmail: z
 			.string()
-			.email()
+			.regex(validEmail.regex, validEmail.message)
 			.refine(async (email) => {
 				const emails = await db
 					.select({ email: users.email })

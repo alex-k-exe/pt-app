@@ -9,11 +9,11 @@ import {
 } from '$lib/drizzleTables';
 import { getSeries, initDrizzle, insertOrUpdateSeries } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other';
-import { type DailyWithSeries } from '$lib/utils/types/other.ts';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import type { FormActivity } from '../schema';
 import { formSchema } from './schema';
 
 // If given, use the dailyId to get daily (i.e. Activity) along with its Series and Sets
@@ -23,7 +23,7 @@ export async function load({ url, locals, platform }) {
 	const dailyId = Number(url.searchParams.get('dailyId'));
 
 	if (!locals.user?.id) return redirect(302, '/login');
-	let daily: DailyWithSeries = {
+	let daily: FormActivity & { activeDays: string } = {
 		activeDays: '0000000',
 		clientId: '',
 		trainerId: locals.user?.id, // only trainers can make a new daily

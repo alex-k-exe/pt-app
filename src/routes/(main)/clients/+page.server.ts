@@ -32,7 +32,6 @@ export async function load({ platform, locals }) {
 	)
 		.filter((trainer): trainer is { users: User; trainers: Trainer } => trainer !== null)
 		.map((user) => user.users);
-	console.log(foundTrainers);
 
 	await db
 		.delete(signupTokens)
@@ -72,6 +71,7 @@ export const actions = {
 		await initDrizzle(platform).insert(signupTokens).values({
 			trainerId: locals.user.id
 		});
+		return redirect(302, '/clients');
 	},
 
 	deleteToken: async ({ platform, request }) => {
