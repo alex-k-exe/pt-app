@@ -4,34 +4,34 @@ import {
 	trainers,
 	users,
 	type SignupToken,
-	type Trainer,
 	type User
 } from '$lib/drizzleTables.ts';
 import { initDrizzle } from '$lib/server/utils';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
-import { eq, lte } from 'drizzle-orm';
+import { eq, lte, ne } from 'drizzle-orm';
 
 export async function load({ platform, locals }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const db = initDrizzle(platform);
 
-	const foundClients: User[] = (
+	const foundClients = (
 		await db
 			.select()
-			.from(clients)
-			.leftJoin(users, eq(users.id, clients.id))
+			.from(users)
+			.leftJoin(clients, eq(clients.id, users.id))
 			.orderBy(users.name)
 			.where(eq(clients.trainerId, locals.user?.id))
-	)
-		.map((user) => user.users)
-		.filter((client): client is User => client !== null);
+	).map((client) => client.users);
 
 	const foundTrainers: User[] = (
-		await db.select().from(trainers).leftJoin(users, eq(users.id, trainers.id)).orderBy(users.name)
-	)
-		.filter((trainer): trainer is { users: User; trainers: Trainer } => trainer !== null)
-		.map((user) => user.users);
+		await db
+			.select()
+			.from(users)
+			.leftJoin(trainers, eq(trainers.id, users.id))
+			.orderBy(users.name)
+			.where(ne(users.id, locals.user.id))
+	).map((user) => user.users);
 
 	await db
 		.delete(signupTokens)
@@ -49,21 +49,22 @@ export const actions = {
 	deleteClient: async ({ platform, request }) => {
 		const data = await request.formData();
 		const clientId = data.get('clientId')?.toString();
-		if (!clientId) return fail(500, { formData: data });
+		if (!clientId) return fail(400);
 
 		const db = initDrizzle(platform);
 		db.delete(users).where(eq(users.id, clientId));
-		await db.delete(clients).where(eq(clients.id, clientId));
 	},
 
 	transferClient: async ({ platform, request }) => {
 		const data = await request.formData();
-		const trainerId = data.get('trainerId')?.toString();
-		const clientId = data.get('clientId')?.toString();
-		if (!trainerId || !clientId) return fail(500, { formData: data });
+		const trainerId = data.get('newTrainerId');
+		const clientId = data.get('clientId');
+		if (!trainerId || !clientId) return fail(400);
 
-		const db = initDrizzle(platform);
-		db.update(clients).set({ trainerId: trainerId }).where(eq(clients.id, clientId));
+		await initDrizzle(platform)
+			.update(clients)
+			.set({ trainerId: trainerId.toString() })
+			.where(eq(clients.id, clientId.toString()));
 	},
 
 	createToken: async ({ platform, locals }) => {

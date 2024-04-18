@@ -1,5 +1,6 @@
-export async function load({ locals }) {
+export async function load({ locals, url }) {
 	return {
-		userType: locals.userType
+		userType: locals.userType,
+		error: url.searchParams.get('error')
 	};
 }

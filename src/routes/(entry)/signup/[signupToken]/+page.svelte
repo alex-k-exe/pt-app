@@ -30,8 +30,6 @@
 	You are a trainer.
 {/if}
 
-<p style="color: red">{data.error ?? ''}</p>
-
 <form method="POST" use:enhance>
 	{#if data.trainer}
 		<input type="hidden" name="trainerId" value={data.trainer.id} />

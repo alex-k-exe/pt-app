@@ -3,14 +3,13 @@
 	import type { User } from '$lib/drizzleTables';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
-	import RemoveClientAction from './RemoveClientAction.svelte';
+	import RemoveClientAction from './DeleteClientAction.svelte';
 	import TransferClientAction from './TransferClientAction.svelte';
 
 	export let clients: User[];
 	export let trainers: User[];
 
 	const table = createTable(readable(clients));
-
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'name',

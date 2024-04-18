@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.ts';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
-	import { dayOnlyFormat } from '$lib/utils/types/other.js';
+	import { dayOnlyFormat, userTypes } from '$lib/utils/types/other.js';
 	import dayjs from 'dayjs';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 
@@ -14,9 +14,11 @@
 <a href="/workouts"><Button variant="outline">Go back to month view</Button></a>
 {date.format('D MMMM YYYY')}
 
-<a href={`/editor/workout?date=${date.format(dayOnlyFormat)}`}
-	><Button>Make a new workout</Button></a
->
+{#if data.userType === userTypes.TRAINER}
+	<a href={`/editor/workout?date=${date.format(dayOnlyFormat)}`}
+		><Button>Make a new workout</Button></a
+	>
+{/if}
 
 <div class="workouts">
 	{#each workouts as workout (workout.id)}

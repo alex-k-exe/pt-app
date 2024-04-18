@@ -8,8 +8,8 @@
 	import { locations } from '$lib/utils/types/other';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import ExercisesEditor from '../ExercisesEditor.svelte';
 	import SelectClient from '../SelectClient.svelte';
-	import WorkoutEditor from '../WorkoutEditor.svelte';
 	import { formSchema } from './schema.ts';
 
 	export let data;
@@ -67,7 +67,7 @@
 		</form>
 	{/if}
 
-	<WorkoutEditor bind:series={$formData.series} bind:sets={$formData.sets} />
+	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />
 </form>
 
 <style>

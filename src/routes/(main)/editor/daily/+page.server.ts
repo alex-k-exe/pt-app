@@ -1,13 +1,10 @@
+import { activities, dailies, sets, users, type Activity, type Daily } from '$lib/drizzleTables';
 import {
-	activities,
-	clients,
-	dailies,
-	sets,
-	users,
-	type Activity,
-	type Daily
-} from '$lib/drizzleTables';
-import { getSeries, initDrizzle, insertOrUpdateSeries } from '$lib/server/utils';
+	getSeries,
+	getTrainersClients,
+	initDrizzle,
+	insertOrUpdateSeries
+} from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -62,20 +59,21 @@ export async function load({ url, locals, platform }) {
 		)[0].name;
 	}
 
-	let clientNames: { id: string; name: string }[];
+	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
 		const db = initDrizzle(platform);
-		clientNames = await db
-			.select({ id: users.id, name: users.name })
-			.from(clients)
-			.limit(1)
-			.innerJoin(users, eq(clients.id, users.id))
-			.where(eq(clients.trainerId, locals.user?.id));
-	} else clientNames = [];
+		trainersClients = (await getTrainersClients(db, locals.user.id)).map((client) => client.users);
+		if (trainersClients.length === 0) {
+			return redirect(
+				302,
+				'/clients?error=You must have atleast one client to create a workout or daily'
+			);
+		}
+	}
 
 	return {
 		daily: { ...daily, clientName: clientOfDailyName },
-		clientNames: clientNames,
+		trainersClients,
 		userType: locals.userType,
 		form: await superValidate(zod(formSchema))
 	};

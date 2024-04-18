@@ -6,11 +6,13 @@
 
 	export let trainers: User[];
 	export let clientId: string;
+
 	let selectedTrainer: { id: string; name: string } | null;
 </script>
 
-<form method="POST" action="?transfer">
+<form method="POST" action="?/transferClient" class="flex">
 	<input type="hidden" name="clientId" value={clientId} />
+	<input type="hidden" name="newTrainerId" value={selectedTrainer?.id ?? ''} />
 	<Select.Root
 		selected={{ value: selectedTrainer?.id, label: selectedTrainer?.name }}
 		onSelectedChange={(event) => {
@@ -28,10 +30,9 @@
 				{/each}
 			</Select.Group>
 		</Select.Content>
-		<Select.Input name="newTrainerId" />
 	</Select.Root>
 
-	<Button variant="outline" size="icon">
+	<Button variant="outline" size="icon" type="submit">
 		<MoveRight />
 	</Button>
 </form>

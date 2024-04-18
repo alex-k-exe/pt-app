@@ -5,9 +5,9 @@
 	export let clientId: string;
 </script>
 
-<form method="POST" action="?/delete">
+<form method="POST" action="?/deleteClient">
 	<input type="hidden" name="clientId" value={clientId} />
-	<Button variant="outline" size="icon">
+	<Button variant="outline" size="icon" type="submit">
 		<X />
 	</Button>
 </form>

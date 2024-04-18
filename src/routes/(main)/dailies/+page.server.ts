@@ -24,7 +24,7 @@ export async function load({ locals, platform }) {
 		});
 
 	let clientsNames: string[] | null = null;
-	if (locals.userType === userTypes.CLIENT) {
+	if (locals.userType === userTypes.TRAINER) {
 		clientsNames = await Promise.all(
 			foundDailies.map(
 				async (daily) =>

@@ -82,8 +82,8 @@ export const actions = {
 		return redirect(302, `/chats?chatId=${createdChatId}`);
 	},
 
-	deleteChat: async ({ platform, url }) => {
-		const chatId = url.searchParams.get('chatId');
+	deleteChat: async ({ platform, request }) => {
+		const chatId = (await request.formData()).get('chatId');
 		if (!chatId) return fail(400);
 
 		await initDrizzle(platform)

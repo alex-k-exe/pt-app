@@ -41,8 +41,7 @@ export async function load({ params, url, platform }) {
 		signupTokenId,
 		trainer,
 		targetPath,
-		form: await superValidate(zod(formSchema)),
-		error: url.searchParams.get('error')
+		form: await superValidate(zod(formSchema))
 	};
 }
 

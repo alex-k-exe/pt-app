@@ -19,6 +19,7 @@
 	</div>
 	{#if data.selectedChat}
 		<form method="POST" action="?/deleteChat" class="chatHeader">
+			<input type="hidden" name="chatId" value={data.selectedChat.id}/>
 			Chat with {data.selectedChat.otherUsersName}
 			<Button type="submit">Delete chat</Button>
 		</form>

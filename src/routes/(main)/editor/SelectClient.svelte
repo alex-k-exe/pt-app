@@ -4,6 +4,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import type { User } from 'lucia';
 
+	// TODO: get rid of this any
 	export let form: any;
 	export let selectedClient: { id: string; name: string } | null = null;
 	export let trainersClients: Pick<User, 'id' | 'name'>[] | null;

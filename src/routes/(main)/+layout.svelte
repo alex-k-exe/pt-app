@@ -23,6 +23,7 @@
 		{/each}
 	</nav>
 	<slot />
+	<p style="color: red">{data.error ?? ''}</p>
 	<nav class="bottom-0 flex bg-background md:hidden">
 		{#each urls as { name, icon }}
 			<a href={'/' + name.toLowerCase()}>

@@ -75,6 +75,12 @@ export async function load({ url, locals, platform }) {
 	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
 		trainersClients = (await getTrainersClients(db, locals.user.id)).map((client) => client.users);
+		if (trainersClients.length === 0) {
+			return redirect(
+				302,
+				'/clients?error=You must have atleast one client to create a workout or daily'
+			);
+		}
 	}
 
 	return {
