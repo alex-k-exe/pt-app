@@ -3,7 +3,7 @@
 	import type { User } from '$lib/drizzleTables';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import { readable } from 'svelte/store';
-	import RemoveClientAction from './DeleteClientAction.svelte';
+	import DeleteClientAction from './DeleteClientAction.svelte';
 	import TransferClientAction from './TransferClientAction.svelte';
 
 	export let clients: User[];
@@ -19,7 +19,7 @@
 			accessor: ({ id }) => id,
 			header: 'Remove',
 			cell: ({ value }) => {
-				return createRender(RemoveClientAction, { clientId: value });
+				return createRender(DeleteClientAction, { clientId: value });
 			}
 		}),
 		table.column({
