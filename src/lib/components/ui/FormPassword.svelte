@@ -4,9 +4,9 @@
 	import * as Form from './form';
 	import { Input } from './input';
 
+	export let value: string | undefined;
 	export let passwordInputType: 'password' | '' = 'password';
-	export let value: string;
-	export let label: string = 'Password';
+	export let label = 'Password';
 </script>
 
 <Form.Control let:attrs>

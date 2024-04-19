@@ -1,7 +1,7 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
@@ -36,7 +36,7 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<SelectClient {form} bind:selectedClient clients={data.trainersClients} />
+		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
 		<a href="/workouts">Cancel</a>
 		<Form.Button>Save</Form.Button>
@@ -64,7 +64,7 @@
 
 	{#if data.workout.id}
 		<form method="POST" action="?delete">
-			<Button variant="destructive" type="submit">Delete this workout</Button>
+			<DestructiveButton triggerText="Delete this workout" />
 		</form>
 	{/if}
 

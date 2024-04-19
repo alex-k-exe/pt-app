@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Card from '$lib/components/ui/card/index.ts';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
@@ -36,7 +37,7 @@
 			<Card.Footer>
 				<form method="POST" action="?/delete">
 					<input type="hidden" value={workout.id} />
-					<Button type="submit" variant="destructive">Delete</Button>
+					<DestructiveButton triggerText="Delete" />
 				</form>
 				<a href={`/editor/workout?workoutId=${workout.id}`}>
 					<Button type="submit">Edit</Button>
