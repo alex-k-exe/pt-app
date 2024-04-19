@@ -24,14 +24,23 @@
 	{#each workouts as workout (workout.id)}
 		<Card.Root>
 			<Card.Header>
-				<Card.Title>{date.format('h:ma') + ' to ' + dayjs(date).format('h:ma') + '\n'}</Card.Title>
-				<Card.Description>{workout.clientsName + ' - ' + workout.title}</Card.Description>
+				<Card.Title>{date.format('h:ma') + ' to ' + dayjs(date).format('h:ma')}</Card.Title>
+				<Card.Description
+					>{(workout.clientsName ? `${workout.clientsName} - ` : '') +
+						workout.title}</Card.Description
+				>
 			</Card.Header>
 			<Card.Content>
-				<p>Card Content</p>
+				Location - <p>{workout.location}</p>
 			</Card.Content>
 			<Card.Footer>
-				<p>Card Footer</p>
+				<form method="POST" action="?/delete">
+					<input type="hidden" value={workout.id} />
+					<Button type="submit" variant="destructive">Delete</Button>
+				</form>
+				<a href={`/editor/workout?workoutId=${workout.id}`}>
+					<Button type="submit">Edit</Button>
+				</a>
 			</Card.Footer>
 		</Card.Root>
 	{/each}

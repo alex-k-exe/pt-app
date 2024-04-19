@@ -23,22 +23,20 @@ export async function load(event) {
 	const month = monthString?.match(validMonthDate)
 		? dayjs(event.url.searchParams.get('month'), 'MM-YYYY')
 		: dayjs();
-	const clientId = event.url.searchParams.get('clientId');
 
 	const db = initDrizzle(event.platform);
 	const foundWorkouts = (
 		await db
 			.select()
 			.from(activities)
-			.leftJoin(workouts, eq(activities.id, workouts.activityId))
+			.innerJoin(workouts, eq(activities.id, workouts.activityId))
 			.where(
 				and(
 					or(
 						eq(activities.clientId, event.locals.user?.id),
 						eq(activities.trainerId, event.locals.user?.id)
 					),
-					eq(workouts.date, month.toDate()),
-					clientId ? eq(activities.clientId, clientId) : eq(activities.id, activities.id)
+					eq(workouts.date, month.toDate())
 				)
 			)
 			.orderBy(workouts.date)
@@ -58,7 +56,7 @@ export async function load(event) {
 					await db
 						.select({ name: users.name })
 						.from(users)
-						.leftJoin(clients, eq(clients.id, users.id))
+						.innerJoin(clients, eq(clients.id, users.id))
 						.where(eq(clients.id, foundWorkouts[0].clientId))
 						.limit(1)
 				)[0].name
@@ -99,23 +97,10 @@ export async function load(event) {
 }
 
 export const actions = {
-	selectClient: async ({ url, request }) => {
-		const clientId = (await request.formData()).get('clientId');
-		console.log(clientId);
-		if (!clientId) return fail(400);
-		const month = url.searchParams.get('month');
-		return redirect(302, `/workouts?clientId=${clientId}` + (month ? `&month=${month}` : ''));
-	},
-
 	previousMonth: async ({ url }) => {
-		const clientId = url.searchParams.get('clientId');
 		const month = url.searchParams.get('month');
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
-		return redirect(
-			302,
-			`/workouts?month=${monthDate.subtract(1, 'month').format('MM-YYYY')}` +
-				(clientId ? `&clientId=${clientId}` : '')
-		);
+		return redirect(302, `/workouts?month=${monthDate.subtract(1, 'month').format('MM-YYYY')}`);
 	},
 
 	changeMonth: async ({ url, request }) => {
@@ -124,44 +109,26 @@ export const actions = {
 
 		const oldMonth = url.searchParams.get('month');
 		const oldDate = oldMonth ? dayjs(oldMonth, 'MM-YYYY') : dayjs();
-		const clientId = url.searchParams.get('clientId');
 
 		return redirect(
 			302,
-			`/workouts?month=${dayjs(newMonth, 'MMMM').format('MM')}-${oldDate.format('YYYY')}` +
-				(clientId ? `&clientId=${clientId}` : '')
+			`/workouts?month=${dayjs(newMonth, 'MMMM').format('MM')}-${oldDate.format('YYYY')}`
 		);
 	},
 
 	nextMonth: async ({ url }) => {
-		const clientId = url.searchParams.get('clientId');
 		const month = url.searchParams.get('month');
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
-
-		return redirect(
-			302,
-			`/workouts?month=${monthDate.add(1, 'month').format('MM-YYYY')}` +
-				(clientId ? `&clientId=${clientId}` : '')
-		);
+		return redirect(302, `/workouts?month=${monthDate.add(1, 'month').format('MM-YYYY')}`);
 	},
 
 	changeYear: async (event) => {
 		let form = await superValidate(event, zod(yearSchema));
 		if (!form.valid) return fail(400, { form });
 
-		const clientId = event.url.searchParams.get('clientId');
 		const month = event.url.searchParams.get('month');
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
 
-		return redirect(
-			302,
-			`/workouts?month=${monthDate.format('MM')}-${form.data.newYear}` +
-				(clientId ? `&clientId=${clientId}` : '')
-		);
-	},
-
-	today: async ({ url }) => {
-		const clientId = url.searchParams.get('clientId');
-		return redirect(302, `/workouts` + (clientId ? `?clientId=${clientId}` : ''));
+		return redirect(302, `/workouts?month=${monthDate.format('MM')}-${form.data.newYear}`);
 	}
 };

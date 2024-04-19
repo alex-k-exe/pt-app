@@ -19,7 +19,7 @@ export async function load({ platform, locals }) {
 		await db
 			.select()
 			.from(users)
-			.leftJoin(clients, eq(clients.id, users.id))
+			.innerJoin(clients, eq(clients.id, users.id))
 			.orderBy(users.name)
 			.where(eq(clients.trainerId, locals.user?.id))
 	).map((client) => client.users);
@@ -28,7 +28,7 @@ export async function load({ platform, locals }) {
 		await db
 			.select()
 			.from(users)
-			.leftJoin(trainers, eq(trainers.id, users.id))
+			.innerJoin(trainers, eq(trainers.id, users.id))
 			.orderBy(users.name)
 			.where(ne(users.id, locals.user.id))
 	).map((user) => user.users);
@@ -42,6 +42,7 @@ export async function load({ platform, locals }) {
 		.orderBy(signupTokens.creationTimeDate)
 		.where(eq(signupTokens.trainerId, locals.user.id));
 
+	console.log(foundClients, foundTrainers);
 	return { clients: foundClients, trainers: foundTrainers, signupTokens: foundTokens };
 }
 

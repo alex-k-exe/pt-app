@@ -88,7 +88,7 @@ export const actions = {
 
 		await initDrizzle(platform)
 			.delete(chats)
-			.where(eq(chats.id, Number(chatId)));
+			.where(eq(chats.id, Number(chatId.toString())));
 		return redirect(302, '/chats');
 	}
 };
@@ -155,7 +155,7 @@ async function getUsersForNewChat(
 		await db
 			.select({ id: users.id, name: users.name })
 			.from(trainers)
-			.leftJoin(users, eq(users.id, trainers.id))
+			.innerJoin(users, eq(users.id, trainers.id))
 			.orderBy(users.name)
 	).filter((trainer): trainer is { id: string; name: string } => trainer !== null);
 

@@ -9,7 +9,7 @@ import {
 import { initDrizzle } from '$lib/server/utils';
 import { datesAreSameDay } from '$lib/utils/dates.js';
 import { dayOnlyFormat, userTypes } from '$lib/utils/types/other';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq, or } from 'drizzle-orm';
 
@@ -24,7 +24,7 @@ export async function load({ locals, platform, url }) {
 		await db
 			.select()
 			.from(activities)
-			.leftJoin(workouts, eq(activities.id, workouts.activityId))
+			.innerJoin(workouts, eq(activities.id, workouts.activityId))
 			.where(
 				or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id))
 			)
@@ -47,7 +47,7 @@ export async function load({ locals, platform, url }) {
 					await db
 						.select({ name: users.name })
 						.from(users)
-						.leftJoin(clients, eq(clients.id, users.id))
+						.innerJoin(clients, eq(clients.id, users.id))
 						.limit(1)
 						.where(eq(users.id, foundWorkouts[0].clientId))
 				)[0].name
@@ -61,3 +61,13 @@ export async function load({ locals, platform, url }) {
 		})
 	};
 }
+
+export const actions = {
+	delete: async ({ platform, request }) => {
+		const workoutId = (await request.formData()).get('workoutId');
+		if (!workoutId) return fail(400);
+		await initDrizzle(platform)
+			.delete(activities)
+			.where(eq(activities.id, Number(workoutId.toString())));
+	}
+};

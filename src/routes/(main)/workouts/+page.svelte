@@ -1,5 +1,4 @@
 <script lang="ts">
-	import SelectClient from '$lib/components/SelectClient.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
@@ -38,28 +37,6 @@
 </svelte:head>
 
 <div class="buttons">
-	{#if data.clients !== null && data.clients.length > 0}
-		<form
-			method="POST"
-			action="?/selectClient"
-			use:enhance
-			class="flex"
-			bind:this={selectClientForm}
-		>
-			<input type="hidden" value={selectedClient?.id ?? ''} name="clientId" />
-			<SelectClient
-				{selectedClient}
-				afterOnSelectedChange={() => {
-					console.log('select');
-					selectClientForm.requestSubmit();
-				}}
-				clients={data.clients}
-			/>
-		</form>
-		<a href={`/workouts?month=${dayjs(data.month).format('MM-YYYY')}`}
-			><Button>Search all clients</Button></a
-		>
-	{/if}
 	<form method="POST" action="?/previousMonth">
 		<Button type="submit" variant="outline" size="icon" style="margin-left: 2%">
 			<ChevronLeft />
@@ -71,6 +48,7 @@
 			onSelectedChange={(event) => {
 				if (!event || !event.value) return;
 				selectedMonth = event.value;
+				console.log(event.value);
 				changeMonthForm.requestSubmit();
 			}}
 		>
@@ -106,9 +84,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 	</form>
-	<form method="POST" action="?/today">
-		<Button type="submit">Today</Button>
-	</form>
+	<a href="/workouts"><Button>Today</Button></a>
 </div>
 
 <MonthGrid

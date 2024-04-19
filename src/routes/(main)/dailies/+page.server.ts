@@ -12,7 +12,7 @@ export async function load({ locals, platform }) {
 		await db
 			.select()
 			.from(dailies)
-			.leftJoin(activities, eq(activities.id, dailies.activityId))
+			.innerJoin(activities, eq(activities.id, dailies.activityId))
 			.orderBy(activities.startTime)
 			.where(
 				or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id))
@@ -32,7 +32,7 @@ export async function load({ locals, platform }) {
 						await db
 							.select({ otherPersonsName: users.name })
 							.from(users)
-							.leftJoin(clients, eq(users.id, clients.id))
+							.innerJoin(clients, eq(users.id, clients.id))
 							.limit(1)
 							.where(eq(clients.id, daily.clientId))
 					)[0].otherPersonsName

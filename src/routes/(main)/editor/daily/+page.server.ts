@@ -39,7 +39,7 @@ export async function load({ url, locals, platform }) {
 				await db
 					.select()
 					.from(dailies)
-					.leftJoin(activities, eq(activities.id, dailies.activityId))
+					.innerJoin(activities, eq(activities.id, dailies.activityId))
 					.limit(1)
 					.where(eq(dailies.activityId, dailyId))
 			)
