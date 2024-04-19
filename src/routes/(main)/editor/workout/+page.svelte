@@ -3,13 +3,14 @@
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
+	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
 	import { locations } from '$lib/utils/types/other';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import SelectClient from '../../../../lib/components/SelectClient.svelte';
 	import ExercisesEditor from '../ExercisesEditor.svelte';
-	import SelectClient from '../SelectClient.svelte';
 	import { formSchema } from './schema.ts';
 
 	export let data;
@@ -28,20 +29,20 @@
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
 	<div class="flex">
-		<SelectClient
-			{form}
-			bind:selectedClient
-			trainersClients={data.trainersClients}
-			bind:title={data.workout.title}
-		/>
+		<Form.Field {form} name="title">
+			<Form.Control let:attrs>
+				<Form.Label>Title</Form.Label>
+				<Input {...attrs} placeholder="Add a title" bind:value={$formData.title} />
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+		<SelectClient {form} bind:selectedClient clients={data.trainersClients} />
 
 		<a href="/workouts">Cancel</a>
 		<Form.Button>Save</Form.Button>
 	</div>
 
-	<div class="timeThings">
-		From <TimePicker bind:selectedDate={$formData.startTime} />
-	</div>
+	<div class="timeThings">From <TimePicker bind:selectedDate={$formData.startTime} /></div>
 	<div class="timeThings">to <TimePicker bind:selectedDate={$formData.endTime} /></div>
 	<div class="timeThings">on <DatePicker bind:selectedDate={$formData.date} /></div>
 

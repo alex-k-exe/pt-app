@@ -1,12 +1,14 @@
 <script lang="ts">
+	import SelectClient from '$lib/components/SelectClient.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { getDaysForCalendar } from '$lib/utils/dates';
-	import { months, type ObjectValues } from '$lib/utils/types/other.js';
+	import { dayOnlyFormat, months, type ObjectValues } from '$lib/utils/types/other.js';
 	import dayjs from 'dayjs';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
+	import { afterUpdate } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import MonthGrid from './MonthGrid.svelte';
@@ -18,15 +20,16 @@
 		validators: zodClient(yearSchema)
 	});
 	const { form: yearFormData, enhance } = changeYearForm;
-	$yearFormData.newYear = data.month.getFullYear();
 
-	let searchClientForm: HTMLFormElement;
 	let selectedClient: { id: string; name: string } | null = null;
+	let selectClientForm: HTMLFormElement;
 
+	let selectedMonth = dayjs(data.month).format('MMMM') as ObjectValues<typeof months>;
 	let changeMonthForm: HTMLFormElement;
-	let selectedMonth: ObjectValues<typeof months> = dayjs(data.month).format('MMMM') as ObjectValues<
-		typeof months
-	>;
+
+	afterUpdate(() => {
+		$yearFormData.newYear = data.month.getFullYear();
+	});
 </script>
 
 <svelte:head>
@@ -35,29 +38,27 @@
 </svelte:head>
 
 <div class="buttons">
-	{#if data.trainersClients !== null && data.trainersClients.length > 0}
-		<form method="POST" action="?/searchForClient" bind:this={searchClientForm}>
-			<Select.Root
-				selected={{ value: selectedClient?.id, label: selectedClient?.name }}
-				onSelectedChange={(event) => {
-					if (!event || !event.value || !event.label) return;
-					selectedClient = { id: event.value, name: event.label };
-					searchClientForm.requestSubmit();
+	{#if data.clients !== null && data.clients.length > 0}
+		<form
+			method="POST"
+			action="?/selectClient"
+			use:enhance
+			class="flex"
+			bind:this={selectClientForm}
+		>
+			<input type="hidden" value={selectedClient?.id ?? ''} name="clientId" />
+			<SelectClient
+				{selectedClient}
+				afterOnSelectedChange={() => {
+					console.log('select');
+					selectClientForm.requestSubmit();
 				}}
-			>
-				<Select.Trigger class="w-[180px]">
-					<Select.Value placeholder="Select a client" />
-				</Select.Trigger>
-				<Select.Content>
-					<Select.Group>
-						{#each data.trainersClients as client}
-							<Select.Item value={client.id} label={client.name}>{client.name}</Select.Item>
-						{/each}
-					</Select.Group>
-				</Select.Content>
-				<Select.Input name="clientId" />
-			</Select.Root>
+				clients={data.clients}
+			/>
 		</form>
+		<a href={`/workouts?month=${dayjs(data.month).format('MM-YYYY')}`}
+			><Button>Search all clients</Button></a
+		>
 	{/if}
 	<form method="POST" action="?/previousMonth">
 		<Button type="submit" variant="outline" size="icon" style="margin-left: 2%">
@@ -96,11 +97,13 @@
 			<Form.Control let:attrs>
 				<Input
 					{...attrs}
+					class="w-fit"
 					placeholder="Year"
 					style="margin-right: 2%"
 					bind:value={$yearFormData.newYear}
 				/>
 			</Form.Control>
+			<Form.FieldErrors />
 		</Form.Field>
 	</form>
 	<form method="POST" action="?/today">
@@ -109,8 +112,7 @@
 </div>
 
 <MonthGrid
-	userType={data.userType}
-	month={getDaysForCalendar(dayjs().month())}
+	month={getDaysForCalendar(dayjs(data.month, dayOnlyFormat).month())}
 	workouts={data.workouts}
 />
 

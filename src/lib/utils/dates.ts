@@ -25,10 +25,10 @@ export function getDaysForCalendar(month: number): Dayjs[][] {
 	});
 }
 
-export function datesAreSameDay(...dates: string[]) {
-	return dates.slice(1).every((date, i) => {
-		const newDate = dayjs(date);
-		let previousDate = dayjs(dates[i - 1]);
+export function datesAreSameDay(...dates: Dayjs[]) {
+	return dates.every((newDate, i) => {
+		if (i === 0) return true;
+		let previousDate = dates[i - 1];
 		return newDate.format(dayOnlyFormat) === previousDate.format(dayOnlyFormat);
 	});
 }

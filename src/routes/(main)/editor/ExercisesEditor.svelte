@@ -13,11 +13,9 @@
 		<Button
 			variant="outline"
 			on:click={() => (series = [...series, { index: series.length, reps: 1, sets: [] }])}
-			>Add another Series</Button
+			>Add a series</Button
 		>
-		<Button variant="outline" on:click={() => (sets = handleAddSet(sets))}
-			>Add another Exercise</Button
-		>
+		<Button variant="outline" on:click={() => (sets = handleAddSet(sets))}>Add an exercise</Button>
 	</div>
 	<div class="flex flex-wrap">
 		{#each series as singleSeries, j}

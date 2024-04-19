@@ -9,7 +9,7 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes, validDate } from '$lib/utils/types/other.js';
+import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { and, eq, or } from 'drizzle-orm';
@@ -20,7 +20,7 @@ import { yearSchema } from './schema.js';
 export async function load(event) {
 	if (!event.locals.user?.id || !event.locals.userType) return redirect(302, '/login');
 	const monthString = event.url.searchParams.get('month');
-	const month = monthString?.match(validDate)
+	const month = monthString?.match(validMonthDate)
 		? dayjs(event.url.searchParams.get('month'), 'MM-YYYY')
 		: dayjs();
 	const clientId = event.url.searchParams.get('clientId');
@@ -41,11 +41,11 @@ export async function load(event) {
 					clientId ? eq(activities.clientId, clientId) : eq(activities.id, activities.id)
 				)
 			)
-			.orderBy(activities.startTime)
+			.orderBy(workouts.date)
 	)
 		.filter((workout): workout is { activities: Activity; workouts: Workout } => workout !== null)
 		.map((workout) => {
-			return { ...workout.activities, ...workout.workouts };
+			return { ...workout.activities, date: workout.workouts.date };
 		});
 
 	let clientsInWorkoutsNames: string[] | null = null;
@@ -72,24 +72,37 @@ export async function load(event) {
 			});
 	}
 
-	return {
-		month: month.set('date', 1).toDate(),
-		workouts: foundWorkouts.map((workout, i) => {
+	const groupedWorkouts = new Map<
+		string,
+		(Activity & { clientsName: string | null; date: Date })[]
+	>();
+	foundWorkouts
+		.map((workout, i) => {
 			return {
 				...workout,
 				clientsName: clientsInWorkoutsNames ? clientsInWorkoutsNames[i] : null
 			};
-		}),
+		})
+		.forEach((workout) => {
+			const dateKey = dayjs(workout.date).format(dayOnlyFormat);
+			if (!groupedWorkouts.has(dateKey)) groupedWorkouts.set(dateKey, []);
+			groupedWorkouts.get(dateKey)!.push(workout);
+		});
+
+	return {
+		month: month.toDate(),
+		workouts: groupedWorkouts,
 		userType: event.locals.userType,
-		trainersClients,
+		clients: trainersClients,
 		changeYearForm: await superValidate(event, zod(yearSchema))
 	};
 }
 
 export const actions = {
-	searchForClient: async ({ url, request }) => {
+	selectClient: async ({ url, request }) => {
 		const clientId = (await request.formData()).get('clientId');
-		if (!clientId) return fail(500);
+		console.log(clientId);
+		if (!clientId) return fail(400);
 		const month = url.searchParams.get('month');
 		return redirect(302, `/workouts?clientId=${clientId}` + (month ? `&month=${month}` : ''));
 	},
@@ -100,7 +113,7 @@ export const actions = {
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
 		return redirect(
 			302,
-			`/workouts?month=${monthDate.subtract(1, 'months').format('MM-YYYY')}` +
+			`/workouts?month=${monthDate.subtract(1, 'month').format('MM-YYYY')}` +
 				(clientId ? `&clientId=${clientId}` : '')
 		);
 	},
@@ -124,9 +137,10 @@ export const actions = {
 		const clientId = url.searchParams.get('clientId');
 		const month = url.searchParams.get('month');
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
+
 		return redirect(
 			302,
-			`/workouts?month=${monthDate.add(1, 'months').format('MM-YYYY')}` +
+			`/workouts?month=${monthDate.add(1, 'month').format('MM-YYYY')}` +
 				(clientId ? `&clientId=${clientId}` : '')
 		);
 	},

@@ -9,7 +9,7 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes, validDate } from '$lib/utils/types/other';
+import { userTypes, validMonthDate } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import { eq } from 'drizzle-orm';
@@ -23,7 +23,7 @@ import { formSchema } from './schema.js';
 // Otherwise make a new workout
 export async function load({ url, locals, platform }) {
 	const dateString = url.searchParams.get('date');
-	const date = dateString?.match(validDate)
+	const date = dateString?.match(validMonthDate)
 		? dayjs(dateString, 'MM-YYYY').toDate()
 		: dayjs().toDate();
 	const workoutId = Number(url.searchParams.get('workoutId'));
@@ -146,7 +146,7 @@ export const actions = {
 		const date = event.url.searchParams.get('date');
 		return redirect(
 			302,
-			'/workouts' + date?.match(validDate) ? `?date=${date}` : dayjs().format('MM-YYYY')
+			'/workouts' + date?.match(validMonthDate) ? `?date=${date}` : dayjs().format('MM-YYYY')
 		);
 	},
 

@@ -1,12 +1,11 @@
 <script lang="ts">
-	import type { Activity, Workout } from '$lib/drizzleTables';
-	import { daysOfTheWeek, userTypes, type ObjectValues } from '$lib/utils/types/other';
+	import type { Activity } from '$lib/drizzleTables';
+	import { dayOnlyFormat, daysOfTheWeek } from '$lib/utils/types/other';
 	import type dayjs from 'dayjs';
 	import DayCell from './DayCell.svelte';
 
 	export let month: dayjs.Dayjs[][];
-	export let workouts: (Activity & Workout & { clientsName: string | null })[];
-	export let userType: ObjectValues<typeof userTypes>;
+	export let workouts: Map<string, (Activity & { clientsName: string | null; date: Date })[]>;
 </script>
 
 <div class="month">
@@ -18,11 +17,7 @@
 	{#each month as week, weekIndex (weekIndex)}
 		{#each week as day, dayIndex (dayIndex)}
 			<div class="h-full w-full" style={`grid-column: ${day.day()}; grid-row:${weekIndex + 2}`}>
-				<DayCell
-					{userType}
-					workouts={workouts.filter((workout) => workout.date === day.toDate())}
-					{day}
-				/>
+				<DayCell workouts={workouts.get(day.format(dayOnlyFormat)) ?? []} {day} />
 			</div>
 		{/each}
 	{/each}

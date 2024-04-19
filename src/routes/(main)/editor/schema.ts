@@ -20,7 +20,7 @@ export const activitySchema = createInsertSchema(activities).extend({
 export type FormActivity = z.infer<typeof activitySchema>;
 
 export function handleAddSet(sets: FormSet[]) {
-	sets.push({ index: sets.length, exerciseName: 'Get it king' });
+	sets.push({ index: sets.length, exerciseName: 'Example' });
 	return sets;
 }
 export function handleDeleteElement<T>(elements: T[], index: number) {

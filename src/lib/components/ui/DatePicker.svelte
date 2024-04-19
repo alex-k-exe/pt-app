@@ -3,28 +3,22 @@
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { cn } from '$lib/utils/shadcn';
-	import {
-		CalendarDate,
-		DateFormatter,
-		getLocalTimeZone,
-		type DateValue
-	} from '@internationalized/date';
+	import { CalendarDate, DateFormatter, getLocalTimeZone } from '@internationalized/date';
 	import dayjs from 'dayjs';
 	import { CalendarDays } from 'lucide-svelte';
 
-	// I prefer Dayjs because of .format() but the creator of the library prefers i8n/date
 	export let selectedDate = dayjs().toDate();
 
-	let value: DateValue;
-	$: value = new CalendarDate(
+	let value = new CalendarDate(
 		selectedDate.getFullYear(),
 		selectedDate.getMonth(),
 		selectedDate.getDate()
 	);
-
 	const df = new DateFormatter('en-US', {
 		dateStyle: 'long'
 	});
+
+	$: selectedDate = value.toDate(getLocalTimeZone());
 </script>
 
 <Popover.Root>
@@ -39,6 +33,6 @@
 		</Button>
 	</Popover.Trigger>
 	<Popover.Content class="w-auto p-0" align="start">
-		<Calendar bind:value />
+		<Calendar bind:value weekStartsOn={1} />
 	</Popover.Content>
 </Popover.Root>

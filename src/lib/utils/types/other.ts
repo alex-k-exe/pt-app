@@ -43,6 +43,6 @@ export const validPassword = {
 export const validActiveDays = /^[01]{7}$/;
 export const validEmail = { regex: /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/gm, message: 'Invalid email' };
 // matches MM-YYYY as a dayjs format
-export const validDate = /^(0[1-9]|1[0-2])-[0-9]{4}$/;
+export const validMonthDate = /^(0[1-9]|1[0-2])-[0-9]{4}$/;
 
 export type ObjectValues<T> = T[keyof T];
