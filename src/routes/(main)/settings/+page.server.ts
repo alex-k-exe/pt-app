@@ -25,7 +25,7 @@ export const actions = {
 		return redirect(302, '/login');
 	},
 
-	changeProfile: async (event) => {
+	updateAccount: async (event) => {
 		const userId = event.locals.user?.id;
 		if (!userId) return redirect(302, '/login');
 		const db = initDrizzle(event.platform);

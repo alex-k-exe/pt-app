@@ -7,8 +7,8 @@ import {
 	type User
 } from '$lib/drizzleTables.ts';
 import { initDrizzle } from '$lib/server/utils';
+import { dayjs } from '$lib/utils/dates';
 import { fail, redirect } from '@sveltejs/kit';
-import dayjs from 'dayjs';
 import { eq, lte, ne } from 'drizzle-orm';
 
 export async function load({ platform, locals }) {
@@ -42,7 +42,6 @@ export async function load({ platform, locals }) {
 		.orderBy(signupTokens.creationTimeDate)
 		.where(eq(signupTokens.trainerId, locals.user.id));
 
-	console.log(foundClients, foundTrainers);
 	return { clients: foundClients, trainers: foundTrainers, signupTokens: foundTokens };
 }
 

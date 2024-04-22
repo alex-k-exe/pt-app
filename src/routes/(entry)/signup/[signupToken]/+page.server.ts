@@ -40,7 +40,6 @@ export async function load({ params, url, platform }) {
 	return {
 		signupTokenId,
 		trainer,
-		targetPath,
 		form: await superValidate(zod(formSchema))
 	};
 }

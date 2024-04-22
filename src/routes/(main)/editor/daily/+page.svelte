@@ -20,16 +20,14 @@
 	});
 	const { form: formData, enhance } = form;
 
-	let selectedClient: { id: string; name: string } | null =
+	$formData = data.daily;
+
+	let selectedClient =
 		data.trainersClients?.find((client) => client.id === data.daily.clientId) ?? null;
 	$: if (selectedClient?.id) $formData.clientId = selectedClient.id;
-	$formData.trainerId = data.daily.trainerId;
 
 	let activeDays = data.daily.activeDays.split('').map((active) => active === '1');
-	$: {
-		$formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join('');
-	}
-	$formData.trainerId = data.daily.trainerId;
+	$: $formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join('');
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
@@ -41,7 +39,7 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<SelectClient {form} clients={data.trainersClients} bind:selectedClient />
+		<SelectClient clients={data.trainersClients} bind:selectedClient />
 
 		<a href="/dailies">Cancel</a>
 		<Form.Button>Save</Form.Button>
@@ -80,6 +78,7 @@
 
 	<Select.Root
 		selected={{ value: $formData.location, label: $formData.location ?? 'Select a location' }}
+		onSelectedChange={(event) => ($formData.location = event?.value ?? '')}
 	>
 		<Select.Trigger class="w-[180px]">
 			<Select.Value placeholder="Select a location" />
@@ -91,13 +90,12 @@
 				{/each}
 			</Select.Group>
 		</Select.Content>
-		<Select.Input name="location" />
 	</Select.Root>
 
 	{#if data.daily.id}
-		<form method="POST" action="?delete">
+		<form method="POST" action="?/delete">
 			<input type="hidden" name="id" value={data.daily.id} />
-			<Button>Delete this daily</Button>
+			<Button type="submit" variant="destructive">Delete this daily</Button>
 		</form>
 	{/if}
 

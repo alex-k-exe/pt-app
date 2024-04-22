@@ -14,8 +14,8 @@
 			<b>{heading.substring(0, 3)}</b>
 		</div>
 	{/each}
-	{#each month as week, weekIndex (weekIndex)}
-		{#each week as day, dayIndex (dayIndex)}
+	{#each month as week, weekIndex}
+		{#each week as day}
 			<div class="h-full w-full" style={`grid-column: ${day.day()}; grid-row:${weekIndex + 2}`}>
 				<DayCell workouts={workouts.get(day.format(dayOnlyFormat)) ?? []} {day} />
 			</div>
@@ -27,7 +27,7 @@
 	.month {
 		display: grid;
 		margin-top: 10px;
-		grid-template-rows: auto repeat(6, 1fr);
+		grid-template-rows: auto repeat(5, 1fr);
 		grid-template-columns: repeat(7, 1fr);
 		text-align: center;
 		align-items: start;

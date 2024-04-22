@@ -1,16 +1,3 @@
-DROP TABLE IF EXISTS `activities`;
-DROP TABLE IF EXISTS `chats`;
-DROP TABLE IF EXISTS `clients`;
-DROP TABLE IF EXISTS `dailies`;
-DROP TABLE IF EXISTS `messages`;
-DROP TABLE IF EXISTS `series`;
-DROP TABLE IF EXISTS `sessions`;
-DROP TABLE IF EXISTS `sets`;
-DROP TABLE IF EXISTS `signupTokens`;
-DROP TABLE IF EXISTS `trainers`;
-DROP TABLE IF EXISTS `users`;
-DROP TABLE IF EXISTS `workouts`;
-
 CREATE TABLE `activities` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`clientId` text NOT NULL,
@@ -41,7 +28,7 @@ CREATE TABLE `clients` (
 --> statement-breakpoint
 CREATE TABLE `dailies` (
 	`activityId` integer PRIMARY KEY NOT NULL,
-	`activeDays` text NOT NULL,
+	`activeDays` text DEFAULT '0000000' NOT NULL,
 	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -74,7 +61,7 @@ CREATE TABLE `sessions` (
 CREATE TABLE `sets` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`activityId` integer NOT NULL,
-	`seriesId` integer NOT NULL,
+	`seriesId` integer,
 	`index` integer NOT NULL,
 	`exerciseName` text NOT NULL,
 	`reps` text,

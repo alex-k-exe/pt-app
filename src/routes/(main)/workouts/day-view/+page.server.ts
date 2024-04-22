@@ -1,23 +1,16 @@
-import {
-	activities,
-	clients,
-	users,
-	workouts,
-	type Activity,
-	type Workout
-} from '$lib/drizzleTables';
+import { activities, clients, users, workouts } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { datesAreSameDay } from '$lib/utils/dates.js';
+import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
-import dayjs from 'dayjs';
-import { eq, or } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const date = url.searchParams.get('date')
-		? dayjs(url.searchParams.get('date'), dayOnlyFormat)
-		: dayjs();
+		? dayjs(url.searchParams.get('date'), dayOnlyFormat).toDate()
+		: dayjs().toDate();
+	date.setHours(0, 0, 0, 0);
 	const db = initDrizzle(platform);
 
 	const foundWorkouts = (
@@ -26,17 +19,15 @@ export async function load({ locals, platform, url }) {
 			.from(activities)
 			.innerJoin(workouts, eq(activities.id, workouts.activityId))
 			.where(
-				or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id))
+				and(
+					or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id)),
+					eq(workouts.date, date)
+				)
 			)
 			.orderBy(activities.startTime)
-	)
-		.filter((workout): workout is { activities: Activity; workouts: Workout } => {
-			if (workout.workouts === null) return false;
-			return !datesAreSameDay(dayjs(workout.workouts.date), date);
-		})
-		.map((workout) => {
-			return { ...workout.workouts, ...workout.activities };
-		});
+	).map((workout) => {
+		return { ...workout.workouts, ...workout.activities };
+	});
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
@@ -55,7 +46,7 @@ export async function load({ locals, platform, url }) {
 	}
 
 	return {
-		date: date.toDate(),
+		date,
 		workouts: foundWorkouts.map((workout, i) => {
 			return { ...workout, clientsName: clientsNames ? clientsNames[i] : null };
 		})

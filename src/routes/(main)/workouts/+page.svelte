@@ -1,34 +1,13 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import * as Form from '$lib/components/ui/form/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
-	import { getDaysForCalendar } from '$lib/utils/dates';
-	import { dayOnlyFormat, months, type ObjectValues } from '$lib/utils/types/other.js';
-	import dayjs from 'dayjs';
+	import { dayjs, getDaysForCalendar } from '$lib/utils/dates';
+	import { months } from '$lib/utils/types/other.js';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
-	import { afterUpdate } from 'svelte';
-	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
 	import MonthGrid from './MonthGrid.svelte';
-	import { yearSchema } from './schema.js';
 
 	export let data;
-
-	const changeYearForm = superForm(data.changeYearForm, {
-		validators: zodClient(yearSchema)
-	});
-	const { form: yearFormData, enhance } = changeYearForm;
-
-	let selectedClient: { id: string; name: string } | null = null;
-	let selectClientForm: HTMLFormElement;
-
-	let selectedMonth = dayjs(data.month).format('MMMM') as ObjectValues<typeof months>;
-	let changeMonthForm: HTMLFormElement;
-
-	afterUpdate(() => {
-		$yearFormData.newYear = data.month.getFullYear();
-	});
 </script>
 
 <svelte:head>
@@ -37,19 +16,16 @@
 </svelte:head>
 
 <div class="buttons">
-	<form method="POST" action="?/previousMonth">
-		<Button type="submit" variant="outline" size="icon" style="margin-left: 2%">
+	<a href={`/workouts?month=${dayjs(data.month).subtract(1, 'month').format('MM-YYYY')}`}>
+		<Button variant="outline" size="icon" style="margin-left: 2%">
 			<ChevronLeft />
 		</Button>
-	</form>
-	<form method="POST" action="?/changeMonth" bind:this={changeMonthForm}>
+	</a>
+	<form method="POST" action="?/changeMonth">
 		<Select.Root
-			selected={{ value: selectedMonth, label: selectedMonth }}
-			onSelectedChange={(event) => {
-				if (!event || !event.value) return;
-				selectedMonth = event.value;
-				console.log(event.value);
-				changeMonthForm.requestSubmit();
+			selected={{
+				value: dayjs(data.month).format('MMMM'),
+				label: dayjs(data.month).format('MMMM')
 			}}
 		>
 			<Select.Trigger class="w-[180px]">
@@ -58,37 +34,37 @@
 			<Select.Content>
 				<Select.Group>
 					{#each Object.values(months) as month}
-						<Select.Item value={month} label={month}>{month}</Select.Item>
+						<a
+							href={`/workouts?month=${dayjs(`1-${month}-${data.month.getFullYear()}`, 'D-MMMM-YYYY').format('MM-YYYY')}`}
+						>
+							<Select.Item value={month} label={month}>
+								{month}
+							</Select.Item>
+						</a>
 					{/each}
 				</Select.Group>
 			</Select.Content>
-			<Select.Input name="newMonth" value={selectedMonth} />
 		</Select.Root>
 	</form>
-	<form method="POST" action="?/nextMonth">
-		<Button type="submit" variant="outline" size="icon" style="margin-right: 2%">
+	<a href={`/workouts?month=${dayjs(data.month).add(1, 'month').format('MM-YYYY')}`}>
+		<Button variant="outline" size="icon" style="margin-right: 2%">
 			<ChevronRight />
 		</Button>
-	</form>
-	<form class="hidden md:inline" method="POST" action="?/changeYear" use:enhance>
-		<Form.Field form={changeYearForm} name="newYear">
-			<Form.Control let:attrs>
-				<Input
-					{...attrs}
-					class="w-fit"
-					placeholder="Year"
-					style="margin-right: 2%"
-					bind:value={$yearFormData.newYear}
-				/>
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+	</a>
+	<form class="hidden md:inline" method="POST" action="?/changeYear">
+		<Input
+			name="newYear"
+			class="w-fit"
+			placeholder="Year"
+			style="margin-right: 2%"
+			value={data.month.getFullYear()}
+		/>
 	</form>
 	<a href="/workouts"><Button>Today</Button></a>
 </div>
 
 <MonthGrid
-	month={getDaysForCalendar(dayjs(data.month, dayOnlyFormat).month())}
+	month={getDaysForCalendar(data.month.getMonth(), data.month.getFullYear())}
 	workouts={data.workouts}
 />
 

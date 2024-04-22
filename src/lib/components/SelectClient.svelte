@@ -3,7 +3,6 @@
 	import type { User } from 'lucia';
 
 	export let selectedClient: { id: string; name: string } | null = null;
-	export let afterOnSelectedChange: () => void = () => {};
 
 	export let clients: Pick<User, 'id' | 'name'>[] | null = null;
 </script>
@@ -14,8 +13,6 @@
 		onSelectedChange={(event) => {
 			if (!event || !event.value || !event.label) return;
 			selectedClient = { id: event.value, name: event.label };
-			console.log('change');
-			afterOnSelectedChange();
 		}}
 	>
 		<Select.Trigger class="w-[180px]">

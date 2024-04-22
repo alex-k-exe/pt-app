@@ -1,25 +1,37 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
-	import dayjs from 'dayjs';
+	import { dayjs } from '$lib/utils/dates';
 	import z from 'zod';
 
 	export let selectedDate = dayjs().toDate();
+	console.log(selectedDate);
 
 	const AmOrPm = {
-		AM: 'am',
-		PM: 'pm'
+		AM: 'AM',
+		PM: 'PM'
 	} as const;
 
 	const selectedTime: { hours: string; minutes: string; amOrPm: keyof typeof AmOrPm } = {
-		hours: '9',
-		minutes: '05',
-		amOrPm: 'AM'
+		hours: (selectedDate.getHours() % 12).toString(),
+		minutes:
+			selectedDate.getMinutes() < 10
+				? selectedDate.getMinutes().toString()
+				: selectedDate.getMinutes().toString(),
+		amOrPm: selectedDate.getHours() >= 12 ? 'PM' : 'AM'
 	};
-	$: selectedDate = new Date(selectedTime.minutes);
+	console.log(selectedTime);
+	$: selectedDate = dayjs(
+		`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
+		'h:mm A'
+	).toDate();
+	$: console.log(selectedDate);
 
 	const hourSchema = z.string().min(1).max(2).regex(/\d+$/);
-	const minutesSchema = z.string().length(2).regex(/\d+$/);
+	const minutesSchema = z
+		.string()
+		.length(2)
+		.regex(/\d{2}$/);
 
 	function handleHoursChange(value: unknown, changingHours: boolean) {
 		const validatedValue = (changingHours ? hourSchema : minutesSchema).safeParse(value);

@@ -28,7 +28,7 @@
 	/>
 </form>
 
-<form
+<form method="POST" action="?/updateAccount" use:enhance>
 	<p>You current email is: {data.user.email}</p>
 	<Form.Field {form} name="newEmail">
 		<Form.Control let:attrs>

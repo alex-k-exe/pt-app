@@ -1,9 +1,8 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Activity } from '$lib/drizzleTables';
-	import { datesAreSameDay } from '$lib/utils/dates';
+	import { datesAreSameDay, dayjs } from '$lib/utils/dates';
 	import { dayOnlyFormat, timeOnlyFormat } from '$lib/utils/types/other';
-	import dayjs from 'dayjs';
 
 	export let day: dayjs.Dayjs;
 	export let workouts: (Activity & { clientsName: string | null; date: Date })[];
@@ -14,10 +13,9 @@
 	class={datesAreSameDay(day, dayjs()) ? 'text-red-500' : ''}
 >
 	{day.format(day.date() === 1 ? 'MMM D' : 'D')}
-	<!-- {day.toISOString()} -->
 </a>
 
-{#if workouts.length > 2}
+{#if workouts.length > 1}
 	{workouts.length} workouts
 {:else}
 	{#each workouts as workout}

@@ -1,9 +1,12 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
+	import { createEventDispatcher } from 'svelte';
 	import Button from './ui/button/button.svelte';
 
 	export let triggerText: string;
 	export let description: string = '';
+
+	const dispatch = createEventDispatcher();
 </script>
 
 <AlertDialog.Root>
@@ -18,8 +21,8 @@
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel></AlertDialog.Cancel>
-			<AlertDialog.Action type="submit">Confirm</AlertDialog.Action>
+			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Action on:click={() => dispatch('confirm')}>Confirm</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
