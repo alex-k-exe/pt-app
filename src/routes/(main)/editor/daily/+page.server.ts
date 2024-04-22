@@ -1,13 +1,16 @@
-import { activities, dailies, sets, users, type Activity, type Daily } from '$lib/drizzleTables';
 import {
-	getSeries,
-	getTrainersClients,
-	initDrizzle,
-	insertOrUpdateSeries
-} from '$lib/server/utils';
+	activities,
+	dailies,
+	series,
+	sets,
+	users,
+	type Activity,
+	type Daily
+} from '$lib/drizzleTables';
+import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { FormActivity } from '../schema';
@@ -17,9 +20,20 @@ import { formSchema } from './schema';
 // If User is a Trainer, find the names of their clients and attach the name of the client to the daily
 // Otherwise make a new daily
 export async function load({ url, locals, platform }) {
-	const dailyId = Number(url.searchParams.get('dailyId'));
-
 	if (!locals.user?.id) return redirect(302, '/login');
+	const db = initDrizzle(platform);
+
+	let trainersClients: { id: string; name: string }[] | null = null;
+	if (locals.userType === userTypes.TRAINER) {
+		trainersClients = (await getTrainersClients(db, locals.user.id)).map((client) => client.users);
+		if (trainersClients.length === 0) {
+			return redirect(
+				302,
+				'/clients?error=You must have atleast one client to create a workout or daily'
+			);
+		}
+	}
+
 	let daily: FormActivity & { activeDays: string } = {
 		activeDays: '0000000',
 		clientId: '',
@@ -31,9 +45,9 @@ export async function load({ url, locals, platform }) {
 		sets: []
 	};
 
+	const dailyId = Number(url.searchParams.get('dailyId'));
 	let clientOfDailyName: string = '';
 	if (dailyId) {
-		const db = initDrizzle(platform);
 		daily = {
 			...(
 				await db
@@ -53,22 +67,15 @@ export async function load({ url, locals, platform }) {
 			sets: []
 		};
 		daily.series = await getSeries(db, dailyId);
+		daily.sets = await db
+			.select()
+			.from(sets)
+			.orderBy(sets.index)
+			.where(and(eq(sets.activityId, dailyId), isNull(sets.seriesId)));
 
 		clientOfDailyName = (
 			await db.select({ name: users.name }).from(users).limit(1).where(eq(users.id, daily.clientId))
 		)[0].name;
-	}
-
-	let trainersClients: { id: string; name: string }[] | null = null;
-	if (locals.userType === userTypes.TRAINER) {
-		const db = initDrizzle(platform);
-		trainersClients = (await getTrainersClients(db, locals.user.id)).map((client) => client.users);
-		if (trainersClients.length === 0) {
-			return redirect(
-				302,
-				'/clients?error=You must have atleast one client to create a workout or daily'
-			);
-		}
 	}
 
 	return {
@@ -89,32 +96,38 @@ export const actions = {
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
-				await db.select().from(activities).limit(1).where(eq(activities.id, form.data.id))
+				await db
+					.update(activities)
+					.set(form.data)
+					.where(eq(activities.id, form.data.id))
+					.returning()
 			)[0];
+			await db.batch([
+				db.update(dailies).set(form.data).where(eq(dailies.activityId, form.data.id)),
+				db.delete(series).where(eq(series.activityId, dbActivity.id)),
+				db.delete(sets).where(eq(sets.activityId, dbActivity.id))
+			]);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
 			await db
 				.insert(dailies)
 				.values({ activityId: dbActivity.id, activeDays: form.data.activeDays });
 		}
-		form.data.series.forEach(async (formSeries, i) => {
-			formSeries.index = i;
-
-			const dbSeries = await insertOrUpdateSeries(db, { ...formSeries, activityId: dbActivity.id });
-
-			formSeries.sets.forEach(async (formSet, j) => {
-				formSet.index = j;
-				if (formSet.id) {
-					await db
-						.update(sets)
-						.set({ ...formSet, seriesId: dbSeries.id })
-						.where(eq(sets.id, formSet.id));
-				} else {
-					await db
-						.insert(sets)
-						.values({ ...formSet, activityId: dbActivity.id, seriesId: dbSeries.id });
-				}
+		form.data.series.forEach(async (formSeries) => {
+			const dbSeries = (
+				await db
+					.insert(series)
+					.values({ ...formSeries, activityId: dbActivity.id })
+					.returning()
+			)[0];
+			formSeries.sets.map(async (formSet) => {
+				await db
+					.insert(sets)
+					.values({ ...formSet, seriesId: dbSeries.id, activityId: dbActivity.id });
 			});
+		});
+		form.data.sets.forEach(async (formSet) => {
+			await db.insert(sets).values({ ...formSet, activityId: dbActivity.id });
 		});
 		return redirect(302, '/dailies');
 	},

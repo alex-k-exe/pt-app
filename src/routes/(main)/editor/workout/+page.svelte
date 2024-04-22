@@ -1,12 +1,12 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
-	import { locations } from '$lib/utils/types/other';
+	import { locations, type ObjectValues } from '$lib/utils/types/other';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import SelectClient from '../../../../lib/components/SelectClient.svelte';
@@ -22,9 +22,11 @@
 	const { form: formData, enhance } = form;
 
 	let selectedClient: { id: string; name: string } | null = null;
-	$: if (selectedClient?.id) $formData.clientId = selectedClient?.id;
-	$formData.trainerId = data.workout.trainerId;
-	$formData.date = data.workout.date;
+	$: $formData.clientId = selectedClient?.id ?? '';
+	$formData = data.workout;
+
+	let selectedLocation: ObjectValues<typeof locations> | null = null;
+	$: $formData.location = selectedLocation;
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
@@ -36,10 +38,10 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<SelectClient {form} bind:selectedClient clients={data.trainersClients} />
+		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
 		<a href="/workouts">Cancel</a>
-		<Form.Button>Save</Form.Button>
+		<Form.Button type="submit">Save</Form.Button>
 	</div>
 
 	<div class="timeThings">From <TimePicker bind:selectedDate={$formData.startTime} /></div>
@@ -48,7 +50,10 @@
 
 	<Textarea name="notes" placeholder="Notes" bind:value={$formData.notes} />
 
-	<Select.Root>
+	<Select.Root
+		selected={{ value: selectedLocation, label: selectedLocation ?? 'Select a location' }}
+		onSelectedChange={(event) => (selectedLocation = event?.value ?? null)}
+	>
 		<Select.Trigger class="w-[180px]">
 			<Select.Value placeholder="Select a location" />
 		</Select.Trigger>
@@ -64,7 +69,7 @@
 
 	{#if data.workout.id}
 		<form method="POST" action="?delete">
-			<Button variant="destructive" type="submit">Delete this workout</Button>
+			<DestructiveButton triggerText="Delete this workout" />
 		</form>
 	{/if}
 

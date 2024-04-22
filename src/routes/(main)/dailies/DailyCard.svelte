@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import type { Activity } from '$lib/drizzleTables.ts';
@@ -19,17 +20,18 @@
 			isActive: boolean;
 		};
 	});
+
+	let form: HTMLFormElement;
 </script>
 
 <Card.Root>
 	<Card.Header>
 		<Card.Title
-			>{userType === userTypes.CLIENT
-				? `Title - ${daily.title}`
-				: `Client - ${daily.clientsName}`}</Card.Title
+			>{userType === userTypes.CLIENT ? `${daily.title}` : `${daily.clientsName}`}</Card.Title
 		>
 		<Card.Description
-			>{userType === userTypes.CLIENT ? '' : `Title - ${daily.title}`}</Card.Description
+			>{userType === userTypes.CLIENT ? '' : `${daily.title} - `}
+			{daily.location}</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>
@@ -40,9 +42,9 @@
 		</div>
 	</Card.Content>
 	<Card.Footer class="flex gap-[5px]">
-		<form method="POST">
+		<form method="POST" bind:this={form}>
 			<input type="hidden" name="dailyId" value={daily.id} />
-			<Button variant="destructive" type="submit">Delete</Button>
+			<DestructiveButton triggerText="Delete this daily" on:confirm={() => form.requestSubmit()} />
 		</form>
 		<a href={`/editor/daily?dailyId=${daily.id}`}><Button>Edit</Button></a>
 	</Card.Footer>

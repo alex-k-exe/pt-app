@@ -1,17 +1,15 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
+	import FormPassword from '$lib/components/ui/FormPassword.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Form from '$lib/components/ui/form/index.ts';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { resetMode, setMode } from 'mode-watcher';
+	import { Input } from '$lib/components/ui/input';
 	import { superForm } from 'sveltekit-superforms';
-	import ChangeEmailForm from './ChangeEmailForm.svelte';
 
 	export let data;
 
-	const changePasswordForm = superForm(data.changePasswordForm);
-	const { form: formData, enhance } = changePasswordForm;
-	const changeEmailForm = superForm(data.changeEmailForm);
+	const form = superForm(data.form);
+	const { form: formData, enhance } = form;
 </script>
 
 <svelte:head>
@@ -24,39 +22,29 @@
 </form>
 
 <form method="POST" action="?/deleteAccount">
-	<Button type="submit" variant="destructive">Delete your account</Button>
+	<DestructiveButton
+		triggerText="Delete your account"
+		description="Delete your account and anything related to it or your clients' accounts"
+	/>
 </form>
 
-<DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
-		<Button builders={[builder]} variant="outline">Change theme</Button>
-	</DropdownMenu.Trigger>
-	<DropdownMenu.Content align="end">
-		<DropdownMenu.Item on:click={() => setMode('light')}>Light</DropdownMenu.Item>
-		<DropdownMenu.Item on:click={() => setMode('dark')}>Dark</DropdownMenu.Item>
-		<DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
-	</DropdownMenu.Content>
-</DropdownMenu.Root>
+<form method="POST" action="?/updateAccount" use:enhance>
+	<p>You current email is: {data.user.email}</p>
+	<Form.Field {form} name="newEmail">
+		<Form.Control let:attrs>
+			<Form.Label>Your new email</Form.Label>
+			<Input {...attrs} class="w-fit" bind:value={$formData.newEmail} />
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
 
-You current email is: {data.user.email}
-<ChangeEmailForm form={changeEmailForm} />
-
-<form method="POST" action="?/changePassword" use:enhance>
-	<div class="flex">
-		<Form.Field form={changePasswordForm} name="oldPassword">
-			<Form.Control let:attrs>
-				<Form.Label>Old password</Form.Label>
-				<Input {...attrs} placeholder="Your old password" bind:value={$formData.oldPassword} />
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-		<Form.Field form={changePasswordForm} name="newPassword">
-			<Form.Control let:attrs>
-				<Form.Label>New password</Form.Label>
-				<Input {...attrs} placeholder="A new password" bind:value={$formData.newPassword} />
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-	</div>
-	<Button type="submit">Change password</Button>
+	<Form.Field {form} name="oldPassword">
+		<FormPassword label="Your old password" bind:value={$formData.oldPassword} />
+		<Form.FieldErrors />
+	</Form.Field>
+	<Form.Field {form} name="newPassword">
+		<FormPassword label="Your new password" bind:value={$formData.newPassword} />
+		<Form.FieldErrors />
+	</Form.Field>
+	<Button type="submit">Update profile</Button>
 </form>

@@ -10,7 +10,7 @@
 	<meta name="clients" content="Manage your clients and invite links" />
 </svelte:head>
 
-<h1>Clients and invite links</h1>
+<h1>Clients and signup tokens</h1>
 
 <div class="flex w-full flex-row justify-around gap-10">
 	<div class="w-full">

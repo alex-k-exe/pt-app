@@ -9,8 +9,7 @@ export async function formSchema(db: DrizzleD1Database) {
 	return z
 		.object({
 			email: z.string().regex(validEmail.regex, validEmail.message).min(5).max(100),
-			password: z.string().regex(validPassword.regex, validPassword.message).min(12).max(100),
-			targetPath: z.string().max(100).nullish()
+			password: z.string().regex(validPassword.regex, validPassword.message).min(12).max(100)
 		})
 		.refine(async (data) => {
 			const existingUser = await db

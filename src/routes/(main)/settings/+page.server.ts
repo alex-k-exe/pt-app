@@ -4,7 +4,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { changeEmailSchema, changePasswordSchema } from './schema';
+import { formSchema } from './schema';
 
 export async function load(event) {
 	if (!event.locals.user?.id) return redirect(302, '/login?targetPath=/settings');
@@ -12,11 +12,7 @@ export async function load(event) {
 
 	return {
 		user: event.locals.user,
-		changePasswordForm: await superValidate(
-			event,
-			zod(await changePasswordSchema(db, event.locals.user?.id))
-		),
-		changeEmailForm: await superValidate(event, zod(await changeEmailSchema(db)))
+		form: await superValidate(event, zod(await formSchema(db, event.locals.user.id)))
 	};
 }
 
@@ -29,24 +25,17 @@ export const actions = {
 		return redirect(302, '/login');
 	},
 
-	changePassword: async (event) => {
-		const userId = event.locals.user?.id;
-		if (!userId) return redirect(302, '/login?targetPath=/settings');
-		const db = initDrizzle(event.platform);
-		let form = await superValidate(event, zod(await changePasswordSchema(db, userId)));
-		if (!form.valid) return fail(400, { form });
-
-		await db.update(users).set({ password: form.data.newPassword }).where(eq(users.id, userId));
-	},
-
-	changeEmail: async (event) => {
+	updateAccount: async (event) => {
 		const userId = event.locals.user?.id;
 		if (!userId) return redirect(302, '/login');
 		const db = initDrizzle(event.platform);
-		let form = await superValidate(event, zod(await changeEmailSchema(db)));
+		let form = await superValidate(event, zod(await formSchema(db, userId)));
 		if (!form.valid) return fail(400, { form });
 
-		await db.update(users).set({ password: form.data.newEmail }).where(eq(users.id, userId));
+		await db
+			.update(users)
+			.set({ password: form.data.newPassword, email: form.data.newEmail })
+			.where(eq(users.id, userId));
 	},
 
 	deleteAccount: async ({ locals, platform }) => {

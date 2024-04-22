@@ -9,10 +9,10 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes, validMonthDate } from '$lib/utils/types/other';
+import { dayjs } from '$lib/utils/dates';
+import { dayOnlyFormat, userTypes } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
-import dayjs from 'dayjs';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { FormActivity } from '../schema.js';
@@ -23,11 +23,10 @@ import { formSchema } from './schema.js';
 // Otherwise make a new workout
 export async function load({ url, locals, platform }) {
 	const dateString = url.searchParams.get('date');
-	const date = dateString?.match(validMonthDate)
-		? dayjs(dateString, 'MM-YYYY').toDate()
-		: dayjs().toDate();
-	const workoutId = Number(url.searchParams.get('workoutId'));
+	let date = dayjs(dateString, 'MM-YYYY').toDate();
+	if (date.toString() === 'Invalid date') date = dayjs().toDate();
 
+	const workoutId = Number(url.searchParams.get('workoutId'));
 	if (!locals.user?.id) return redirect(302, '/login');
 	let workout: FormActivity & { date: Date } = {
 		clientId: '',
@@ -62,6 +61,11 @@ export async function load({ url, locals, platform }) {
 			sets: []
 		};
 		workout.series = await getSeries(db, workoutId);
+		workout.sets = await db
+			.select()
+			.from(sets)
+			.orderBy(sets.index)
+			.where(and(eq(sets.activityId, workoutId), isNull(sets.seriesId)));
 
 		clientOfWorkoutName = (
 			await db
@@ -96,6 +100,7 @@ export const actions = {
 		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
+		form.data.date.setHours(0, 0, 0, 0);
 
 		const db = initDrizzle(event.platform);
 		let dbActivity: Activity;
@@ -111,43 +116,22 @@ export const actions = {
 			formSeries.index = i;
 
 			let dbSeries: Series;
-			if (formSeries.id) {
-				dbSeries = (
-					await db
-						.update(series)
-						.set({ ...formSeries, activityId: dbActivity.id })
-						.where(eq(series.id, formSeries.id))
-						.returning()
-				)[0];
-			} else {
-				dbSeries = (
-					await db
-						.insert(series)
-						.values({ ...formSeries, activityId: dbActivity.id })
-						.returning()
-				)[0];
-			}
+			dbSeries = (
+				await db
+					.insert(series)
+					.values({ ...formSeries, activityId: dbActivity.id })
+					.returning()
+			)[0];
 
 			formSeries.sets.forEach(async (formSet, j) => {
 				formSet.index = j;
-				if (formSet.id) {
-					await db
-						.update(sets)
-						.set({ ...formSet, seriesId: dbSeries.id })
-						.where(eq(sets.id, formSet.id));
-				} else {
-					await db
-						.insert(sets)
-						.values({ ...formSet, activityId: dbActivity.id, seriesId: dbSeries.id });
-				}
+				await db
+					.insert(sets)
+					.values({ ...formSet, activityId: dbActivity.id, seriesId: dbSeries.id });
 			});
 		});
 
-		const date = event.url.searchParams.get('date');
-		return redirect(
-			302,
-			'/workouts' + date?.match(validMonthDate) ? `?date=${date}` : dayjs().format('MM-YYYY')
-		);
+		return redirect(302, `/workouts/day-view?date=${dayjs(form.data.date).format(dayOnlyFormat)}`);
 	},
 
 	delete: async ({ locals, platform, url }) => {
@@ -160,6 +144,6 @@ export const actions = {
 			.where(eq(activities.id, Number(id)));
 
 		const date = url.searchParams.get('date');
-		return redirect(302, '/workouts' + date ? `?date=${date}` : '');
+		return redirect(302, '/workouts' + date ? `?month=${date}` : '');
 	}
 };

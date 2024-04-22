@@ -9,20 +9,18 @@ import {
 	type Workout
 } from '$lib/drizzleTables';
 import { getTrainersClients, initDrizzle } from '$lib/server/utils';
+import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
-import dayjs from 'dayjs';
 import { and, eq, or } from 'drizzle-orm';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
 import { yearSchema } from './schema.js';
 
 export async function load(event) {
 	if (!event.locals.user?.id || !event.locals.userType) return redirect(302, '/login');
 	const monthString = event.url.searchParams.get('month');
-	const month = monthString?.match(validMonthDate)
-		? dayjs(event.url.searchParams.get('month'), 'MM-YYYY')
-		: dayjs();
+	const month = validMonthDate.test(monthString ?? '')
+		? dayjs(monthString, 'MM-YYYY').toDate()
+		: dayjs().toDate();
 
 	const db = initDrizzle(event.platform);
 	const foundWorkouts = (
@@ -36,7 +34,7 @@ export async function load(event) {
 						eq(activities.clientId, event.locals.user?.id),
 						eq(activities.trainerId, event.locals.user?.id)
 					),
-					eq(workouts.date, month.toDate())
+					eq(workouts.date, month)
 				)
 			)
 			.orderBy(workouts.date)
@@ -88,27 +86,20 @@ export async function load(event) {
 		});
 
 	return {
-		month: month.toDate(),
+		month,
 		workouts: groupedWorkouts,
 		userType: event.locals.userType,
-		clients: trainersClients,
-		changeYearForm: await superValidate(event, zod(yearSchema))
+		clients: trainersClients
 	};
 }
 
 export const actions = {
-	previousMonth: async ({ url }) => {
-		const month = url.searchParams.get('month');
-		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
-		return redirect(302, `/workouts?month=${monthDate.subtract(1, 'month').format('MM-YYYY')}`);
-	},
-
 	changeMonth: async ({ url, request }) => {
 		const newMonth = (await request.formData()).get('newMonth')?.toString();
 		if (!newMonth) return fail(400);
 
 		const oldMonth = url.searchParams.get('month');
-		const oldDate = oldMonth ? dayjs(oldMonth, 'MM-YYYY') : dayjs();
+		const oldDate = validMonthDate.test(oldMonth ?? '') ? dayjs(oldMonth, 'MM-YYYY') : dayjs();
 
 		return redirect(
 			302,
@@ -116,19 +107,13 @@ export const actions = {
 		);
 	},
 
-	nextMonth: async ({ url }) => {
-		const month = url.searchParams.get('month');
-		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
-		return redirect(302, `/workouts?month=${monthDate.add(1, 'month').format('MM-YYYY')}`);
-	},
-
 	changeYear: async (event) => {
-		let form = await superValidate(event, zod(yearSchema));
-		if (!form.valid) return fail(400, { form });
+		const form = yearSchema.safeParse(Number((await event.request.formData()).get('newYear')));
+		if (!form.success) return fail(400);
 
 		const month = event.url.searchParams.get('month');
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
 
-		return redirect(302, `/workouts?month=${monthDate.format('MM')}-${form.data.newYear}`);
+		return redirect(302, `/workouts?month=${monthDate.format('MM')}-${form.data}`);
 	}
 };
