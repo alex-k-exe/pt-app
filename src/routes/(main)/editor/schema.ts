@@ -3,14 +3,14 @@ import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 const setsSchema = createInsertSchema(sets).omit({
-	activityId: true,
+	id: true,
 	seriesId: true,
 	id: true
 });
 export type FormSet = z.infer<typeof setsSchema>;
 
 const seriesSchema = createInsertSchema(series)
-	.omit({ activityId: true, id: true })
+	.omit({ id: true, id: true })
 	.extend({ sets: z.array(setsSchema) });
 export type FormSeries = z.infer<typeof seriesSchema>;
 

@@ -47,9 +47,9 @@ export async function load({ url, locals, platform }) {
 				await db
 					.select()
 					.from(workouts)
-					.innerJoin(activities, eq(activities.id, workouts.activityId))
+					.innerJoin(activities, eq(activities.id, workouts.id))
 					.limit(1)
-					.where(eq(workouts.activityId, workoutId))
+					.where(eq(workouts.id, workoutId))
 			)
 				.filter((workout): workout is { activities: Activity; workouts: Workout } => {
 					return workout.activities !== null;
@@ -65,7 +65,7 @@ export async function load({ url, locals, platform }) {
 			.select()
 			.from(sets)
 			.orderBy(sets.index)
-			.where(and(eq(sets.activityId, workoutId), isNull(sets.seriesId)));
+			.where(and(eq(sets.id, workoutId), isNull(sets.seriesId)));
 
 		clientOfWorkoutName = (
 			await db
@@ -110,7 +110,7 @@ export const actions = {
 			)[0];
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values({ activityId: dbActivity.id, date: form.data.date });
+			await db.insert(workouts).values({ id: dbActivity.id, date: form.data.date });
 		}
 		form.data.series.forEach(async (formSeries, i) => {
 			formSeries.index = i;
@@ -119,15 +119,13 @@ export const actions = {
 			dbSeries = (
 				await db
 					.insert(series)
-					.values({ ...formSeries, activityId: dbActivity.id })
+					.values({ ...formSeries, id: dbActivity.id })
 					.returning()
 			)[0];
 
 			formSeries.sets.forEach(async (formSet, j) => {
 				formSet.index = j;
-				await db
-					.insert(sets)
-					.values({ ...formSet, activityId: dbActivity.id, seriesId: dbSeries.id });
+				await db.insert(sets).values({ ...formSet, id: dbActivity.id, seriesId: dbSeries.id });
 			});
 		});
 

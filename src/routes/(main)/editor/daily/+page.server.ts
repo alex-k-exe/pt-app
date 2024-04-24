@@ -53,9 +53,9 @@ export async function load({ url, locals, platform }) {
 				await db
 					.select()
 					.from(dailies)
-					.innerJoin(activities, eq(activities.id, dailies.activityId))
+					.innerJoin(activities, eq(activities.id, dailies.id))
 					.limit(1)
-					.where(eq(dailies.activityId, dailyId))
+					.where(eq(dailies.id, dailyId))
 			)
 				.filter((daily): daily is { activities: Activity; dailies: Daily } => {
 					return daily.activities !== null;
@@ -71,7 +71,7 @@ export async function load({ url, locals, platform }) {
 			.select()
 			.from(sets)
 			.orderBy(sets.index)
-			.where(and(eq(sets.activityId, dailyId), isNull(sets.seriesId)));
+			.where(and(eq(sets.id, dailyId), isNull(sets.seriesId)));
 
 		clientOfDailyName = (
 			await db.select({ name: users.name }).from(users).limit(1).where(eq(users.id, daily.clientId))
@@ -103,42 +103,38 @@ export const actions = {
 					.returning()
 			)[0];
 			await db.batch([
-				db.update(dailies).set(form.data).where(eq(dailies.activityId, form.data.id)),
-				db.delete(series).where(eq(series.activityId, dbActivity.id)),
-				db.delete(sets).where(eq(sets.activityId, dbActivity.id))
+				db.update(dailies).set(form.data).where(eq(dailies.id, form.data.id)),
+				db.delete(series).where(eq(series.id, dbActivity.id)),
+				db.delete(sets).where(eq(sets.id, dbActivity.id))
 			]);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db
-				.insert(dailies)
-				.values({ activityId: dbActivity.id, activeDays: form.data.activeDays });
+			await db.insert(dailies).values({ id: dbActivity.id, activeDays: form.data.activeDays });
 		}
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db
 					.insert(series)
-					.values({ ...formSeries, activityId: dbActivity.id })
+					.values({ ...formSeries, id: dbActivity.id })
 					.returning()
 			)[0];
 			formSeries.sets.map(async (formSet) => {
-				await db
-					.insert(sets)
-					.values({ ...formSet, seriesId: dbSeries.id, activityId: dbActivity.id });
+				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id, id: dbActivity.id });
 			});
 		});
 		form.data.sets.forEach(async (formSet) => {
-			await db.insert(sets).values({ ...formSet, activityId: dbActivity.id });
+			await db.insert(sets).values({ ...formSet, id: dbActivity.id });
 		});
 		return redirect(302, '/dailies');
 	},
 
 	delete: async ({ request, platform, locals }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
-		const activityId = (await request.formData()).get('activityId');
-		if (!activityId) return fail(500);
+		const id = (await request.formData()).get('id');
+		if (!id) return fail(500);
 
 		await initDrizzle(platform)
 			.delete(activities)
-			.where(eq(activities.id, Number(activityId.toString())));
+			.where(eq(activities.id, Number(id.toString())));
 	}
 };

@@ -37,14 +37,14 @@
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
 			<Form.Label>Name</Form.Label>
-			<Input {...attrs} bind:value={$formData.name} />
+			<Input {...attrs} bind:value={$formData.name} class="w-fit" />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="email">
 		<Form.Control let:attrs>
 			<Form.Label>Email</Form.Label>
-			<Input {...attrs} type="email" bind:value={$formData.email} />
+			<Input {...attrs} type="email" bind:value={$formData.email} class="w-fit" />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

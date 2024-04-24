@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "454df1e9-0e1d-4d23-b291-adf9af883f76",
+  "id": "5dd7e80f-b54c-4cb5-b91e-60f261fdacc6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activities": {
@@ -196,7 +196,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -206,8 +206,8 @@
     "dailies": {
       "name": "dailies",
       "columns": {
-        "activityId": {
-          "name": "activityId",
+        "id": {
+          "name": "id",
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
@@ -224,12 +224,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "dailies_activityId_activities_id_fk": {
-          "name": "dailies_activityId_activities_id_fk",
+        "dailies_id_activities_id_fk": {
+          "name": "dailies_id_activities_id_fk",
           "tableFrom": "dailies",
           "tableTo": "activities",
           "columnsFrom": [
-            "activityId"
+            "id"
           ],
           "columnsTo": [
             "id"
@@ -497,6 +497,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "sets_seriesId_series_id_fk": {
+          "name": "sets_seriesId_series_id_fk",
+          "tableFrom": "sets",
+          "tableTo": "series",
+          "columnsFrom": [
+            "seriesId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -625,8 +638,8 @@
     "workouts": {
       "name": "workouts",
       "columns": {
-        "activityId": {
-          "name": "activityId",
+        "id": {
+          "name": "id",
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
@@ -642,12 +655,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "workouts_activityId_activities_id_fk": {
-          "name": "workouts_activityId_activities_id_fk",
+        "workouts_id_activities_id_fk": {
+          "name": "workouts_id_activities_id_fk",
           "tableFrom": "workouts",
           "tableTo": "activities",
           "columnsFrom": [
-            "activityId"
+            "id"
           ],
           "columnsTo": [
             "id"

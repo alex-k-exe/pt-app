@@ -20,7 +20,7 @@ export const clients = sqliteTable('clients', {
 		.references(() => users.id, { onDelete: 'cascade' })
 		.primaryKey(),
 	trainerId: text('trainerId')
-		.references(() => trainers.id)
+		.references(() => trainers.id, { onDelete: 'cascade' })
 		.notNull()
 });
 export type Client = typeof clients.$inferSelect;
@@ -95,7 +95,7 @@ export type Activity = typeof activities.$inferSelect;
 export type ActivityInsert = typeof activities.$inferInsert;
 
 export const dailies = sqliteTable('dailies', {
-	activityId: integer('activityId')
+	id: integer('id')
 		.references(() => activities.id, { onDelete: 'cascade' })
 		.primaryKey(),
 	// 7 digit binary string indicating which days the daily is on
@@ -105,7 +105,7 @@ export type Daily = typeof dailies.$inferSelect;
 export type DailyInsert = typeof dailies.$inferInsert;
 
 export const workouts = sqliteTable('workouts', {
-	activityId: integer('activityId')
+	id: integer('id')
 		.references(() => activities.id, { onDelete: 'cascade' })
 		.primaryKey()
 		.notNull(),

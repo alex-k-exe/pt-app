@@ -27,7 +27,7 @@ export async function load(event) {
 		await db
 			.select()
 			.from(activities)
-			.innerJoin(workouts, eq(activities.id, workouts.activityId))
+			.innerJoin(workouts, eq(activities.id, workouts.id))
 			.where(
 				and(
 					or(

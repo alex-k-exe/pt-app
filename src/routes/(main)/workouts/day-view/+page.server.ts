@@ -17,7 +17,7 @@ export async function load({ locals, platform, url }) {
 		await db
 			.select()
 			.from(activities)
-			.innerJoin(workouts, eq(activities.id, workouts.activityId))
+			.innerJoin(workouts, eq(activities.id, workouts.id))
 			.where(
 				and(
 					or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id)),

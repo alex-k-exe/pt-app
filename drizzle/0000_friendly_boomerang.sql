@@ -23,13 +23,13 @@ CREATE TABLE `clients` (
 	`id` text PRIMARY KEY NOT NULL,
 	`trainerId` text NOT NULL,
 	FOREIGN KEY (`id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `dailies` (
-	`activityId` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY NOT NULL,
 	`activeDays` text DEFAULT '0000000' NOT NULL,
-	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`id`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `messages` (
@@ -68,7 +68,8 @@ CREATE TABLE `sets` (
 	`weight` text,
 	`duration` text,
 	`rpe` text,
-	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`seriesId`) REFERENCES `series`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `signupTokens` (
@@ -91,9 +92,9 @@ CREATE TABLE `users` (
 );
 --> statement-breakpoint
 CREATE TABLE `workouts` (
-	`activityId` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY NOT NULL,
 	`date` integer NOT NULL,
-	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`id`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

@@ -15,12 +15,16 @@
 
 <div class="chats">
 	<div class="chatList">
-		<ChatList chats={data.chats} trainers={data.trainers} />
+		<ChatList
+			chats={data.chats}
+			trainers={data.trainers}
+			selectedChatId={data.selectedChat?.id ?? null}
+		/>
 	</div>
 	{#if data.selectedChat}
 		<form method="POST" action="?/deleteChat" class="chatHeader">
-			<input type="hidden" name="chatId" value={data.selectedChat.id}/>
-			Chat with {data.selectedChat.otherUsersName}
+			<input type="hidden" name="chatId" value={data.selectedChat.id} />
+			Chat with <b>{data.selectedChat.otherUsersName}</b>
 			<Button type="submit">Delete chat</Button>
 		</form>
 		<div class="messageList">

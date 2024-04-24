@@ -1,10 +1,18 @@
-import { users } from '$lib/drizzleTables';
+import { clients, users } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { fail, redirect, type Cookies } from '@sveltejs/kit';
+import { eq, or } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
+
+async function signout(cookies: Cookies, locals: App.Locals) {
+	cookies.delete('userType', { path: '/' });
+	const sessionId = cookies.get(locals.lucia.sessionCookieName);
+	if (sessionId) locals.lucia.invalidateSession(sessionId);
+	cookies.delete(locals.lucia.sessionCookieName, { path: '/' });
+	return redirect(302, '/login');
+}
 
 export async function load(event) {
 	if (!event.locals.user?.id) return redirect(302, '/login?targetPath=/settings');
@@ -18,11 +26,7 @@ export async function load(event) {
 
 export const actions = {
 	signout: async ({ cookies, locals }) => {
-		cookies.delete('userType', { path: '/' });
-		const sessionId = cookies.get(locals.lucia.sessionCookieName);
-		if (sessionId) locals.lucia.invalidateSession(sessionId);
-		cookies.delete(locals.lucia.sessionCookieName, { path: '/' });
-		return redirect(302, '/login');
+		return await signout(cookies, locals);
 	},
 
 	updateAccount: async (event) => {
@@ -38,10 +42,14 @@ export const actions = {
 			.where(eq(users.id, userId));
 	},
 
-	deleteAccount: async ({ locals, platform }) => {
+	deleteAccount: async ({ cookies, locals, platform }) => {
 		const userId = locals.user?.id;
-		if (!userId) return redirect(302, '/login?targetPath=settings');
-		await initDrizzle(platform).delete(users).where(eq(users.id, userId));
-		return redirect(302, '/settings?/signout');
+		if (!userId) return redirect(302, '/login?targetPath=/settings');
+
+		await initDrizzle(platform)
+			.delete(clients)
+			.where(or(eq(clients.id, userId), eq(clients.trainerId, userId)));
+
+		return await signout(cookies, locals);
 	}
 };

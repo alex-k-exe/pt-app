@@ -10,6 +10,8 @@
 
 	const form = superForm(data.form);
 	const { form: formData, enhance } = form;
+
+	let deleteAccountForm: HTMLFormElement;
 </script>
 
 <svelte:head>
@@ -21,15 +23,16 @@
 	<Button type="submit">Sign out</Button>
 </form>
 
-<form method="POST" action="?/deleteAccount">
+<form method="POST" action="?/deleteAccount" bind:this={deleteAccountForm}>
 	<DestructiveButton
 		triggerText="Delete your account"
-		description="Delete your account and anything related to it or your clients' accounts"
+		description="This will also delete anything related to you or your clients' accounts"
+		on:confirm={() => deleteAccountForm.requestSubmit()}
 	/>
 </form>
 
 <form method="POST" action="?/updateAccount" use:enhance>
-	<p>You current email is: {data.user.email}</p>
+	<p>You current email is: <b>{data.user.email}</b></p>
 	<Form.Field {form} name="newEmail">
 		<Form.Control let:attrs>
 			<Form.Label>Your new email</Form.Label>

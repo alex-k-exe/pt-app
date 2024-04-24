@@ -1,7 +1,8 @@
-import { chats, messages, trainers, users, type Message } from '$lib/drizzleTables';
+import { chats, clients, messages, trainers, users, type Message } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
+import { userTypes, type ObjectValues } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { eq, ne } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -9,7 +10,7 @@ import { formSchema } from './schema';
 
 export async function load({ platform, url, locals }) {
 	let chatId: string | number | null = url.searchParams.get('chatId');
-	if (!locals.user?.id) return redirect(302, '/login');
+	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 	// get first 10 chats and other user's name
 	// if chatId, get first 10 messages from that chat
 	const db = initDrizzle(platform);
@@ -27,7 +28,7 @@ export async function load({ platform, url, locals }) {
 			};
 		});
 
-	const otherTrainers = await getUsersForNewChat(db, foundChats, locals.user?.id);
+	const otherTrainers = await getUsersForNewChat(db, foundChats, locals.user.id, locals.userType);
 
 	let selectedChat:
 		| (typeof combinedChatInfo)[0]
@@ -145,27 +146,49 @@ async function getMostRecentMessages(db: DrizzleD1Database, chats: { id: number 
 
 /**
  * Gets every trainer that the user doesn't already have a chat with other than the current user
- * @param currentUserId ID of the current user, assuming they are a trainer
+ * @param userId ID of the current user, assuming they are a trainer
  */
 async function getUsersForNewChat(
 	db: DrizzleD1Database,
 	chats: { otherUsersId: string }[],
-	currentUserId: string
+	userId: string,
+	userType: ObjectValues<typeof userTypes>
 ) {
-	const otherTrainers = (
-		await db
+	let foundTrainers: { id: string; name: string }[];
+	if (userType === userTypes.TRAINER) {
+		foundTrainers = await db
 			.select({ id: users.id, name: users.name })
 			.from(trainers)
 			.innerJoin(users, eq(users.id, trainers.id))
-			.orderBy(users.name)
-	).filter((trainer): trainer is { id: string; name: string } => trainer !== null);
+			.where(ne(users.id, userId))
+			.orderBy(users.name);
+	} else {
+		const trainerId = (
+			await db
+				.select({ trainerId: clients.trainerId })
+				.from(trainers)
+				.innerJoin(clients, eq(users.id, clients.id))
+				.where(eq(users.id, userId))
+				.limit(1)
+		)[0].trainerId;
+		foundTrainers = await db
+			.select({ id: users.id, name: users.name })
+			.from(trainers)
+			.innerJoin(users, eq(users.id, trainers.id))
+			.where(eq(users.id, trainerId))
+			.limit(1);
+	}
 
-	return otherTrainers
-		.filter((trainer) => {
-			const chatExistsWithTrainer = chats.some((chat) => chat.otherUsersId !== trainer.id);
-			return !chatExistsWithTrainer && trainer.id !== currentUserId;
-		})
-		.map((trainer) => ({ ...trainer }));
+	const foundClients = await db
+		.select({ id: users.id, name: users.name })
+		.from(clients)
+		.innerJoin(users, eq(users.id, clients.id))
+		.where(eq(clients.trainerId, userId))
+		.orderBy(users.name);
+
+	return [...foundTrainers, ...foundClients].filter((trainer) => {
+		return !chats.some((chat) => chat.otherUsersId !== trainer.id);
+	});
 }
 
 async function getMessages(db: DrizzleD1Database, chatId: number) {

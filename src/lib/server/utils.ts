@@ -8,9 +8,9 @@ export function initDrizzle(platform: Readonly<App.Platform> | undefined) {
 	return drizzle(platform?.env.DB);
 }
 
-export async function getSeries(db: DrizzleD1Database, activityId: number) {
+export async function getSeries(db: DrizzleD1Database, id: number) {
 	const seriesWithSets = (
-		await db.select().from(series).orderBy(series.index).where(eq(series.activityId, activityId))
+		await db.select().from(series).orderBy(series.index).where(eq(series.id, id))
 	).map((series) => {
 		return { ...series, sets: [] };
 	});

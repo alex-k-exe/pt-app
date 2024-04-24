@@ -12,7 +12,7 @@ export async function load({ locals, platform }) {
 		await db
 			.select()
 			.from(dailies)
-			.innerJoin(activities, eq(activities.id, dailies.activityId))
+			.innerJoin(activities, eq(activities.id, dailies.id))
 			.orderBy(activities.startTime)
 			.where(
 				or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id))
@@ -55,6 +55,6 @@ export const actions = {
 		if (!dailyId) return fail(400);
 		await initDrizzle(platform)
 			.delete(dailies)
-			.where(eq(dailies.activityId, Number(dailyId)));
+			.where(eq(dailies.id, Number(dailyId)));
 	}
 };
