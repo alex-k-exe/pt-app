@@ -1,11 +1,12 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
-	import { daysOfTheWeek, locations } from '$lib/utils/types/other';
+	import { daysOfTheWeek, locations, validActiveDays } from '$lib/utils/types/other';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import SelectClient from '../../../../lib/components/SelectClient.svelte';
@@ -26,8 +27,11 @@
 		data.trainersClients?.find((client) => client.id === data.daily.clientId) ?? null;
 	$: if (selectedClient?.id) $formData.clientId = selectedClient.id;
 
-	let activeDays = data.daily.activeDays.split('').map((active) => active === '1');
+	if (!validActiveDays.test($formData.activeDays)) $formData.activeDays = '0000000';
+	let activeDays = $formData.activeDays.split('').map((active) => active === '1');
 	$: $formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join('');
+
+	$: console.log($formData.startTime, '', $formData.endTime);
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
@@ -41,8 +45,10 @@
 		</Form.Field>
 		<SelectClient clients={data.trainersClients} bind:selectedClient />
 
-		<a href="/dailies">Cancel</a>
-		<Form.Button>Save</Form.Button>
+		<a href="/dailies"><Button variant="outline">Go back to dailies</Button></a>
+		{#if data.trainersClients}
+			<Form.Button>Save</Form.Button>
+		{/if}
 	</div>
 
 	<Form.Field {form} name="startTime">
@@ -93,10 +99,15 @@
 	</Select.Root>
 
 	{#if data.daily.id}
-		<form method="POST" action="?/delete">
-			<input type="hidden" name="id" value={data.daily.id} />
-			<Button type="submit" variant="destructive">Delete this daily</Button>
-		</form>
+		<div class="flex gap-2">
+			<form method="POST" action="?/delete">
+				<input type="hidden" name="id" value={data.daily.id} />
+				<DestructiveButton triggerText="Delete" />
+			</form>
+			<a href={`/editor/daily?dailyId=${data.daily.id}&duplicate=true`}>
+				<Button>Duplicate</Button>
+			</a>
+		</div>
 	{/if}
 
 	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />

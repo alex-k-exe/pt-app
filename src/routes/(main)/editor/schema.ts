@@ -5,18 +5,20 @@ import { z } from 'zod';
 const setsSchema = createInsertSchema(sets).omit({
 	id: true,
 	seriesId: true,
-	id: true
+	activityId: true
 });
 export type FormSet = z.infer<typeof setsSchema>;
 
 const seriesSchema = createInsertSchema(series)
-	.omit({ id: true, id: true })
+	.omit({ id: true, activityId: true })
 	.extend({ sets: z.array(setsSchema) });
 export type FormSeries = z.infer<typeof seriesSchema>;
 
 export const activitySchema = createInsertSchema(activities).extend({
 	series: z.array(seriesSchema),
-	sets: z.array(setsSchema)
+	sets: z.array(setsSchema),
+	clientId: z.string().min(1),
+	title: z.string().min(1)
 });
 export type FormActivity = z.infer<typeof activitySchema>;
 

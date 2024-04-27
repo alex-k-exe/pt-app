@@ -1,13 +1,4 @@
-import {
-	activities,
-	clients,
-	users,
-	workouts,
-	type Activity,
-	type Client,
-	type User,
-	type Workout
-} from '$lib/drizzleTables';
+import { activities, clients, users, workouts, type Activity, type User } from '$lib/drizzleTables';
 import { getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types/other.js';
@@ -38,11 +29,9 @@ export async function load(event) {
 				)
 			)
 			.orderBy(workouts.date)
-	)
-		.filter((workout): workout is { activities: Activity; workouts: Workout } => workout !== null)
-		.map((workout) => {
-			return { ...workout.activities, date: workout.workouts.date };
-		});
+	).map((workout) => {
+		return { ...workout.activities, date: workout.workouts.date };
+	});
 
 	let clientsInWorkoutsNames: string[] | null = null;
 	let trainersClients: User[] | null = null;
@@ -61,11 +50,7 @@ export async function load(event) {
 			];
 		}
 
-		trainersClients = (await getTrainersClients(db, event.locals.user.id))
-			.filter((user): user is { users: User; clients: Client } => user !== null)
-			.map((user) => {
-				return user.users;
-			});
+		trainersClients = await getTrainersClients(db, event.locals.user.id);
 	}
 
 	const groupedWorkouts = new Map<

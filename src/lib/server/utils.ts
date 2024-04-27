@@ -30,9 +30,11 @@ export async function getSeries(db: DrizzleD1Database, id: number) {
 }
 
 export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {
-	return await db
-		.select()
-		.from(users)
-		.leftJoin(clients, eq(clients.id, users.id))
-		.where(eq(clients.trainerId, trainerId));
+	return (
+		await db
+			.select()
+			.from(users)
+			.innerJoin(clients, eq(clients.id, users.id))
+			.where(eq(clients.trainerId, trainerId))
+	).map((user) => user.users);
 }

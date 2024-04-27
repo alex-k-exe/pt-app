@@ -25,7 +25,7 @@ export const actions = {
 		const client = await db
 			.select()
 			.from(clients)
-			.leftJoin(users, eq(users.id, clients.id))
+			.innerJoin(users, eq(users.id, clients.id))
 			.where(eq(users.id, existingUser.id));
 
 		const session = await event.locals.lucia.createSession(existingUser.id, {});

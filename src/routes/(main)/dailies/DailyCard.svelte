@@ -13,7 +13,7 @@
 	export let daily: Activity & { activeDays: string; clientsName: string | null };
 	export let userType: ObjectValues<typeof userTypes>;
 
-	if (!daily.activeDays.match(validActiveDays)) daily.activeDays = '0000000';
+	if (!validActiveDays.test(daily.activeDays)) daily.activeDays = '0000000';
 	const activeDays = daily.activeDays.split('').map((activeDay, i) => {
 		return { day: daysOfTheWeek[i], isActive: activeDay === '1' } as {
 			day: string;
@@ -29,10 +29,10 @@
 		<Card.Title
 			>{userType === userTypes.CLIENT ? `${daily.title}` : `${daily.clientsName}`}</Card.Title
 		>
-		<Card.Description
-			>{userType === userTypes.CLIENT ? '' : `${daily.title} - `}
-			{daily.location}</Card.Description
-		>
+		<Card.Description>
+			{userType === userTypes.CLIENT ? '' : `${daily.title}`}
+			{daily.location ? ` - ${daily.location}` : ''}
+		</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<div class="flex flex-wrap gap-2">

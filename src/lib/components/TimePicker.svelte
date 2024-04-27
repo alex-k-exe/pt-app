@@ -5,7 +5,6 @@
 	import z from 'zod';
 
 	export let selectedDate = dayjs().toDate();
-	console.log(selectedDate);
 
 	const AmOrPm = {
 		AM: 'AM',
@@ -20,12 +19,10 @@
 				: selectedDate.getMinutes().toString(),
 		amOrPm: selectedDate.getHours() >= 12 ? 'PM' : 'AM'
 	};
-	console.log(selectedTime);
 	$: selectedDate = dayjs(
 		`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
 		'h:mm A'
 	).toDate();
-	$: console.log(selectedDate);
 
 	const hourSchema = z.string().min(1).max(2).regex(/\d+$/);
 	const minutesSchema = z

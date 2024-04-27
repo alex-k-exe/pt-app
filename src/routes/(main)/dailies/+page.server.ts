@@ -1,4 +1,4 @@
-import { activities, clients, dailies, users, type Activity, type Daily } from '$lib/drizzleTables';
+import { activities, clients, dailies, users } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
@@ -11,32 +11,26 @@ export async function load({ locals, platform }) {
 	const foundDailies = (
 		await db
 			.select()
-			.from(dailies)
-			.innerJoin(activities, eq(activities.id, dailies.id))
+			.from(activities)
+			.innerJoin(dailies, eq(activities.id, dailies.id))
 			.orderBy(activities.startTime)
-			.where(
-				or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id))
-			)
-	)
-		.filter((daily): daily is { activities: Activity; dailies: Daily } => daily !== null)
-		.map((daily) => {
-			return { ...daily.activities, activeDays: daily.dailies.activeDays };
-		});
+			.where(or(eq(activities.clientId, locals.user.id), eq(activities.trainerId, locals.user.id)))
+	).map((daily) => {
+		return { ...daily.activities, activeDays: daily.dailies.activeDays };
+	});
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
 		clientsNames = await Promise.all(
-			foundDailies.map(
-				async (daily) =>
-					(
-						await db
-							.select({ otherPersonsName: users.name })
-							.from(users)
-							.innerJoin(clients, eq(users.id, clients.id))
-							.limit(1)
-							.where(eq(clients.id, daily.clientId))
-					)[0].otherPersonsName
-			)
+			foundDailies.map(async (daily) => {
+				const names = await db
+					.select({ clientsName: users.name })
+					.from(users)
+					.innerJoin(clients, eq(users.id, clients.id))
+					.limit(1)
+					.where(eq(clients.id, daily.clientId));
+				return names.length > 0 ? names[0].clientsName : 'No client found';
+			})
 		);
 	}
 

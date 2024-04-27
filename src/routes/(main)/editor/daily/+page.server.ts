@@ -1,12 +1,4 @@
-import {
-	activities,
-	dailies,
-	series,
-	sets,
-	users,
-	type Activity,
-	type Daily
-} from '$lib/drizzleTables';
+import { activities, dailies, series, sets, users, type Activity } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other';
 import { fail, redirect } from '@sveltejs/kit';
@@ -20,12 +12,12 @@ import { formSchema } from './schema';
 // If User is a Trainer, find the names of their clients and attach the name of the client to the daily
 // Otherwise make a new daily
 export async function load({ url, locals, platform }) {
-	if (!locals.user?.id) return redirect(302, '/login');
+	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 	const db = initDrizzle(platform);
 
 	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		trainersClients = (await getTrainersClients(db, locals.user.id)).map((client) => client.users);
+		trainersClients = await getTrainersClients(db, locals.user.id);
 		if (trainersClients.length === 0) {
 			return redirect(
 				302,
@@ -45,43 +37,43 @@ export async function load({ url, locals, platform }) {
 		sets: []
 	};
 
-	const dailyId = Number(url.searchParams.get('dailyId'));
+	const dailyId = url.searchParams.get('dailyId');
 	let clientOfDailyName: string = '';
 	if (dailyId) {
 		daily = {
 			...(
 				await db
 					.select()
-					.from(dailies)
-					.innerJoin(activities, eq(activities.id, dailies.id))
+					.from(activities)
+					.innerJoin(dailies, eq(activities.id, dailies.id))
 					.limit(1)
-					.where(eq(dailies.id, dailyId))
-			)
-				.filter((daily): daily is { activities: Activity; dailies: Daily } => {
-					return daily.activities !== null;
-				})
-				.map((daily) => {
-					return { ...daily.activities, activeDays: daily.dailies.activeDays };
-				})[0],
+					.where(eq(dailies.id, Number(dailyId)))
+			).map((daily) => {
+				return { ...daily.activities, activeDays: daily.dailies.activeDays };
+			})[0],
 			series: [],
 			sets: []
 		};
-		daily.series = await getSeries(db, dailyId);
+		daily.series = await getSeries(db, Number(dailyId));
 		daily.sets = await db
 			.select()
 			.from(sets)
 			.orderBy(sets.index)
-			.where(and(eq(sets.id, dailyId), isNull(sets.seriesId)));
+			.where(and(eq(sets.id, Number(dailyId)), isNull(sets.seriesId)));
 
 		clientOfDailyName = (
 			await db.select({ name: users.name }).from(users).limit(1).where(eq(users.id, daily.clientId))
 		)[0].name;
 	}
 
+	const duplicateString = url.searchParams.get('duplicate');
+	if (duplicateString && duplicateString !== 'false' && duplicateString !== '0') {
+		daily.id = undefined;
+	}
+
 	return {
 		daily: { ...daily, clientName: clientOfDailyName },
 		trainersClients,
-		userType: locals.userType,
 		form: await superValidate(zod(formSchema))
 	};
 }
@@ -92,6 +84,7 @@ export const actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
+		console.log(form.data.startTime, ' ', form.data.endTime);
 		const db = initDrizzle(event.platform);
 		let dbActivity: Activity;
 		if (form.data.id) {
@@ -111,19 +104,22 @@ export const actions = {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
 			await db.insert(dailies).values({ id: dbActivity.id, activeDays: form.data.activeDays });
 		}
+		console.log('sjdj', dbActivity);
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db
 					.insert(series)
-					.values({ ...formSeries, id: dbActivity.id })
+					.values({ ...formSeries, activityId: dbActivity.id })
 					.returning()
 			)[0];
 			formSeries.sets.map(async (formSet) => {
-				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id, id: dbActivity.id });
+				await db
+					.insert(sets)
+					.values({ ...formSet, seriesId: dbSeries.id, activityId: dbActivity.id });
 			});
 		});
 		form.data.sets.forEach(async (formSet) => {
-			await db.insert(sets).values({ ...formSet, id: dbActivity.id });
+			await db.insert(sets).values({ ...formSet, activityId: dbActivity.id });
 		});
 		return redirect(302, '/dailies');
 	},

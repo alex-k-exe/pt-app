@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/index.ts';
@@ -40,7 +41,7 @@
 		</Form.Field>
 		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
-		<a href="/workouts">Cancel</a>
+		<a href="/workouts">Go back to workouts</a>
 		<Form.Button type="submit">Save</Form.Button>
 	</div>
 
@@ -68,9 +69,14 @@
 	</Select.Root>
 
 	{#if data.workout.id}
-		<form method="POST" action="?delete">
-			<DestructiveButton triggerText="Delete this workout" />
-		</form>
+		<div class="flex gap-2">
+			<form method="POST" action="?delete">
+				<DestructiveButton triggerText="Delete this workout" />
+			</form>
+			<a href={`/editor/workout?workoutId=${data.workout.id}&duplicate=true`}>
+				<Button>Duplicate</Button>
+			</a>
+		</div>
 	{/if}
 
 	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />

@@ -5,8 +5,7 @@ import {
 	users,
 	workouts,
 	type Activity,
-	type Series,
-	type Workout
+	type Series
 } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
@@ -50,13 +49,9 @@ export async function load({ url, locals, platform }) {
 					.innerJoin(activities, eq(activities.id, workouts.id))
 					.limit(1)
 					.where(eq(workouts.id, workoutId))
-			)
-				.filter((workout): workout is { activities: Activity; workouts: Workout } => {
-					return workout.activities !== null;
-				})
-				.map((workout) => {
-					return { date: workout.workouts.date, ...workout.activities };
-				})[0],
+			).map((workout) => {
+				return { date: workout.workouts.date, ...workout.activities };
+			})[0],
 			series: [],
 			sets: []
 		};
@@ -119,13 +114,15 @@ export const actions = {
 			dbSeries = (
 				await db
 					.insert(series)
-					.values({ ...formSeries, id: dbActivity.id })
+					.values({ ...formSeries, activityId: dbActivity.id })
 					.returning()
 			)[0];
 
 			formSeries.sets.forEach(async (formSet, j) => {
 				formSet.index = j;
-				await db.insert(sets).values({ ...formSet, id: dbActivity.id, seriesId: dbSeries.id });
+				await db
+					.insert(sets)
+					.values({ ...formSet, activityId: dbActivity.id, seriesId: dbSeries.id });
 			});
 		});
 
