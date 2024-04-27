@@ -1,6 +1,6 @@
 import { clients, users } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { userTypes } from '$lib/utils/types/other.ts';
+import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';

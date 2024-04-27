@@ -3,12 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import type { Activity } from '$lib/drizzleTables.ts';
-	import {
-		daysOfTheWeek,
-		userTypes,
-		validActiveDays,
-		type ObjectValues
-	} from '$lib/utils/types/other.ts';
+	import { daysOfTheWeek, userTypes, validActiveDays, type ObjectValues } from '$lib/utils/types';
 
 	export let activity: Activity & { clientsName: string | null } & (
 			| { activeDays: string }

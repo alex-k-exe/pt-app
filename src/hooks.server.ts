@@ -1,5 +1,5 @@
 import { initLucia } from '$lib/server/lucia';
-import { userTypes } from '$lib/utils/types/other';
+import { userTypes } from '$lib/utils/types';
 
 export async function handle({ event, resolve }) {
 	const lucia = initLucia(event.platform);

@@ -1,7 +1,7 @@
 import { activities, clients, users, workouts } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
-import { dayOnlyFormat, userTypes } from '$lib/utils/types/other';
+import { dayOnlyFormat, userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, or } from 'drizzle-orm';
 

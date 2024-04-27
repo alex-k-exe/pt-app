@@ -1,6 +1,6 @@
 import { clients, signupTokens, trainers, users, type User } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { userTypes } from '$lib/utils/types/other.js';
+import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { Scrypt } from 'lucia';
@@ -78,8 +78,8 @@ export const actions = {
 			await db.insert(trainers).values({ id: user.id });
 			event.cookies.set('userType', userTypes.TRAINER, { path: '/' });
 		}
-
 		await db.delete(signupTokens).where(eq(signupTokens.id, Number(event.params.signupToken)));
+
 		const session = await event.locals.lucia.createSession(user.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
 		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '/' });

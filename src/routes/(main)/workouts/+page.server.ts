@@ -1,7 +1,7 @@
 import { activities, clients, users, workouts, type Activity, type User } from '$lib/drizzleTables';
 import { getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
-import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types/other.js';
+import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, or } from 'drizzle-orm';
 import { yearSchema } from './schema.js';

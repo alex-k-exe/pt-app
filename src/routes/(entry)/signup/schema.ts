@@ -1,6 +1,6 @@
 import { signupTokens } from '$lib/drizzleTables';
 import { dayjs } from '$lib/utils/dates';
-import { validEmail, validPassword } from '$lib/utils/types/other.ts';
+import { validEmail, validPassword } from '$lib/utils/types';
 import { and, eq, gt } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { z } from 'zod';

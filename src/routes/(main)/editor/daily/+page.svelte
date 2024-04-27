@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
-	import { daysOfTheWeek, locations, validActiveDays } from '$lib/utils/types/other';
+	import { daysOfTheWeek, locations, validActiveDays } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import SelectClient from '../../../../lib/components/SelectClient.svelte';

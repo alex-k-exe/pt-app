@@ -1,5 +1,5 @@
 import { initLucia } from '$lib/server/lucia';
-import { type ObjectValues, type userTypes } from '$lib/utils/types/other';
+import { type ObjectValues, type userTypes } from '$lib/utils/types';
 import { Session, User } from 'lucia';
 
 declare global {

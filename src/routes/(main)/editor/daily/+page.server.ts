@@ -1,6 +1,6 @@
 import { activities, dailies, series, sets, users, type Activity } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
-import { userTypes } from '$lib/utils/types/other';
+import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, isNull } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';

@@ -6,14 +6,6 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
 
-async function signout(cookies: Cookies, locals: App.Locals) {
-	cookies.delete('userType', { path: '/' });
-	const sessionId = cookies.get(locals.lucia.sessionCookieName);
-	if (sessionId) locals.lucia.invalidateSession(sessionId);
-	cookies.delete(locals.lucia.sessionCookieName, { path: '/' });
-	return redirect(302, '/login');
-}
-
 export async function load(event) {
 	if (!event.locals.user?.id) return redirect(302, '/login?targetPath=/settings');
 	const db = initDrizzle(event.platform);
@@ -53,3 +45,11 @@ export const actions = {
 		return await signout(cookies, locals);
 	}
 };
+
+async function signout(cookies: Cookies, locals: App.Locals) {
+	cookies.delete('userType', { path: '/' });
+	const sessionId = cookies.get(locals.lucia.sessionCookieName);
+	if (sessionId) locals.lucia.invalidateSession(sessionId);
+	cookies.delete(locals.lucia.sessionCookieName, { path: '/' });
+	return redirect(302, '/login');
+}

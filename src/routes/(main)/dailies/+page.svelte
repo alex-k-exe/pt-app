@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ActivityCard from '$lib/components/ActivityCard.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { userTypes } from '$lib/utils/types/other';
+	import { userTypes } from '$lib/utils/types';
 
 	export let data;
 </script>

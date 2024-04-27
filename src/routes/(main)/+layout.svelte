@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userTypes } from '$lib/utils/types/other.js';
+	import { userTypes } from '$lib/utils/types';
 	import { CalendarDays, MessageCircle, Repeat, Settings, Users } from 'lucide-svelte';
 
 	export let data;

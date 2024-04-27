@@ -2,7 +2,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Activity } from '$lib/drizzleTables';
 	import { datesAreSameDay, dayjs } from '$lib/utils/dates';
-	import { dayOnlyFormat, timeOnlyFormat } from '$lib/utils/types/other';
+	import { dayOnlyFormat, timeOnlyFormat } from '$lib/utils/types';
 
 	export let day: dayjs.Dayjs;
 	export let workouts: (Activity & { clientsName: string | null; date: Date })[];

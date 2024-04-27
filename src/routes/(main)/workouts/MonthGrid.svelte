@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Activity } from '$lib/drizzleTables';
-	import { dayOnlyFormat, daysOfTheWeek } from '$lib/utils/types/other';
+	import { dayOnlyFormat, daysOfTheWeek } from '$lib/utils/types';
 	import type dayjs from 'dayjs';
 	import DayCell from './DayCell.svelte';
 

@@ -3,7 +3,7 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { dayjs, getDaysForCalendar } from '$lib/utils/dates';
-	import { months } from '$lib/utils/types/other.js';
+	import { months } from '$lib/utils/types';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 	import MonthGrid from './MonthGrid.svelte';
 

@@ -2,13 +2,13 @@
 	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import SelectClient from '$lib/components/SelectClient.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
-	import { locations, type ObjectValues } from '$lib/utils/types/other';
+	import { locations, type ObjectValues } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import ExercisesEditor from '../ExercisesEditor.svelte';

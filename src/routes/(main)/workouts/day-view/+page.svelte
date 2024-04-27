@@ -2,7 +2,7 @@
 	import ActivityCard from '$lib/components/ActivityCard.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { dayjs } from '$lib/utils/dates';
-	import { dayOnlyFormat, userTypes } from '$lib/utils/types/other.js';
+	import { dayOnlyFormat, userTypes } from '$lib/utils/types';
 
 	export let data;
 	const date = dayjs(data.date);

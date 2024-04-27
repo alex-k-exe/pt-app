@@ -1,5 +1,5 @@
 import { users } from '$lib/drizzleTables';
-import { validEmail, validPassword } from '$lib/utils/types/other.ts';
+import { validEmail, validPassword } from '$lib/utils/types';
 import { eq } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { Scrypt } from 'lucia';

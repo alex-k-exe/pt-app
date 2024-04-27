@@ -6,7 +6,6 @@
 	import type { FormSet } from './schema';
 
 	export let set: FormSet;
-	export let comparisonSet: typeof set | null = null;
 
 	const dispatch = createEventDispatcher();
 
@@ -22,20 +21,10 @@
 	</Card.Header>
 	<Card.Content>
 		<table>
-			{#if comparisonSet}
-				<tr>
-					<th></th>
-					<th>This workout</th>
-					<th>Compared workout</th>
-				</tr>
-			{/if}
 			{#each setProps as prop}
 				<tr>
 					<td>{prop[0].toUpperCase() + prop.slice(1)}</td>
 					<td><Input bind:value={set[prop]} /></td>
-					{#if comparisonSet}
-						<td><Input bind:value={comparisonSet[prop]} /></td>
-					{/if}
 				</tr>
 			{/each}
 		</table>

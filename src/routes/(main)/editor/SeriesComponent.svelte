@@ -21,7 +21,6 @@
 	</Card.Header>
 	<Card.Content>
 		{#each series.sets as set, j}
-			<!-- TODO: implement comparison set -->
 			<SetComponent
 				bind:set
 				on:delete={() => (series.sets = handleDeleteElement(series.sets, j))}

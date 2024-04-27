@@ -1,6 +1,6 @@
 import { chats, clients, messages, trainers, users, type Message } from '$lib/drizzleTables';
 import { initDrizzle } from '$lib/server/utils';
-import { userTypes, type ObjectValues } from '$lib/utils/types/other.js';
+import { userTypes, type ObjectValues } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, ne } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';

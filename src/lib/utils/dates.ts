@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { dayOnlyFormat } from './types/other';
+import { dayOnlyFormat } from './types';
 
-dayjs.locale('en-au');
 dayjs.extend(customParseFormat);
 export { dayjs };
 
@@ -16,13 +15,13 @@ export function getDaysForCalendar(month: number, year: number | null): dayjs.Da
 	if (year === null) year = dayjs().year();
 
 	// Find the weekday of the first day of the month (0-6)
-	const firstDayOfMonth: number =
-		(dayjs(new Date(year, month, 1))
-			.startOf('month')
-			.day() -
-			1) %
-		7;
+	let firstDayOfMonth: number = dayjs(new Date(year, month, 1))
+		.startOf('month')
+		.day();
+	// Adjust so Monday is first day of the week
+	firstDayOfMonth = (firstDayOfMonth - 1) % 7;
 
+	// when the day of the month is negative dayjs creates a date in the previous month
 	let currentDay: number = 0 - firstDayOfMonth;
 
 	return new Array(5).fill([]).map(() => {
