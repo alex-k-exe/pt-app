@@ -11,7 +11,7 @@ export async function load(event) {
 	const monthString = event.url.searchParams.get('month');
 	const month = validMonthDate.test(monthString ?? '')
 		? dayjs(monthString, 'MM-YYYY').toDate()
-		: dayjs().toDate();
+		: new Date();
 
 	const db = initDrizzle(event.platform);
 	const foundWorkouts = (
@@ -36,19 +36,17 @@ export async function load(event) {
 	let clientsInWorkoutsNames: string[] | null = null;
 	let trainersClients: User[] | null = null;
 	if (event.locals.userType === userTypes.TRAINER) {
-		if (foundWorkouts.length === 0) clientsInWorkoutsNames = [];
-		else {
-			clientsInWorkoutsNames = [
-				(
-					await db
-						.select({ name: users.name })
-						.from(users)
-						.innerJoin(clients, eq(clients.id, users.id))
-						.where(eq(clients.id, foundWorkouts[0].clientId))
-						.limit(1)
-				)[0].name
-			];
-		}
+		clientsInWorkoutsNames = await Promise.all(
+			foundWorkouts.map(async (workout) => {
+				const names = await db
+					.select({ clientsName: users.name })
+					.from(users)
+					.innerJoin(clients, eq(users.id, clients.id))
+					.limit(1)
+					.where(eq(clients.id, workout.clientId));
+				return names.length > 0 ? names[0].clientsName : 'No client found';
+			})
+		);
 
 		trainersClients = await getTrainersClients(db, event.locals.user.id);
 	}
@@ -73,7 +71,6 @@ export async function load(event) {
 	return {
 		month,
 		workouts: groupedWorkouts,
-		userType: event.locals.userType,
 		clients: trainersClients
 	};
 }

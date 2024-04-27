@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
+	import SelectClient from '$lib/components/SelectClient.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
@@ -10,7 +11,6 @@
 	import { locations, type ObjectValues } from '$lib/utils/types/other';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import SelectClient from '../../../../lib/components/SelectClient.svelte';
 	import ExercisesEditor from '../ExercisesEditor.svelte';
 	import { formSchema } from './schema.ts';
 

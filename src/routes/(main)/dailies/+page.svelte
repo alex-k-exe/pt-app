@@ -1,7 +1,7 @@
 <script lang="ts">
+	import ActivityCard from '$lib/components/ActivityCard.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { userTypes } from '$lib/utils/types/other';
-	import DailyCard from './DailyCard.svelte';
 
 	export let data;
 </script>
@@ -20,7 +20,7 @@
 
 <div class="dailies">
 	{#each data.dailies as daily}
-		<DailyCard userType={data.userType} {daily} />
+		<ActivityCard userType={data.userType} activity={daily} />
 	{/each}
 </div>
 

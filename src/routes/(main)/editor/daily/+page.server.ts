@@ -13,23 +13,11 @@ import { formSchema } from './schema';
 // Otherwise make a new daily
 export async function load({ url, locals, platform }) {
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
-	const db = initDrizzle(platform);
-
-	let trainersClients: { id: string; name: string }[] | null = null;
-	if (locals.userType === userTypes.TRAINER) {
-		trainersClients = await getTrainersClients(db, locals.user.id);
-		if (trainersClients.length === 0) {
-			return redirect(
-				302,
-				'/clients?error=You must have atleast one client to create a workout or daily'
-			);
-		}
-	}
 
 	let daily: FormActivity & { activeDays: string } = {
 		activeDays: '0000000',
 		clientId: '',
-		trainerId: locals.user?.id, // only trainers can make a new daily
+		trainerId: locals.user.id, // only trainers can make a new daily
 		title: '',
 		startTime: new Date(),
 		endTime: new Date(),
@@ -37,6 +25,7 @@ export async function load({ url, locals, platform }) {
 		sets: []
 	};
 
+	const db = initDrizzle(platform);
 	const dailyId = url.searchParams.get('dailyId');
 	let clientOfDailyName: string = '';
 	if (dailyId) {
@@ -71,6 +60,17 @@ export async function load({ url, locals, platform }) {
 		daily.id = undefined;
 	}
 
+	let trainersClients: { id: string; name: string }[] | null = null;
+	if (locals.userType === userTypes.TRAINER) {
+		trainersClients = await getTrainersClients(db, locals.user.id);
+		if (trainersClients.length === 0) {
+			return redirect(
+				302,
+				'/clients?error=You must have atleast one client to create a workout or daily'
+			);
+		}
+	}
+
 	return {
 		daily: { ...daily, clientName: clientOfDailyName },
 		trainersClients,
@@ -84,7 +84,6 @@ export const actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		console.log(form.data.startTime, ' ', form.data.endTime);
 		const db = initDrizzle(event.platform);
 		let dbActivity: Activity;
 		if (form.data.id) {
@@ -104,7 +103,6 @@ export const actions = {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
 			await db.insert(dailies).values({ id: dbActivity.id, activeDays: form.data.activeDays });
 		}
-		console.log('sjdj', dbActivity);
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db

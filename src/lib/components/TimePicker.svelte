@@ -4,7 +4,7 @@
 	import { dayjs } from '$lib/utils/dates';
 	import z from 'zod';
 
-	export let selectedDate = dayjs().toDate();
+	export let selectedDate = new Date();
 
 	const AmOrPm = {
 		AM: 'AM',

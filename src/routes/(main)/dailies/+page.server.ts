@@ -1,13 +1,13 @@
-import { activities, clients, dailies, users } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
+import { activities, clients, dailies, users, type User } from '$lib/drizzleTables';
+import { getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types/other.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
 
 export async function load({ locals, platform }) {
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
-	const db = initDrizzle(platform);
 
+	const db = initDrizzle(platform);
 	const foundDailies = (
 		await db
 			.select()
@@ -19,26 +19,29 @@ export async function load({ locals, platform }) {
 		return { ...daily.activities, activeDays: daily.dailies.activeDays };
 	});
 
-	let clientsNames: string[] | null = null;
+	let clientsInWorkoutsNames: string[] | null = null;
+	let trainersClients: User[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		clientsNames = await Promise.all(
-			foundDailies.map(async (daily) => {
+		clientsInWorkoutsNames = await Promise.all(
+			foundDailies.map(async (workout) => {
 				const names = await db
 					.select({ clientsName: users.name })
 					.from(users)
 					.innerJoin(clients, eq(users.id, clients.id))
 					.limit(1)
-					.where(eq(clients.id, daily.clientId));
+					.where(eq(clients.id, workout.clientId));
 				return names.length > 0 ? names[0].clientsName : 'No client found';
 			})
 		);
+
+		trainersClients = await getTrainersClients(db, locals.user.id);
 	}
 
 	return {
 		dailies: foundDailies.map((daily, i) => {
-			return { ...daily, clientsName: clientsNames ? clientsNames[i] : null };
+			return { ...daily, clientsName: clientsInWorkoutsNames ? clientsInWorkoutsNames[i] : null };
 		}),
-		userType: locals.userType
+		clients: trainersClients
 	};
 }
 

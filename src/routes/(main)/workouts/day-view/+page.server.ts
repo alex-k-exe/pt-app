@@ -9,10 +9,9 @@ export async function load({ locals, platform, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const date = url.searchParams.get('date')
 		? dayjs(url.searchParams.get('date'), dayOnlyFormat).toDate()
-		: dayjs().toDate();
-	date.setHours(0, 0, 0, 0);
-	const db = initDrizzle(platform);
+		: new Date();
 
+	const db = initDrizzle(platform);
 	const foundWorkouts = (
 		await db
 			.select()

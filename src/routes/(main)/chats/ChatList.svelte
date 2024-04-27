@@ -18,7 +18,7 @@
 		}}
 	>
 		<Select.Trigger class="w-[180px]">
-			<Select.Value placeholder="Select a trainer" />
+			<Select.Value placeholder="Select another user" />
 		</Select.Trigger>
 		<Select.Content>
 			<Select.Group>
