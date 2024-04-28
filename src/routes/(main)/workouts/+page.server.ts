@@ -1,5 +1,5 @@
 import { activities, clients, users, workouts, type Activity } from '$lib/drizzleTables';
-import { getTrainersClients } from '$lib/server/utils';
+import { getTrainersClients } from '$lib/server/dbUtils.js';
 import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';

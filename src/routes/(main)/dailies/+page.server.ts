@@ -1,5 +1,5 @@
 import { activities, clients, dailies, users, type User } from '$lib/drizzleTables';
-import { getTrainersClients } from '$lib/server/utils';
+import { getTrainersClients } from '$lib/server/dbUtils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
