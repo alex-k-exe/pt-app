@@ -7,21 +7,21 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
 
 export async function load({ url, locals }) {
-	const selectedChatId = url.searchParams.get('chatId');
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 	const db = locals.db;
 
-	const foundChats = await getChats(db, locals.user?.id);
-	const otherTrainers = await getUsersForNewChat(db, foundChats, locals.user.id, locals.userType);
+	const chats = await getChats(db, locals.user.id);
+	const usersForNewChat = await getUsersForNewChat(db, chats, locals.user.id, locals.userType);
 
+	const selectedChatId = url.searchParams.get('chatId');
 	const selectedChat = selectedChatId
-		? getChatWithMessages(db, foundChats, Number(selectedChatId))
+		? await getChatWithMessages(db, chats, Number(selectedChatId))
 		: null;
 
 	return {
-		chats: foundChats,
+		chats,
 		selectedChat,
-		trainers: otherTrainers,
+		usersForNewChat,
 		form: await superValidate(zod(formSchema))
 	};
 }

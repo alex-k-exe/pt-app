@@ -3,7 +3,7 @@
 	import * as Select from '$lib/components/ui/select';
 
 	export let chats: { id: number; otherUsersName: string; hasBeenRead: boolean }[];
-	export let trainers: { id: string; name: string }[];
+	export let usersForNewChat: { id: string; name: string }[];
 	export let selectedChatId: number | null = null;
 
 	let selectedTrainer: { id: string; name: string } | null = null;
@@ -22,7 +22,7 @@
 		</Select.Trigger>
 		<Select.Content>
 			<Select.Group>
-				{#each trainers as trainer}
+				{#each usersForNewChat as trainer}
 					<Select.Item value={trainer.id} label={trainer.name}>{trainer.name}</Select.Item>
 				{/each}
 			</Select.Group>

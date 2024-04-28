@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DestructiveButton from '$lib/components/DestructiveButton.svelte';
 	import { Button } from '$lib/components/ui/button/index.ts';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import { Send } from 'lucide-svelte';
@@ -6,6 +7,8 @@
 	import MessageList from './MessageList.svelte';
 
 	export let data;
+
+	let deleteChatForm: HTMLFormElement;
 </script>
 
 <svelte:head>
@@ -17,15 +20,18 @@
 	<div class="chatList">
 		<ChatList
 			chats={data.chats}
-			trainers={data.trainers}
+			usersForNewChat={data.usersForNewChat}
 			selectedChatId={data.selectedChat?.id ?? null}
 		/>
 	</div>
 	{#if data.selectedChat}
-		<form method="POST" action="?/deleteChat" class="chatHeader">
+		<form method="POST" action="?/deleteChat" class="chatHeader" bind:this={deleteChatForm}>
 			<input type="hidden" name="chatId" value={data.selectedChat.id} />
 			Chat with <b>{data.selectedChat.otherUsersName}</b>
-			<Button type="submit">Delete chat</Button>
+			<DestructiveButton
+				triggerText="Delete this chat"
+				on:confirm={() => deleteChatForm.requestSubmit()}
+			/>
 		</form>
 		<div class="messageList">
 			<MessageList messages={data.selectedChat.messages} />

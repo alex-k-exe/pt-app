@@ -72,16 +72,16 @@ export const actions = {
 
 		if (form.data.trainerId) {
 			await db.insert(clients).values({ id: user.id, trainerId: form.data.trainerId });
-			event.cookies.set('userType', userTypes.CLIENT, { path: '/' });
+			event.cookies.set('userType', userTypes.CLIENT, { path: '.' });
 		} else {
 			await db.insert(trainers).values({ id: user.id });
-			event.cookies.set('userType', userTypes.TRAINER, { path: '/' });
+			event.cookies.set('userType', userTypes.TRAINER, { path: '.' });
 		}
 		await db.delete(signupTokens).where(eq(signupTokens.id, Number(event.params.signupToken)));
 
 		const session = await event.locals.lucia.createSession(user.id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
-		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '/' });
+		event.cookies.set(event.locals.lucia.sessionCookieName, sessionCookie.value, { path: '.' });
 
 		return redirect(302, event.url.searchParams.get('targetPath') ?? '/workouts');
 	}

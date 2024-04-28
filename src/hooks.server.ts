@@ -13,7 +13,7 @@ export async function handle({ event, resolve }) {
 	const userType = event.cookies.get('userType');
 
 	const targetPath = event.url.pathname;
-	if (!sessionId || !userType) {
+	if (!sessionId || !userType || (userType !== 'Client' && userType !== 'Trainer')) {
 		event.locals.user = null;
 		event.locals.session = null;
 		return new Response(null, {
@@ -35,7 +35,7 @@ export async function handle({ event, resolve }) {
 	}
 	event.locals.user = user;
 	event.locals.session = session;
-	event.locals.userType = userType as 'Client' | 'Trainer';
+	event.locals.userType = userType;
 
 	const clientCantVisitPage = targetPath.startsWith('/clients');
 	if (event.locals.userType === userTypes.CLIENT && clientCantVisitPage) {
