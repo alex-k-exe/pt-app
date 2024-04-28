@@ -5,6 +5,7 @@ export async function load({ locals, url }) {
 
 	return {
 		userType: locals.userType,
-		error: url.searchParams.get('error')
+		error: url.searchParams.get('error'),
+		pathName: url.pathname
 	};
 }

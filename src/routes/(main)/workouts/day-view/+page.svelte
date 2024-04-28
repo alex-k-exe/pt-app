@@ -9,7 +9,9 @@
 	const workouts = data.workouts;
 </script>
 
-<a href="/workouts"><Button variant="outline">Go back to month view</Button></a>
+<a href={`/workouts?month=${date.format('MM-YYYY')}`}>
+	<Button variant="outline">Go back to month view</Button>
+</a>
 {date.format('D MMMM YYYY')}
 
 {#if data.userType === userTypes.TRAINER}

@@ -13,10 +13,7 @@
 
 	const selectedTime: { hours: string; minutes: string; amOrPm: keyof typeof AmOrPm } = {
 		hours: (selectedDate.getHours() % 12).toString(),
-		minutes:
-			selectedDate.getMinutes() < 10
-				? selectedDate.getMinutes().toString()
-				: selectedDate.getMinutes().toString(),
+		minutes: dayjs(selectedDate).format('mm'),
 		amOrPm: selectedDate.getHours() >= 12 ? 'PM' : 'AM'
 	};
 	$: selectedDate = dayjs(
@@ -32,9 +29,13 @@
 
 	function handleHoursChange(value: unknown, changingHours: boolean) {
 		const validatedValue = (changingHours ? hourSchema : minutesSchema).safeParse(value);
-		if (!validatedValue.success) return;
-		if (changingHours) selectedTime.hours = validatedValue.data;
-		else selectedTime.minutes = validatedValue.data;
+		if (!validatedValue.success) console.log(validatedValue.error);
+		else console.log(validatedValue.data);
+		if (changingHours) {
+			selectedTime.hours = validatedValue.success ? validatedValue.data : selectedTime.hours;
+		} else {
+			selectedTime.minutes = validatedValue.success ? validatedValue.data : selectedTime.minutes;
+		}
 	}
 </script>
 

@@ -8,6 +8,12 @@
 	import MonthGrid from './MonthGrid.svelte';
 
 	export let data;
+
+	// TODO: give this a better name
+	function createThing(month: string, selectedClientId: string | null) {
+		let withoutClientId = `/workouts?month=${dayjs(`${month}-${data.month.getFullYear()}`, 'MMMM-YYYY').format('MM-YYYY')}`;
+		return (withoutClientId += selectedClientId ? `&clientId=${selectedClientId}` : '');
+	}
 </script>
 
 <svelte:head>
@@ -16,37 +22,69 @@
 </svelte:head>
 
 <div class="buttons">
-	<a href={`/workouts?month=${dayjs(data.month).subtract(1, 'month').format('MM-YYYY')}`}>
-		<Button variant="outline" size="icon" style="margin-left: 2%">
-			<ChevronLeft />
-		</Button>
-	</a>
-	<form method="POST" action="?/changeMonth">
+	{#if data.clients}
 		<Select.Root
 			selected={{
-				value: dayjs(data.month).format('MMMM'),
-				label: dayjs(data.month).format('MMMM')
+				value: data.selectedClientId ?? '',
+				label:
+					data.clients.find((client) => client.id === data.selectedClientId)?.name ??
+					'Select all clients'
 			}}
 		>
 			<Select.Trigger class="w-[180px]">
-				<Select.Value placeholder="Select a month" />
+				<Select.Value placeholder="Select all clients" />
 			</Select.Trigger>
 			<Select.Content>
 				<Select.Group>
-					{#each Object.values(months) as month}
+					<a href={'/workouts?month=' + dayjs(data.month).format('MM-YYYY')}>
+						<Select.Item value="" label="Select all clients">Select all clients</Select.Item>
+					</a>
+					{#each data.clients as client}
 						<a
-							href={`/workouts?month=${dayjs(`1-${month}-${data.month.getFullYear()}`, 'D-MMMM-YYYY').format('MM-YYYY')}`}
+							href={`/workouts?month=${dayjs(data.month).format('MM-YYYY')}&clientId=${client.id}`}
 						>
-							<Select.Item value={month} label={month}>
-								{month}
+							<Select.Item value={client.id} label={client.name}>
+								{client.name}
 							</Select.Item>
 						</a>
 					{/each}
 				</Select.Group>
 			</Select.Content>
 		</Select.Root>
-	</form>
-	<a href={`/workouts?month=${dayjs(data.month).add(1, 'month').format('MM-YYYY')}`}>
+	{/if}
+	<a
+		href={`/workouts?month=${dayjs(data.month).subtract(1, 'month').format('MM-YYYY')}` +
+			(data.selectedClientId ? `&clientId=${data.selectedClientId}` : '')}
+	>
+		<Button variant="outline" size="icon" style="margin-left: 2%">
+			<ChevronLeft />
+		</Button>
+	</a>
+	<Select.Root
+		selected={{
+			value: dayjs(data.month).format('MMMM'),
+			label: dayjs(data.month).format('MMMM')
+		}}
+	>
+		<Select.Trigger class="w-[180px]">
+			<Select.Value placeholder="Select a month" />
+		</Select.Trigger>
+		<Select.Content>
+			<Select.Group>
+				{#each Object.values(months) as month}
+					<a href={createThing(month, data.selectedClientId)}>
+						<Select.Item value={month} label={month}>
+							{month}
+						</Select.Item>
+					</a>
+				{/each}
+			</Select.Group>
+		</Select.Content>
+	</Select.Root>
+	<a
+		href={`/workouts?month=${dayjs(data.month).add(1, 'month').format('MM-YYYY')}` +
+			(data.selectedClientId ? `&clientId=${data.selectedClientId}` : '')}
+	>
 		<Button variant="outline" size="icon" style="margin-right: 2%">
 			<ChevronRight />
 		</Button>
@@ -60,7 +98,9 @@
 			value={data.month.getFullYear()}
 		/>
 	</form>
-	<a href="/workouts"><Button>Today</Button></a>
+	<a href={'/workouts' + (data.selectedClientId ? `?clientId=${data.selectedClientId}` : '')}
+		><Button>Today</Button></a
+	>
 </div>
 
 <MonthGrid

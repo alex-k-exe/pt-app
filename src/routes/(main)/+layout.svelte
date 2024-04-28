@@ -18,8 +18,12 @@
 <div class="container">
 	<nav class="top-0 hidden bg-background md:flex">
 		<enhanced:img src="$lib/assets/logo.png" alt="App logo" style="width: 50px" />
-		{#each urls as { name }}
-			<a href={'/' + name.toLowerCase()}>{name}</a>
+		{#each urls as { name: pathName }}
+			<a
+				href={'/' + pathName.toLowerCase()}
+				class={data.pathName.startsWith('/' + pathName.toLowerCase()) ? 'text-red-500' : ''}
+				>{pathName}</a
+			>
 		{/each}
 	</nav>
 	<slot />

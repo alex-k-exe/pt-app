@@ -1,3 +1,4 @@
+// TODO: generalise this
 export const locations = {
 	WEST_END: 'West End',
 	ALBION: 'Albion',

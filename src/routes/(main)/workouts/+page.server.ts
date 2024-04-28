@@ -1,9 +1,10 @@
-import { activities, clients, users, workouts, type Activity, type User } from '$lib/drizzleTables';
+import { activities, clients, users, workouts, type Activity } from '$lib/drizzleTables';
 import { getTrainersClients, initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq, ne, or } from 'drizzle-orm';
+import type { User } from 'lucia';
 import { yearSchema } from './schema.js';
 
 export async function load(event) {
@@ -14,6 +15,7 @@ export async function load(event) {
 		: new Date();
 
 	const db = initDrizzle(event.platform);
+	const selectedClientId = event.url.searchParams.get('clientId');
 	const foundWorkouts = (
 		await db
 			.select()
@@ -25,7 +27,8 @@ export async function load(event) {
 						eq(activities.clientId, event.locals.user?.id),
 						eq(activities.trainerId, event.locals.user?.id)
 					),
-					eq(workouts.date, month)
+					eq(workouts.date, month),
+					eq(activities.clientId, selectedClientId ?? activities.clientId)
 				)
 			)
 			.orderBy(workouts.date)
@@ -43,7 +46,7 @@ export async function load(event) {
 					.from(users)
 					.innerJoin(clients, eq(users.id, clients.id))
 					.limit(1)
-					.where(eq(clients.id, workout.clientId));
+					.where(and(eq(clients.id, workout.clientId), ne(clients.id, selectedClientId ?? '')));
 				return names.length > 0 ? names[0].clientsName : 'No client found';
 			})
 		);
@@ -71,7 +74,8 @@ export async function load(event) {
 	return {
 		month,
 		workouts: groupedWorkouts,
-		clients: trainersClients
+		clients: trainersClients,
+		selectedClientId
 	};
 }
 
@@ -95,7 +99,12 @@ export const actions = {
 
 		const month = event.url.searchParams.get('month');
 		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
+		const selectedClientId = event.url.searchParams.get('clientId');
 
-		return redirect(302, `/workouts?month=${monthDate.format('MM')}-${form.data}`);
+		return redirect(
+			302,
+			`/workouts?month=${monthDate.format('MM')}-${form.data}` +
+				(selectedClientId ? `&clientId=${selectedClientId}` : '')
+		);
 	}
 };
