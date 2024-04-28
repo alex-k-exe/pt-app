@@ -1,5 +1,4 @@
 import { clients, users } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
 import { fail, redirect, type Cookies } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
@@ -8,7 +7,7 @@ import { formSchema } from './schema';
 
 export async function load(event) {
 	if (!event.locals.user?.id) return redirect(302, '/login?targetPath=/settings');
-	const db = initDrizzle(event.platform);
+	const db = event.locals.db;
 
 	return {
 		user: event.locals.user,
@@ -24,7 +23,7 @@ export const actions = {
 	updateAccount: async (event) => {
 		const userId = event.locals.user?.id;
 		if (!userId) return redirect(302, '/login');
-		const db = initDrizzle(event.platform);
+		const db = event.locals.db;
 		let form = await superValidate(event, zod(await formSchema(db, userId)));
 		if (!form.valid) return fail(400, { form });
 
@@ -38,7 +37,7 @@ export const actions = {
 		const userId = locals.user?.id;
 		if (!userId) return redirect(302, '/login?targetPath=/settings');
 
-		await initDrizzle(platform)
+		await locals.db
 			.delete(clients)
 			.where(or(eq(clients.id, userId), eq(clients.trainerId, userId)));
 

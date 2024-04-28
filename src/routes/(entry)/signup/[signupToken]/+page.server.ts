@@ -1,5 +1,4 @@
 import { clients, signupTokens, trainers, users, type User } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -8,11 +7,11 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { asyncTokenSchema, formSchema } from '../schema';
 
-export async function load({ params, url, platform }) {
+export async function load({ params, url, locals }) {
 	const signupTokenId = Number(params.signupToken);
 	const targetPath = url.searchParams.get('targetPath');
 
-	const db = initDrizzle(platform);
+	const db = locals.db;
 	const tokenValidation = await (await asyncTokenSchema(db)).safeParseAsync(signupTokenId);
 	if (!tokenValidation.success) {
 		return redirect(
@@ -46,7 +45,7 @@ export async function load({ params, url, platform }) {
 
 export const actions = {
 	default: async (event) => {
-		const db = initDrizzle(event.platform);
+		const db = event.locals.db;
 		let form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 

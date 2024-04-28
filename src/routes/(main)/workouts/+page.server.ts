@@ -1,5 +1,5 @@
 import { activities, clients, users, workouts, type Activity } from '$lib/drizzleTables';
-import { getTrainersClients, initDrizzle } from '$lib/server/utils';
+import { getTrainersClients } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
@@ -14,7 +14,7 @@ export async function load(event) {
 		? dayjs(monthString, 'MM-YYYY').toDate()
 		: new Date();
 
-	const db = initDrizzle(event.platform);
+	const db = event.locals.db;
 	const selectedClientId = event.url.searchParams.get('clientId');
 	const foundWorkouts = (
 		await db
@@ -80,19 +80,7 @@ export async function load(event) {
 }
 
 export const actions = {
-	changeMonth: async ({ url, request }) => {
-		const newMonth = (await request.formData()).get('newMonth')?.toString();
-		if (!newMonth) return fail(400);
-
-		const oldMonth = url.searchParams.get('month');
-		const oldDate = validMonthDate.test(oldMonth ?? '') ? dayjs(oldMonth, 'MM-YYYY') : dayjs();
-
-		return redirect(
-			302,
-			`/workouts?month=${dayjs(newMonth, 'MMMM').format('MM')}-${oldDate.format('YYYY')}`
-		);
-	},
-
+	// TODO: make this a <a> in +page.svelte
 	changeYear: async (event) => {
 		const form = yearSchema.safeParse(Number((await event.request.formData()).get('newYear')));
 		if (!form.success) return fail(400);

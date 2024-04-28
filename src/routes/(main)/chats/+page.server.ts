@@ -1,5 +1,4 @@
 import { chats, clients, messages, trainers, users, type Message } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
 import { userTypes, type ObjectValues } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, ne } from 'drizzle-orm';
@@ -8,12 +7,12 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema';
 
-export async function load({ platform, url, locals }) {
+export async function load({ url, locals }) {
 	let chatId: string | number | null = url.searchParams.get('chatId');
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 	// get first 10 chats and other user's name
 	// if chatId, get first 10 messages from that chat
-	const db = initDrizzle(platform);
+	const db = locals.db;
 	// get the id of the other user in the chat when the user is user1
 
 	const foundChats = await getChats(db, locals.user?.id);
@@ -63,20 +62,20 @@ export const actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		await initDrizzle(event.platform)
+		await event.locals.db
 			.insert(messages)
 			.values({ chatId: form.data.chatId, text: form.data.text, senderId: event.locals.user?.id });
 		return redirect(302, `/chats?chatId=${form.data.chatId}`);
 	},
 
-	createNewChat: async ({ platform, request, locals }) => {
+	createNewChat: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const otherUserId = formData.get('otherUserId');
 		const userId = locals.user?.id;
 		if (!otherUserId || !userId) return fail(400, { formData });
 
 		const createdChatId = (
-			await initDrizzle(platform)
+			await locals.db
 				.insert(chats)
 				.values({ userId1: userId, userId2: otherUserId.toString() })
 				.returning()
@@ -84,13 +83,11 @@ export const actions = {
 		return redirect(302, `/chats?chatId=${createdChatId}`);
 	},
 
-	deleteChat: async ({ platform, request }) => {
+	deleteChat: async ({ locals, request }) => {
 		const chatId = (await request.formData()).get('chatId');
 		if (!chatId) return fail(400);
 
-		await initDrizzle(platform)
-			.delete(chats)
-			.where(eq(chats.id, Number(chatId.toString())));
+		await locals.db.delete(chats).where(eq(chats.id, Number(chatId.toString())));
 		return redirect(302, '/chats');
 	}
 };

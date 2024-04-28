@@ -1,17 +1,16 @@
 import { activities, clients, users, workouts } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, or } from 'drizzle-orm';
 
-export async function load({ locals, platform, url }) {
+export async function load({ locals, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const date = url.searchParams.get('date')
 		? dayjs(url.searchParams.get('date'), dayOnlyFormat).toDate()
 		: new Date();
 
-	const db = initDrizzle(platform);
+	const db = locals.db;
 	const foundWorkouts = (
 		await db
 			.select()
@@ -53,11 +52,9 @@ export async function load({ locals, platform, url }) {
 }
 
 export const actions = {
-	delete: async ({ platform, request }) => {
+	delete: async ({ locals, request }) => {
 		const workoutId = (await request.formData()).get('workoutId');
 		if (!workoutId) return fail(400);
-		await initDrizzle(platform)
-			.delete(activities)
-			.where(eq(activities.id, Number(workoutId.toString())));
+		await locals.db.delete(activities).where(eq(activities.id, Number(workoutId.toString())));
 	}
 };

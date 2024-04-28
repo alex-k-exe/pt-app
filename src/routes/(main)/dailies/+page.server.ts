@@ -1,5 +1,5 @@
 import { activities, clients, dailies, users, type User } from '$lib/drizzleTables';
-import { getTrainersClients, initDrizzle } from '$lib/server/utils';
+import { getTrainersClients } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
@@ -7,7 +7,7 @@ import { eq, or } from 'drizzle-orm';
 export async function load({ locals, platform }) {
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 
-	const db = initDrizzle(platform);
+	const db = locals.db;
 	const foundDailies = (
 		await db
 			.select()
@@ -50,8 +50,6 @@ export const actions = {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
 		const dailyId = (await request.formData()).get('dailyId')?.toString();
 		if (!dailyId) return fail(400);
-		await initDrizzle(platform)
-			.delete(dailies)
-			.where(eq(dailies.id, Number(dailyId)));
+		await locals.db.delete(dailies).where(eq(dailies.id, Number(dailyId)));
 	}
 };

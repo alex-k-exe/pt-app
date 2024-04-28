@@ -1,5 +1,4 @@
 import { clients, users } from '$lib/drizzleTables';
-import { initDrizzle } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -7,15 +6,15 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema.ts';
 
-export async function load({ platform }) {
+export async function load({ locals }) {
 	return {
-		form: await superValidate(zod(await formSchema(initDrizzle(platform))))
+		form: await superValidate(zod(await formSchema(locals.db)))
 	};
 }
 
 export const actions = {
 	default: async (event) => {
-		const db = initDrizzle(event.platform);
+		const db = event.locals.db;
 		const form = await superValidate(event, zod(await formSchema(db)));
 		if (!form.valid) return fail(400, { form });
 

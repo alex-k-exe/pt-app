@@ -1,5 +1,5 @@
 import { activities, dailies, series, sets, users, type Activity } from '$lib/drizzleTables';
-import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
+import { getSeries, getTrainersClients } from '$lib/server/utils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, isNull } from 'drizzle-orm';
@@ -25,7 +25,7 @@ export async function load({ url, locals, platform }) {
 		sets: []
 	};
 
-	const db = initDrizzle(platform);
+	const db = locals.db;
 	const dailyId = url.searchParams.get('dailyId');
 	let clientOfDailyName: string = '';
 	if (dailyId) {
@@ -84,7 +84,7 @@ export const actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		const db = initDrizzle(event.platform);
+		const db = event.locals.db;
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
@@ -127,8 +127,6 @@ export const actions = {
 		const id = (await request.formData()).get('id');
 		if (!id) return fail(500);
 
-		await initDrizzle(platform)
-			.delete(activities)
-			.where(eq(activities.id, Number(id.toString())));
+		await locals.db.delete(activities).where(eq(activities.id, Number(id.toString())));
 	}
 };

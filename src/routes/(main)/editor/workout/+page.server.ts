@@ -1,5 +1,5 @@
 import { activities, series, sets, users, workouts, type Activity } from '$lib/drizzleTables';
-import { getSeries, getTrainersClients, initDrizzle } from '$lib/server/utils';
+import { getSeries, getTrainersClients } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
 import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
@@ -12,7 +12,7 @@ import { formSchema } from './schema.js';
 // If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
 // If User is a Trainer, find the names of their clients and attach the name of the client to the workout
 // Otherwise make a new workout
-export async function load({ url, locals, platform }) {
+export async function load({ url, locals }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const dateString = url.searchParams.get('date');
 	const date = validMonthDate.test(dateString ?? '')
@@ -30,7 +30,7 @@ export async function load({ url, locals, platform }) {
 		sets: []
 	};
 
-	const db = initDrizzle(platform);
+	const db = locals.db;
 	const workoutId = Number(url.searchParams.get('workoutId'));
 	let clientOfWorkoutName: string = '';
 	if (workoutId) {
@@ -93,7 +93,7 @@ export const actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		const db = initDrizzle(event.platform);
+		const db = event.locals.db;
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
@@ -130,14 +130,12 @@ export const actions = {
 		return redirect(302, `/workouts/day-view?date=${dayjs(form.data.date).format(dayOnlyFormat)}`);
 	},
 
-	delete: async ({ locals, platform, url }) => {
+	delete: async ({ locals, url }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
 		const id = url.searchParams.get('workoutId');
 		if (!id) return fail(400);
 
-		await initDrizzle(platform)
-			.delete(activities)
-			.where(eq(activities.id, Number(id)));
+		await locals.db.delete(activities).where(eq(activities.id, Number(id)));
 
 		const date = url.searchParams.get('date');
 		return redirect(302, '/workouts' + date ? `?month=${date}` : '');

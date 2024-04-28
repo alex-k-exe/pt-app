@@ -1,9 +1,12 @@
 import { initLucia } from '$lib/server/lucia';
 import { userTypes } from '$lib/utils/types';
+import { drizzle } from 'drizzle-orm/d1';
 
 export async function handle({ event, resolve }) {
 	const lucia = initLucia(event.platform);
 	event.locals.lucia = lucia;
+	if (!event.platform?.env.DB) throw new Error('Database is undefined');
+	event.locals.db = drizzle(event.platform.env.DB);
 
 	if (routeIsPublic(event.url.pathname)) return resolve(event);
 	const sessionId = event.cookies.get(lucia.sessionCookieName);

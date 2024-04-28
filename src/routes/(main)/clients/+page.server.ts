@@ -6,14 +6,13 @@ import {
 	type SignupToken,
 	type User
 } from '$lib/drizzleTables.ts';
-import { initDrizzle } from '$lib/server/utils';
 import { dayjs } from '$lib/utils/dates';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, lte, ne } from 'drizzle-orm';
 
-export async function load({ platform, locals }) {
+export async function load({ locals }) {
 	if (!locals.user?.id) return redirect(302, '/login');
-	const db = initDrizzle(platform);
+	const db = locals.db;
 
 	const foundClients = (
 		await db
@@ -46,40 +45,40 @@ export async function load({ platform, locals }) {
 }
 
 export const actions = {
-	deleteClient: async ({ platform, request }) => {
+	deleteClient: async ({ locals, request }) => {
 		const data = await request.formData();
 		const clientId = data.get('clientId')?.toString();
 		if (!clientId) return fail(400);
 
-		const db = initDrizzle(platform);
+		const db = locals.db;
 		db.delete(users).where(eq(users.id, clientId));
 	},
 
-	transferClient: async ({ platform, request }) => {
+	transferClient: async ({ locals, request }) => {
 		const data = await request.formData();
 		const trainerId = data.get('newTrainerId');
 		const clientId = data.get('clientId');
 		if (!trainerId || !clientId) return fail(400);
 
-		await initDrizzle(platform)
+		await locals.db
 			.update(clients)
 			.set({ trainerId: trainerId.toString() })
 			.where(eq(clients.id, clientId.toString()));
 	},
 
-	createToken: async ({ platform, locals }) => {
+	createToken: async ({ locals }) => {
 		if (!locals.user?.id) return fail(400);
-		await initDrizzle(platform).insert(signupTokens).values({
+		await locals.db.insert(signupTokens).values({
 			trainerId: locals.user.id
 		});
 		return redirect(302, '/clients');
 	},
 
-	deleteToken: async ({ platform, request }) => {
+	deleteToken: async ({ locals, request }) => {
 		const signupTokenId = (await request.formData()).get('signupTokenId');
 		if (!signupTokenId) return fail(500, { message: 'Signup token is undefined' });
 
-		await initDrizzle(platform)
+		await locals.db
 			.delete(signupTokens)
 			.where(eq(signupTokens.id, Number(signupTokenId.toString())));
 	}
