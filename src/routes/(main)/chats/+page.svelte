@@ -34,7 +34,7 @@
 			/>
 		</form>
 		<div class="messageList">
-			<MessageList messages={data.selectedChat.messages} />
+			<MessageList messages={data.selectedChat.messages} userName={data.userName} />
 		</div>
 		<form method="POST" action="?/sendMessage" class="messageBox">
 			<input type="hidden" name="chatId" value={data.selectedChat.id} />

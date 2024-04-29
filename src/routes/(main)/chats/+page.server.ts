@@ -19,6 +19,7 @@ export async function load({ url, locals }) {
 		: null;
 
 	return {
+		userName: locals.user.name,
 		chats,
 		selectedChat,
 		usersForNewChat,
