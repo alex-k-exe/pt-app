@@ -103,11 +103,12 @@ export async function getUsersForNewChat(
 		const trainerId = (
 			await db
 				.select({ trainerId: clients.trainerId })
-				.from(trainers)
-				.innerJoin(clients, eq(users.id, clients.id))
-				.where(eq(users.id, userId))
+				.from(clients)
+				.innerJoin(users, eq(users.id, clients.id))
+				.where(eq(clients.id, userId))
 				.limit(1)
 		)[0].trainerId;
+		// here foundTrainers will just be the client's trainer
 		foundTrainers = await db
 			.select({ id: users.id, name: users.name })
 			.from(trainers)
@@ -116,12 +117,7 @@ export async function getUsersForNewChat(
 			.limit(1);
 	}
 
-	const foundClients = await db
-		.select({ id: users.id, name: users.name })
-		.from(clients)
-		.innerJoin(users, eq(users.id, clients.id))
-		.where(eq(clients.trainerId, userId))
-		.orderBy(users.name);
+	const foundClients = await getTrainersClients(db, userId);
 
 	return [...foundTrainers, ...foundClients].filter((trainer) => {
 		return !chats.some((chat) => chat.otherUsersId !== trainer.id);

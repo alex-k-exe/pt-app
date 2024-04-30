@@ -29,7 +29,7 @@ export async function handle({ event, resolve }) {
 
 	if (!session || !session.fresh) {
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
+			path: '/',
 			...sessionCookie.attributes
 		});
 	}

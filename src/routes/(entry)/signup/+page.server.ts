@@ -4,9 +4,8 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { signupTokenSchema } from './schema.ts';
 
-export async function load({ url }) {
+export async function load() {
 	return {
-		asyncValidationError: url.searchParams.get('error'),
 		form: await superValidate(zod(z.object({ signupToken: signupTokenSchema })))
 	};
 }
@@ -21,7 +20,7 @@ export const actions = {
 
 		return redirect(
 			302,
-			`/signup/${form.data.signupToken}/` +
+			`/signup/${form.data.signupToken}` +
 				(targetPath === undefined ? '' : `?targetPath=${targetPath}`)
 		);
 	}

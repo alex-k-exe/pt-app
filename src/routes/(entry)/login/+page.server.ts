@@ -38,11 +38,11 @@ export const actions = {
 		const session = await event.locals.lucia.createSession(existingUser[0].id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: '.',
+			path: '/',
 			...sessionCookie.attributes
 		});
 		event.cookies.set('userType', client.length === 1 ? userTypes.CLIENT : userTypes.TRAINER, {
-			path: '.'
+			path: '/'
 		});
 
 		return redirect(302, event.url.searchParams.get('targetPath') ?? '/workouts');

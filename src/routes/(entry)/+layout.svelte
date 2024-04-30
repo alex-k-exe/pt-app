@@ -11,3 +11,5 @@
 </div>
 
 <slot />
+
+<p class="text-red-500">{data.error ?? ''}</p>
