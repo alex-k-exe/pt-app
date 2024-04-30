@@ -12,7 +12,7 @@
 
 <h1>Clients and signup tokens</h1>
 
-<div class="flex w-full flex-row justify-around gap-10">
+<div class="w-full flex-row justify-around gap-10 sm:inline-block md:flex">
 	<div class="w-full">
 		<ClientsTable clients={data.clients} trainers={data.trainers} />
 	</div>

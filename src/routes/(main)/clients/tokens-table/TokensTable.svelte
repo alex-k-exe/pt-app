@@ -25,8 +25,8 @@
 	]);
 </script>
 
-<form method="POST" action="?/createToken" class="flex gap-4 pb-5 align-middle">
-	<h2>Sign up tokens</h2>
+<h2>Sign up tokens</h2>
+<form method="POST" action="?/createToken">
 	<Button type="submit">Create a new token</Button>
 </form>
 <DataTable {table} {columns} />

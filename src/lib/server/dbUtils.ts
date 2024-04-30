@@ -53,8 +53,7 @@ export async function getChats(db: DrizzleD1Database, userId: string) {
 			return {
 				...chat,
 				otherUsersName: await getOtherUsersName(db, chat),
-				hasBeenRead: ((await getMostRecentMessage(db, chat)) ?? { readByreciever: true })
-					.readByReciever
+				hasBeenRead: (await getMostRecentMessage(db, chat))?.readByReciever ?? true
 			};
 		})
 	);
@@ -119,8 +118,8 @@ export async function getUsersForNewChat(
 
 	const foundClients = await getTrainersClients(db, userId);
 
-	return [...foundTrainers, ...foundClients].filter((trainer) => {
-		return !chats.some((chat) => chat.otherUsersId !== trainer.id);
+	return [...foundTrainers, ...foundClients].filter((user) => {
+		return !chats.some((chat) => chat.otherUsersId == user.id);
 	});
 }
 
