@@ -53,7 +53,8 @@ export async function getChats(db: DrizzleD1Database, userId: string) {
 			return {
 				...chat,
 				otherUsersName: await getOtherUsersName(db, chat),
-				hasBeenRead: (await getMostRecentMessage(db, chat)).readByReciever
+				hasBeenRead: ((await getMostRecentMessage(db, chat)) ?? { readByreciever: true })
+					.readByReciever
 			};
 		})
 	);
@@ -71,14 +72,13 @@ async function getOtherUsersName(db: DrizzleD1Database, chat: { otherUsersId: st
 
 /** Get the most recent mesage from the chat */
 async function getMostRecentMessage(db: DrizzleD1Database, chat: { id: number }) {
-	return (
-		await db
-			.select()
-			.from(messages)
-			.limit(1)
-			.orderBy(messages.sentTimestamp)
-			.where(eq(messages.chatId, chat.id))
-	)[0];
+	const message = await db
+		.select()
+		.from(messages)
+		.limit(1)
+		.orderBy(messages.sentTimestamp)
+		.where(eq(messages.chatId, chat.id));
+	return message.length === 1 ? message[0] : null;
 }
 
 /**

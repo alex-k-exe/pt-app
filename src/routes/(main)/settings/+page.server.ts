@@ -33,7 +33,7 @@ export const actions = {
 			.where(eq(users.id, userId));
 	},
 
-	deleteAccount: async ({ cookies, locals, platform }) => {
+	deleteAccount: async ({ cookies, locals }) => {
 		const userId = locals.user?.id;
 		if (!userId) return redirect(302, '/login?targetPath=/settings');
 

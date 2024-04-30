@@ -39,7 +39,7 @@
 			variant="outline"
 		>
 			<p style="font-size: 20px">{chat.otherUsersName}</p>
-			<p>No new messages</p>
+			<p>{chat.hasBeenRead ? 'No new messages' : 'New message(s)'}</p>
 		</Button>
 	</a>
 {/each}

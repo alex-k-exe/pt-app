@@ -4,7 +4,7 @@ import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
 
-export async function load({ locals, platform }) {
+export async function load({ locals }) {
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 
 	const db = locals.db;
