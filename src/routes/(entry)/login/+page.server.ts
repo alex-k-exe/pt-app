@@ -7,7 +7,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from './schema.ts';
 
-export async function load({ locals }) {
+export async function load() {
 	return {
 		form: await superValidate(zod(formSchema))
 	};

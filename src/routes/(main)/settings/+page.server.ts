@@ -1,17 +1,22 @@
 import { clients, users } from '$lib/drizzleTables';
 import { fail, redirect, type Cookies } from '@sveltejs/kit';
 import { eq, or } from 'drizzle-orm';
+import { Scrypt } from 'lucia';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { formSchema } from './schema';
+import { emailSchema, nameSchema, passwordSchema } from './schema';
 
 export async function load(event) {
 	if (!event.locals.user?.id) return redirect(302, '/login?targetPath=/settings');
-	const db = event.locals.db;
 
 	return {
 		user: event.locals.user,
-		form: await superValidate(event, zod(await formSchema(db, event.locals.user.id)))
+		nameSchema: await superValidate(event, zod(nameSchema)),
+		emailSchema: await superValidate(event, zod(await emailSchema(event.locals.db))),
+		passwordSchema: await superValidate(
+			event,
+			zod(await passwordSchema(event.locals.db, event.locals.user.id))
+		)
 	};
 }
 
@@ -20,16 +25,36 @@ export const actions = {
 		return await signout(cookies, locals);
 	},
 
-	updateAccount: async (event) => {
+	updateName: async (event) => {
 		const userId = event.locals.user?.id;
 		if (!userId) return redirect(302, '/login');
 		const db = event.locals.db;
-		let form = await superValidate(event, zod(await formSchema(db, userId)));
+		const form = await superValidate(event, zod(nameSchema));
+		if (!form.valid) return fail(400, { form });
+
+		await db.update(users).set({ name: form.data.newName }).where(eq(users.id, userId));
+	},
+
+	updateEmail: async (event) => {
+		const userId = event.locals.user?.id;
+		if (!userId) return redirect(302, '/login');
+		const db = event.locals.db;
+		const form = await superValidate(event, zod(await emailSchema(db)));
+		if (!form.valid) return fail(400, { form });
+
+		await db.update(users).set({ email: form.data.newEmail }).where(eq(users.id, userId));
+	},
+
+	updatePassword: async (event) => {
+		const userId = event.locals.user?.id;
+		if (!userId) return redirect(302, '/login');
+		const db = event.locals.db;
+		const form = await superValidate(event, zod(await passwordSchema(db, userId)));
 		if (!form.valid) return fail(400, { form });
 
 		await db
 			.update(users)
-			.set({ password: form.data.newPassword, email: form.data.newEmail })
+			.set({ password: await new Scrypt().hash(form.data.newPassword) })
 			.where(eq(users.id, userId));
 	},
 
