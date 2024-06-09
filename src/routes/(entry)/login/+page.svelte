@@ -23,8 +23,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="password">
-		<Form.Control let:attrs>
-			<Form.Label>Password</Form.Label>
+		<Form.Control>
 			<FormPassword bind:value={$formData.password} />
 		</Form.Control>
 		<Form.FieldErrors />

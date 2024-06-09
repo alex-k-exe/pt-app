@@ -29,10 +29,7 @@
 
 	if (!validActiveDays.test($formData.activeDays)) $formData.activeDays = '0000000';
 	let activeDays = $formData.activeDays.split('').map((active) => active === '1');
-	$: {
-		$formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join('');
-		console.log($formData.activeDays);
-	}
+	$: $formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join('');
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>

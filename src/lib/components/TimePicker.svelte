@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
 	import { dayjs } from '$lib/utils/dates';
 	import z from 'zod';
+	import Input from './ui/input/input.svelte';
 
 	export let selectedDate = new Date();
 
@@ -11,46 +11,37 @@
 		PM: 'PM'
 	} as const;
 
-	const selectedTime: { hours: string; minutes: string; amOrPm: keyof typeof AmOrPm } = {
-		hours: (selectedDate.getHours() % 12).toString(),
-		minutes: dayjs(selectedDate).format('mm'),
+	let inputHours = selectedDate.getHours() % 12;
+	let inputMinutes = Number(dayjs(selectedDate).format('mm'));
+
+	const selectedTime: { hours: number; minutes: number; amOrPm: keyof typeof AmOrPm } = {
+		hours: inputHours,
+		minutes: inputMinutes,
 		amOrPm: selectedDate.getHours() >= 12 ? 'PM' : 'AM'
 	};
-	$: selectedDate = dayjs(
-		`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
-		'h:mm A'
-	).toDate();
 
-	const hourSchema = z.string().min(1).max(2).regex(/\d+$/);
-	const minutesSchema = z
-		.string()
-		.length(2)
-		.regex(/\d{2}$/);
+	const hourSchema = z.number().min(0).max(12);
+	const minutesSchema = z.number().min(0).max(59);
 
-	function handleHoursChange(value: unknown, changingHours: boolean) {
-		const validatedValue = (changingHours ? hourSchema : minutesSchema).safeParse(value);
-		if (!validatedValue.success) console.log(validatedValue.error);
-		else console.log(validatedValue.data);
-		if (changingHours) {
-			selectedTime.hours = validatedValue.success ? validatedValue.data : selectedTime.hours;
-		} else {
-			selectedTime.minutes = validatedValue.success ? validatedValue.data : selectedTime.minutes;
-		}
+	$: console.log(inputHours);
+	$: {
+		if (hourSchema.safeParse(inputHours)) selectedTime.hours = inputHours;
+		else break $;
+
+		if (minutesSchema.safeParse(inputMinutes)) selectedTime.minutes = inputMinutes;
+		else break $;
+
+		selectedDate = dayjs(
+			`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
+			'h:mm A'
+		).toDate();
 	}
 </script>
 
 <div class="flex items-center">
-	<Input
-		value={selectedTime.hours}
-		on:change={(value) => handleHoursChange(value, true)}
-		placeholder="9"
-	/>
+	<Input bind:value={inputHours} placeholder="9" class="w-fit" on:input={() => console.log(23)} />
 	:
-	<Input
-		value={selectedTime.minutes}
-		on:change={(value) => handleHoursChange(value, false)}
-		placeholder="05"
-	/>
+	<Input bind:value={inputMinutes} placeholder="5" class="w-fit" />
 
 	<Select.Root
 		selected={{ value: selectedTime.amOrPm, label: selectedTime.amOrPm }}
