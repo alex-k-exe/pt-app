@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FormPassword from '$lib/components/ui/FormPassword.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import { superForm } from 'sveltekit-superforms';
@@ -24,7 +25,7 @@
 	<Form.Field {form} name="password">
 		<Form.Control let:attrs>
 			<Form.Label>Password</Form.Label>
-			<Input type="password" bind:value={$formData.password} {...attrs} class="w-fit" />
+			<FormPassword bind:value={$formData.password} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
