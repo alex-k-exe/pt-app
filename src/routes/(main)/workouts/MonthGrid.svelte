@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Activity } from '$lib/drizzleTables';
-	import { dayOnlyFormat, daysOfTheWeek } from '$lib/utils/types';
+	import { daysOfTheWeek, validDate } from '$lib/utils/types';
 	import type dayjs from 'dayjs';
 	import DayCell from './DayCell.svelte';
 
@@ -17,7 +17,7 @@
 	{#each month as week, weekIndex}
 		{#each week as day}
 			<div class="h-full w-full" style={`grid-column: ${day.day()}; grid-row:${weekIndex + 2}`}>
-				<DayCell workouts={workouts.get(day.format(dayOnlyFormat)) ?? []} {day} />
+				<DayCell workouts={workouts.get(day.format(validDate.format)) ?? []} {day} />
 			</div>
 		{/each}
 	{/each}

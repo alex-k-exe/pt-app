@@ -1,9 +1,10 @@
 import { activities, series, sets, users, workouts, type Activity } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients } from '$lib/server/dbUtils.js';
 import { dayjs } from '$lib/utils/dates';
-import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
+import { userTypes, validDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, isNull } from 'drizzle-orm';
+import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { FormActivity } from '../schema.js';
@@ -15,11 +16,13 @@ import { formSchema } from './schema.js';
 export async function load({ url, locals }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const dateString = url.searchParams.get('date');
-	const date = validMonthDate.test(dateString ?? '')
-		? dayjs(dateString, 'MM-YYYY').toDate()
+	const date = validDate.regex.test(dateString ?? '')
+		? dayjs(dateString, validDate.format).toDate()
 		: new Date();
 
-	let workout: FormActivity & { date: Date } = {
+	const workoutId = url.searchParams.get('workoutId');
+	let clientOfWorkoutName: string | null = null;
+	const workout: FormActivity & { date: Date } = (await getWorkout(workoutId, locals.db)) ?? {
 		clientId: '',
 		trainerId: locals.user.id, // only trainers can make a new workout
 		title: '',
@@ -29,34 +32,9 @@ export async function load({ url, locals }) {
 		series: [],
 		sets: []
 	};
-
-	const db = locals.db;
-	const workoutId = Number(url.searchParams.get('workoutId'));
-	let clientOfWorkoutName: string = '';
 	if (workoutId) {
-		workout = {
-			...(
-				await db
-					.select()
-					.from(workouts)
-					.innerJoin(activities, eq(activities.id, workouts.id))
-					.limit(1)
-					.where(eq(workouts.id, workoutId))
-			).map((workout) => {
-				return { date: workout.workouts.date, ...workout.activities };
-			})[0],
-			series: [],
-			sets: []
-		};
-		workout.series = await getSeries(db, workoutId);
-		workout.sets = await db
-			.select()
-			.from(sets)
-			.orderBy(sets.index)
-			.where(and(eq(sets.id, workoutId), isNull(sets.seriesId)));
-
 		clientOfWorkoutName = (
-			await db
+			await locals.db
 				.select({ name: users.name })
 				.from(users)
 				.limit(1)
@@ -71,7 +49,7 @@ export async function load({ url, locals }) {
 
 	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		trainersClients = await getTrainersClients(db, locals.user.id);
+		trainersClients = await getTrainersClients(locals.db, locals.user.id);
 		if (trainersClients.length === 0) {
 			return redirect(
 				302,
@@ -127,7 +105,10 @@ export const actions = {
 			});
 		});
 
-		return redirect(302, `/workouts/day-view?date=${dayjs(form.data.date).format(dayOnlyFormat)}`);
+		return redirect(
+			302,
+			`/workouts/day-view?date=${dayjs(form.data.date).format(validDate.format)}`
+		);
 	},
 
 	delete: async ({ locals, url }) => {
@@ -141,3 +122,29 @@ export const actions = {
 		return redirect(302, '/workouts' + date ? `?month=${date}` : '');
 	}
 };
+
+async function getWorkout(workoutId: string | number | null, db: DrizzleD1Database) {
+	workoutId = Number(workoutId);
+	if (!workoutId) return null;
+	const dbWorkout = await db
+		.select()
+		.from(workouts)
+		.innerJoin(activities, eq(activities.id, workouts.id))
+		.limit(1)
+		.where(eq(workouts.id, workoutId));
+	if (dbWorkout.length === 0) return null;
+	const workout: FormActivity & { date: Date } = {
+		date: dbWorkout[0].workouts.date,
+		...dbWorkout[0].activities,
+		series: [],
+		sets: []
+	};
+	workout.series = await getSeries(db, workoutId);
+	workout.sets = await db
+		.select()
+		.from(sets)
+		.orderBy(sets.index)
+		.where(and(eq(sets.id, workoutId), isNull(sets.seriesId)));
+
+	return workout;
+}

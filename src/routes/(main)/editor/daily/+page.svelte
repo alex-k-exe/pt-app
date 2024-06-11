@@ -32,6 +32,18 @@
 	$: $formData.activeDays = activeDays.map((active) => (active ? '1' : '0')).join('');
 </script>
 
+{#if data.daily.id}
+	<div class="flex gap-2">
+		<form method="POST" action="?/delete">
+			<input type="hidden" name="id" value={data.daily.id} />
+			<DestructiveButton triggerText="Delete" />
+		</form>
+		<a href={`/editor/daily?dailyId=${data.daily.id}&duplicate=true`}>
+			<Button>Duplicate</Button>
+		</a>
+	</div>
+{/if}
+
 <form method="POST" action="?/insertOrUpdate" use:enhance>
 	<div class="flex">
 		<Form.Field {form} name="title">
@@ -95,18 +107,6 @@
 			</Select.Group>
 		</Select.Content>
 	</Select.Root>
-
-	{#if data.daily.id}
-		<div class="flex gap-2">
-			<form method="POST" action="?/delete">
-				<input type="hidden" name="id" value={data.daily.id} />
-				<DestructiveButton triggerText="Delete" />
-			</form>
-			<a href={`/editor/daily?dailyId=${data.daily.id}&duplicate=true`}>
-				<Button>Duplicate</Button>
-			</a>
-		</div>
-	{/if}
 
 	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />
 </form>

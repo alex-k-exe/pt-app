@@ -2,14 +2,14 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Activity } from '$lib/drizzleTables';
 	import { datesAreSameDay, dayjs } from '$lib/utils/dates';
-	import { dayOnlyFormat, timeOnlyFormat } from '$lib/utils/types';
+	import { timeOnlyFormat, validDate } from '$lib/utils/types';
 
 	export let day: dayjs.Dayjs;
 	export let workouts: (Activity & { clientsName: string | null; date: Date })[];
 </script>
 
 <a
-	href={'/workouts/day-view?date=' + day.format(dayOnlyFormat)}
+	href={'/workouts/day-view?date=' + day.format(validDate.format)}
 	class={datesAreSameDay(day, dayjs()) ? 'text-red-500' : ''}
 >
 	{day.format(day.date() === 1 ? 'MMM D' : 'D')}

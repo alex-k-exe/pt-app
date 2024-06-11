@@ -1,7 +1,7 @@
 import { activities, clients, users, workouts, type Activity } from '$lib/drizzleTables';
 import { getTrainersClients } from '$lib/server/dbUtils.js';
 import { dayjs } from '$lib/utils/dates';
-import { dayOnlyFormat, userTypes, validMonthDate } from '$lib/utils/types';
+import { userTypes, validDate, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, ne, or } from 'drizzle-orm';
 import type { User } from 'lucia';
@@ -10,7 +10,7 @@ import { yearSchema } from './schema.js';
 export async function load(event) {
 	if (!event.locals.user?.id || !event.locals.userType) return redirect(302, '/login');
 	const monthString = event.url.searchParams.get('month');
-	const month = validMonthDate.test(monthString ?? '')
+	const month = validMonthDate.regex.test(monthString ?? '')
 		? dayjs(monthString, 'MM-YYYY').toDate()
 		: new Date();
 
@@ -66,7 +66,7 @@ export async function load(event) {
 			};
 		})
 		.forEach((workout) => {
-			const dateKey = dayjs(workout.date).format(dayOnlyFormat);
+			const dateKey = dayjs(workout.date).format(validDate.format);
 			if (!groupedWorkouts.has(dateKey)) groupedWorkouts.set(dateKey, []);
 			groupedWorkouts.get(dateKey)!.push(workout);
 		});

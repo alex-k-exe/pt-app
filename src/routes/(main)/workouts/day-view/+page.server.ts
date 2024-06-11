@@ -1,18 +1,17 @@
 import { activities, clients, users, workouts } from '$lib/drizzleTables';
 import { dayjs } from '$lib/utils/dates';
-import { dayOnlyFormat, userTypes } from '$lib/utils/types';
+import { userTypes, validDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function load({ locals, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const date = url.searchParams.get('date')
-		? dayjs(url.searchParams.get('date'), dayOnlyFormat).toDate()
+		? dayjs(url.searchParams.get('date'), validDate.format).toDate()
 		: new Date();
 
-	const db = locals.db;
 	const foundWorkouts = (
-		await db
+		await locals.db
 			.select()
 			.from(activities)
 			.innerJoin(workouts, eq(activities.id, workouts.id))
@@ -33,7 +32,7 @@ export async function load({ locals, url }) {
 		else
 			clientsNames = [
 				(
-					await db
+					await locals.db
 						.select({ name: users.name })
 						.from(users)
 						.innerJoin(clients, eq(clients.id, users.id))
@@ -52,7 +51,7 @@ export async function load({ locals, url }) {
 }
 
 export const actions = {
-	delete: async ({ locals, request }) => {
+	default: async ({ locals, request }) => {
 		const workoutId = (await request.formData()).get('workoutId');
 		if (!workoutId) return fail(400);
 		await locals.db.delete(activities).where(eq(activities.id, Number(workoutId.toString())));

@@ -14,7 +14,7 @@
 	// TODO: jank
 	const activityType = 'activeDays' in activity ? 'daily' : 'workout';
 
-	let activeDays: { day: string; isActive: boolean }[];
+	let activeDays: { day: string; isActive: boolean }[] = [];
 	if ('activeDays' in activity) {
 		if (!validActiveDays.test(activity.activeDays)) activity.activeDays = '0000000';
 		activeDays = activity.activeDays.split('').map((activeDay, i) => {

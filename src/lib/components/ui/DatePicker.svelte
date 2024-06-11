@@ -11,7 +11,7 @@
 
 	let value = new CalendarDate(
 		selectedDate.getFullYear(),
-		selectedDate.getMonth(),
+		selectedDate.getMonth() + 1,
 		selectedDate.getDate()
 	);
 	const df = new DateFormatter('en-US', {

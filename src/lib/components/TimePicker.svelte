@@ -23,7 +23,6 @@
 	const hourSchema = z.number().min(0).max(12);
 	const minutesSchema = z.number().min(0).max(59);
 
-	$: console.log(inputHours);
 	$: {
 		if (hourSchema.safeParse(inputHours)) selectedTime.hours = inputHours;
 		else break $;
@@ -39,7 +38,7 @@
 </script>
 
 <div class="flex items-center">
-	<Input bind:value={inputHours} placeholder="9" class="w-fit" on:input={() => console.log(23)} />
+	<Input bind:value={inputHours} placeholder="9" class="w-fit" />
 	:
 	<Input bind:value={inputMinutes} placeholder="5" class="w-fit" />
 
