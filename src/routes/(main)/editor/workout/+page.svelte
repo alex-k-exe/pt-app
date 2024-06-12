@@ -3,7 +3,6 @@
 	import SelectClient from '$lib/components/SelectClient.svelte';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import DatePicker from '$lib/components/ui/DatePicker.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
@@ -82,23 +81,14 @@
 	</Select.Root>
 
 	{#if data.workout.id}
-		<div class="flex gap-2">
-			<form method="POST" action="?/delete" bind:this={deleteForm}>
-				<input
-					type="hidden"
-					value={dayjs(data.workout.date).format(validDate.format)}
-					name="date"
-				/>
-				<input type="hidden" value={data.workout.id} name="workoutId" />
-				<DestructiveButton
-					triggerText="Delete this workout"
-					on:confirm={() => deleteForm.requestSubmit()}
-				/>
-			</form>
-			<a href={`/editor/workout?workoutId=${data.workout.id}&duplicate=true`}>
-				<Button>Duplicate</Button>
-			</a>
-		</div>
+		<form method="POST" action="?/delete" bind:this={deleteForm}>
+			<input type="hidden" value={dayjs(data.workout.date).format(validDate.format)} name="date" />
+			<input type="hidden" value={data.workout.id} name="workoutId" />
+			<DestructiveButton
+				triggerText="Delete this workout"
+				on:confirm={() => deleteForm.requestSubmit()}
+			/>
+		</form>
 	{/if}
 
 	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />

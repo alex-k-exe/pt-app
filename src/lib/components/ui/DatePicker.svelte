@@ -22,7 +22,6 @@
 
 	$: {
 		selectedDate = value.toDate(getLocalTimeZone());
-		console.log('3', selectedDate);
 		selectedDateString = dayjs(selectedDate).format(validDate.format);
 	}
 </script>

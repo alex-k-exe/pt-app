@@ -11,7 +11,7 @@ import { formSchema } from './schema';
 // If given, use the dailyId to get daily (i.e. Activity) along with its Series and Sets
 // If User is a Trainer, find the names of their clients and attach the name of the client to the daily
 // Otherwise make a new daily
-export async function load({ url, locals, platform }) {
+export async function load({ url, locals }) {
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 
 	let daily: FormActivity & { activeDays: string } = {
@@ -19,8 +19,6 @@ export async function load({ url, locals, platform }) {
 		clientId: '',
 		trainerId: locals.user.id, // only trainers can make a new daily
 		title: '',
-		startTime: new Date(),
-		endTime: new Date(),
 		series: [],
 		sets: []
 	};
@@ -53,11 +51,6 @@ export async function load({ url, locals, platform }) {
 		clientOfDailyName = (
 			await db.select({ name: users.name }).from(users).limit(1).where(eq(users.id, daily.clientId))
 		)[0].name;
-	}
-
-	const duplicateString = url.searchParams.get('duplicate');
-	if (duplicateString && duplicateString !== 'false' && duplicateString !== '0') {
-		daily.id = undefined;
 	}
 
 	let trainersClients: { id: string; name: string }[] | null = null;
@@ -122,7 +115,7 @@ export const actions = {
 		return redirect(302, '/dailies');
 	},
 
-	delete: async ({ request, platform, locals }) => {
+	delete: async ({ request, locals }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
 		const id = (await request.formData()).get('id');
 		if (!id) return fail(500);

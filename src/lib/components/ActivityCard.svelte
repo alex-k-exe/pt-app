@@ -7,7 +7,7 @@
 
 	export let activity: Activity & { clientsName: string | null } & (
 			| { activeDays: string }
-			| { date: dayjs.Dayjs; startTime: dayjs.Dayjs; endTime: dayjs.Dayjs }
+			| { date: string; startTime: string; endTime: string }
 		);
 	export let userType: ObjectValues<typeof userTypes>;
 
@@ -48,10 +48,7 @@
 	<Card.Footer class="flex gap-[5px]">
 		<form method="POST" bind:this={form}>
 			<input type="hidden" name={`${activityType}Id`} value={activity.id} />
-			<DestructiveButton
-				triggerText={`Delete this ${activityType}`}
-				on:confirm={() => form.requestSubmit()}
-			/>
+			<DestructiveButton triggerText={`Delete`} on:confirm={() => form.requestSubmit()} />
 		</form>
 		<a href={`/editor/${activityType}?${activityType}Id=${activity.id}`}>
 			<Button>Edit</Button>

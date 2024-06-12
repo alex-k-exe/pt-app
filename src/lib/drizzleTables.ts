@@ -46,7 +46,7 @@ export const signupTokens = sqliteTable('signupTokens', {
 		.primaryKey()
 		.$defaultFn(() => generateSignupToken()),
 	trainerId: text('trainerId').references(() => trainers.id, { onDelete: 'cascade' }),
-	creationTimeDate: text('creationTimestamp')
+	creationTimestamp: text('creationTimestamp')
 		.notNull()
 		.default(sql`(CURRENT_TIMESTAMP)`)
 });

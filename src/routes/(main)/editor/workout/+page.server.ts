@@ -46,11 +46,6 @@ export async function load({ url, locals }) {
 		)[0].name;
 	}
 
-	const duplicateString = url.searchParams.get('duplicate');
-	if (duplicateString && duplicateString !== 'false' && duplicateString !== '0') {
-		workout.id = undefined;
-	}
-
 	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
 		trainersClients = await getTrainersClients(locals.db, locals.user.id);
@@ -85,20 +80,14 @@ export const actions = {
 					.where(eq(activities.id, form.data.id))
 					.returning()
 			)[0];
-			const thing = await db
-				.update(workouts)
-				.set(form.data)
-				.where(eq(workouts.id, form.data.id))
-				.returning();
 			await db.batch([
+				db.update(workouts).set(form.data).where(eq(workouts.id, form.data.id)),
 				db.delete(series).where(eq(series.id, dbActivity.id)),
 				db.delete(sets).where(eq(sets.id, dbActivity.id))
 			]);
-			console.log('here bozo', thing[0].date);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			const thing = await db.insert(workouts).values(form.data).returning();
-			console.log('here bozo', thing[0].date);
+			await db.insert(workouts).values(form.data).returning();
 		}
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (

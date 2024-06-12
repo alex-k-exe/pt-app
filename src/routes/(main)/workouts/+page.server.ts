@@ -7,27 +7,22 @@ import { and, between, eq, ne, or } from 'drizzle-orm';
 import type { User } from 'lucia';
 import { yearSchema } from './schema.js';
 
-export async function load(event) {
-	if (!event.locals.user?.id || !event.locals.userType) return redirect(302, '/login');
-	const monthString = event.url.searchParams.get('month');
+export async function load({ locals, url }) {
+	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
+	const monthString = url.searchParams.get('month');
 	const month = validMonthDate.regex.test(monthString ?? '')
 		? dayjs(monthString, validMonthDate.format).startOf('month')
 		: dayjs().startOf('month');
 
-	console.log(1);
-	const db = event.locals.db;
-	const selectedClientId = event.url.searchParams.get('clientId');
+	const selectedClientId = url.searchParams.get('clientId');
 	const foundWorkouts = (
-		await db
+		await locals.db
 			.select()
 			.from(activities)
 			.innerJoin(workouts, eq(activities.id, workouts.id))
 			.where(
 				and(
-					or(
-						eq(activities.clientId, event.locals.user?.id),
-						eq(activities.trainerId, event.locals.user?.id)
-					),
+					or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id)),
 					between(
 						workouts.date,
 						month.format(validMonthDate.format),
@@ -45,14 +40,13 @@ export async function load(event) {
 			endTime: dayjs(workout.workouts.endTime, validTime)
 		};
 	});
-	console.log(2);
 
 	let clientsInWorkoutsNames: string[] | null = null;
 	let trainersClients: User[] | null = null;
-	if (event.locals.userType === userTypes.TRAINER) {
+	if (locals.userType === userTypes.TRAINER) {
 		clientsInWorkoutsNames = await Promise.all(
 			foundWorkouts.map(async (workout) => {
-				const names = await db
+				const names = await locals.db
 					.select({ clientsName: users.name })
 					.from(users)
 					.innerJoin(clients, eq(users.id, clients.id))
@@ -61,9 +55,8 @@ export async function load(event) {
 				return names.length > 0 ? names[0].clientsName : 'No client found';
 			})
 		);
-		trainersClients = await getTrainersClients(db, event.locals.user.id);
+		trainersClients = await getTrainersClients(locals.db, locals.user.id);
 	}
-	console.log(3);
 
 	const groupedWorkouts = new Map<
 		string,

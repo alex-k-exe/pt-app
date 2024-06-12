@@ -25,7 +25,6 @@
 	};
 
 	$: {
-		console.log('didi it');
 		if (hourSchema.safeParse(inputHours)) selectedTime.hours = inputHours;
 		else break $;
 

@@ -10,9 +10,9 @@ export const userTypes = {
 	TRAINER: 'Trainer'
 } as const;
 
-export const validMonthDate = { regex: /^(0[1-9]|1[0-2])-[0-9]{4}$/, format: 'YYYY-MM' };
+export const validMonthDate = { regex: /(?:19|20)\d{2}-(?:0[1-9]|1[0-2])/, format: 'YYYY-MM' };
 export const validDate = {
-	regex: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\d{2})$/,
+	regex: /(?:19|20)\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])/,
 	format: 'YYYY-MM-DD'
 };
 export const validTime = 'HH:MM:ss';

@@ -2,18 +2,17 @@ import { activities, clients, dailies, users, type User } from '$lib/drizzleTabl
 import { getTrainersClients } from '$lib/server/dbUtils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq, or } from 'drizzle-orm';
+import { desc, eq, or } from 'drizzle-orm';
 
 export async function load({ locals }) {
 	if (!locals.user?.id || !locals.userType) return redirect(302, '/login');
 
-	const db = locals.db;
 	const foundDailies = (
-		await db
+		await locals.db
 			.select()
 			.from(activities)
 			.innerJoin(dailies, eq(activities.id, dailies.id))
-			.orderBy(activities.startTime)
+			.orderBy(desc(dailies.activeDays))
 			.where(or(eq(activities.clientId, locals.user.id), eq(activities.trainerId, locals.user.id)))
 	).map((daily) => {
 		return { ...daily.activities, activeDays: daily.dailies.activeDays };
@@ -24,7 +23,7 @@ export async function load({ locals }) {
 	if (locals.userType === userTypes.TRAINER) {
 		clientsInWorkoutsNames = await Promise.all(
 			foundDailies.map(async (workout) => {
-				const names = await db
+				const names = await locals.db
 					.select({ clientsName: users.name })
 					.from(users)
 					.innerJoin(clients, eq(users.id, clients.id))
@@ -34,7 +33,7 @@ export async function load({ locals }) {
 			})
 		);
 
-		trainersClients = await getTrainersClients(db, locals.user.id);
+		trainersClients = await getTrainersClients(locals.db, locals.user.id);
 	}
 
 	return {
@@ -46,7 +45,7 @@ export async function load({ locals }) {
 }
 
 export const actions = {
-	default: async ({ request, platform, locals }) => {
+	default: async ({ request, locals }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
 		const dailyId = (await request.formData()).get('dailyId')?.toString();
 		if (!dailyId) return fail(400);
