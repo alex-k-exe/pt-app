@@ -7,7 +7,7 @@
 
 	export let activity: Activity & { clientsName: string | null } & (
 			| { activeDays: string }
-			| { date: Date }
+			| { date: dayjs.Dayjs; startTime: dayjs.Dayjs; endTime: dayjs.Dayjs }
 		);
 	export let userType: ObjectValues<typeof userTypes>;
 

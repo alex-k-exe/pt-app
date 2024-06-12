@@ -6,9 +6,9 @@ import { and, eq, or } from 'drizzle-orm';
 
 export async function load({ locals, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
-	const date = url.searchParams.get('date')
-		? dayjs(url.searchParams.get('date'), validDate.format).toDate()
-		: new Date();
+	const date = validDate.regex.test(url.searchParams.get('date') ?? '')
+		? dayjs(url.searchParams.get('date'), validDate.format)
+		: dayjs();
 
 	const foundWorkouts = (
 		await locals.db
@@ -18,28 +18,27 @@ export async function load({ locals, url }) {
 			.where(
 				and(
 					or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id)),
-					eq(workouts.date, date)
+					eq(workouts.date, date.format(validDate.format))
 				)
 			)
-			.orderBy(activities.startTime)
+			.orderBy(workouts.startTime)
 	).map((workout) => {
 		return { ...workout.workouts, ...workout.activities };
 	});
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		if (foundWorkouts.length === 0) clientsNames = [];
-		else
-			clientsNames = [
-				(
-					await locals.db
-						.select({ name: users.name })
-						.from(users)
-						.innerJoin(clients, eq(clients.id, users.id))
-						.limit(1)
-						.where(eq(users.id, foundWorkouts[0].clientId))
-				)[0].name
-			];
+		clientsNames = await Promise.all(
+			foundWorkouts.map(async (workout) => {
+				const client = await locals.db
+					.select({ name: users.name })
+					.from(users)
+					.innerJoin(clients, eq(clients.id, users.id))
+					.limit(1)
+					.where(eq(users.id, workout.clientId));
+				return client[0].name;
+			})
+		);
 	}
 
 	return {

@@ -2,10 +2,10 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { Activity } from '$lib/drizzleTables';
 	import { datesAreSameDay, dayjs } from '$lib/utils/dates';
-	import { timeOnlyFormat, validDate } from '$lib/utils/types';
+	import { validDate } from '$lib/utils/types';
 
 	export let day: dayjs.Dayjs;
-	export let workouts: (Activity & { clientsName: string | null; date: Date })[];
+	export let workouts: (Activity & { clientsName: string | null; date: dayjs.Dayjs, startTime: dayjs.Dayjs, endTime: dayjs.Dayjs })[];
 </script>
 
 <a
@@ -21,9 +21,9 @@
 	{#each workouts as workout}
 		<a class="w-full" href={`/editor/workout?workoutId=${workout.id}`}>
 			<Button variant="secondary" size="sm">
-				{workout.clientsName ?? workout.title}: from {dayjs(workout.startTime).format(
-					timeOnlyFormat
-				)} to {dayjs(workout.endTime).format(timeOnlyFormat)}
+				{workout.clientsName ?? workout.title}: from {dayjs(workout.startTime).format('h:mm A')} to {dayjs(
+					workout.endTime
+				).format('h:mm A')}
 			</Button>
 		</a>
 	{/each}

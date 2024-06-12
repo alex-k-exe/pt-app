@@ -1,7 +1,7 @@
 import { activities, series, sets, users, workouts, type Activity } from '$lib/drizzleTables';
 import { getSeries, getTrainersClients } from '$lib/server/dbUtils.js';
 import { dayjs } from '$lib/utils/dates';
-import { userTypes, validDate } from '$lib/utils/types';
+import { userTypes, validDate, validTime } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, isNull } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
@@ -17,18 +17,22 @@ export async function load({ url, locals }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	const dateString = url.searchParams.get('date');
 	const date = validDate.regex.test(dateString ?? '')
-		? dayjs(dateString, validDate.format).toDate()
-		: new Date();
+		? dayjs(dateString, validDate.format)
+		: dayjs();
 
 	const workoutId = url.searchParams.get('workoutId');
 	let clientOfWorkoutName: string | null = null;
-	const workout: FormActivity & { date: Date } = (await getWorkout(workoutId, locals.db)) ?? {
+	const workout: FormActivity & {
+		date: dayjs.Dayjs;
+		startTime: dayjs.Dayjs;
+		endTime: dayjs.Dayjs;
+	} = (await getWorkout(workoutId, locals.db)) ?? {
 		clientId: '',
 		trainerId: locals.user.id, // only trainers can make a new workout
 		title: '',
 		date,
-		startTime: new Date(),
-		endTime: new Date(),
+		startTime: dayjs(),
+		endTime: dayjs(),
 		series: [],
 		sets: []
 	};
@@ -81,14 +85,20 @@ export const actions = {
 					.where(eq(activities.id, form.data.id))
 					.returning()
 			)[0];
+			const thing = await db
+				.update(workouts)
+				.set(form.data)
+				.where(eq(workouts.id, form.data.id))
+				.returning();
 			await db.batch([
-				db.update(workouts).set(form.data).where(eq(workouts.id, form.data.id)),
 				db.delete(series).where(eq(series.id, dbActivity.id)),
 				db.delete(sets).where(eq(sets.id, dbActivity.id))
 			]);
+			console.log('here bozo', thing[0].date);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values({ id: dbActivity.id, date: form.data.date });
+			const thing = await db.insert(workouts).values(form.data).returning();
+			console.log('here bozo', thing[0].date);
 		}
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
@@ -111,15 +121,16 @@ export const actions = {
 		);
 	},
 
-	delete: async ({ locals, url }) => {
+	delete: async ({ locals, request }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
-		const id = url.searchParams.get('workoutId');
+		const formData = await request.formData();
+		const id = formData.get('workoutId');
 		if (!id) return fail(400);
 
 		await locals.db.delete(activities).where(eq(activities.id, Number(id)));
 
-		const date = url.searchParams.get('date');
-		return redirect(302, '/workouts' + date ? `?month=${date}` : '');
+		const date = formData.get('date');
+		return redirect(302, `/workouts/day-view?date=${dayjs(date?.toString(), validDate)}`);
 	}
 };
 
@@ -133,8 +144,14 @@ async function getWorkout(workoutId: string | number | null, db: DrizzleD1Databa
 		.limit(1)
 		.where(eq(workouts.id, workoutId));
 	if (dbWorkout.length === 0) return null;
-	const workout: FormActivity & { date: Date } = {
-		date: dbWorkout[0].workouts.date,
+	const workout: FormActivity & {
+		date: dayjs.Dayjs;
+		startTime: dayjs.Dayjs;
+		endTime: dayjs.Dayjs;
+	} = {
+		date: dayjs(dbWorkout[0].workouts.date, validDate.format),
+		startTime: dayjs(dbWorkout[0].workouts.startTime, validTime),
+		endTime: dayjs(dbWorkout[0].workouts.endTime, validTime),
 		...dbWorkout[0].activities,
 		series: [],
 		sets: []

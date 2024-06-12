@@ -5,7 +5,15 @@
 	import DayCell from './DayCell.svelte';
 
 	export let month: dayjs.Dayjs[][];
-	export let workouts: Map<string, (Activity & { clientsName: string | null; date: Date })[]>;
+	export let workouts: Map<
+		string,
+		(Activity & {
+			clientsName: string | null;
+			date: dayjs.Dayjs;
+			startTime: dayjs.Dayjs;
+			endTime: dayjs.Dayjs;
+		})[]
+	>;
 </script>
 
 <div class="month">

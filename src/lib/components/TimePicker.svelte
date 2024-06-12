@@ -1,39 +1,42 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select';
 	import { dayjs } from '$lib/utils/dates';
+	import { validTime } from '$lib/utils/types';
 	import z from 'zod';
 	import Input from './ui/input/input.svelte';
 
-	export let selectedDate = new Date();
+	export let selectedTimeString = dayjs().format(validTime);
+	let selectedTimeDayjs = dayjs(selectedTimeString, validTime);
 
 	const AmOrPm = {
 		AM: 'AM',
 		PM: 'PM'
 	} as const;
+	const hourSchema = z.number().min(0).max(12);
+	const minutesSchema = z.number().min(0).max(59);
 
-	let inputHours = selectedDate.getHours() % 12;
-	let inputMinutes = Number(dayjs(selectedDate).format('mm'));
+	let inputHours = selectedTimeDayjs.hour() % 12;
+	let inputMinutes = selectedTimeDayjs.minute();
 
 	const selectedTime: { hours: number; minutes: number; amOrPm: keyof typeof AmOrPm } = {
 		hours: inputHours,
 		minutes: inputMinutes,
-		amOrPm: selectedDate.getHours() >= 12 ? 'PM' : 'AM'
+		amOrPm: selectedTimeDayjs.hour() >= 12 ? 'PM' : 'AM'
 	};
 
-	const hourSchema = z.number().min(0).max(12);
-	const minutesSchema = z.number().min(0).max(59);
-
 	$: {
+		console.log('didi it');
 		if (hourSchema.safeParse(inputHours)) selectedTime.hours = inputHours;
 		else break $;
 
 		if (minutesSchema.safeParse(inputMinutes)) selectedTime.minutes = inputMinutes;
 		else break $;
 
-		selectedDate = dayjs(
+		selectedTimeDayjs = dayjs(
 			`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
 			'h:mm A'
-		).toDate();
+		);
+		selectedTimeString = selectedTimeDayjs.format(validTime);
 	}
 </script>
 

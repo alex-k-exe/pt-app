@@ -10,13 +10,13 @@ export const userTypes = {
 	TRAINER: 'Trainer'
 } as const;
 
-// matches MM-YYYY as a dayjs format
-export const validMonthDate = { regex: /^(0[1-9]|1[0-2])-[0-9]{4}$/, format: 'MM-YYYY' };
+export const validMonthDate = { regex: /^(0[1-9]|1[0-2])-[0-9]{4}$/, format: 'YYYY-MM' };
 export const validDate = {
 	regex: /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-((19|20)\d{2})$/,
-	format: 'DD-MM-YYYY'
+	format: 'YYYY-MM-DD'
 };
-export const timeOnlyFormat = 'h:m-A';
+export const validTime = 'HH:MM:ss';
+
 export const months = {
 	JANUARY: 'January',
 	FEBRUARY: 'February',
@@ -41,13 +41,13 @@ export const daysOfTheWeek = [
 	'Sunday'
 ] as const;
 
+export const validEmail = { regex: /^[\w\-.]+@([\w-]+\.)+[\w-]{2,}$/gm, message: 'Invalid email' };
 // require passwords to have one uppercase letter, one digit, and one special character
 export const validPassword = {
 	regex: /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{12,}$/,
 	message: 'At least one uppercase and lowercase letter, one number and one special character'
 };
 export const validActiveDays = /^[01]{7}$/;
-export const validEmail = { regex: /^[\w\-.]+@([\w-]+\.)+[\w-]{2,}$/gm, message: 'Invalid email' };
 export const validNaturalNumber = /^[1-9]\d*$/;
 
 export type ObjectValues<T> = T[keyof T];

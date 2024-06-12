@@ -8,7 +8,8 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
-	import { locations, type ObjectValues } from '$lib/utils/types';
+	import { dayjs } from '$lib/utils/dates.ts';
+	import { locations, validDate, validTime, type ObjectValues } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import ExercisesEditor from '../ExercisesEditor.svelte';
@@ -24,10 +25,18 @@
 
 	let selectedClient: { id: string; name: string } | null = null;
 	$: $formData.clientId = selectedClient?.id ?? '';
-	$formData = data.workout;
+	$formData = {
+		...data.workout,
+		date: data.workout.date.format(validDate.format),
+		startTime: data.workout.startTime.format(validTime),
+		endTime: data.workout.endTime.format(validTime)
+	};
 
 	let selectedLocation: ObjectValues<typeof locations> | null = null;
 	$: $formData.location = selectedLocation;
+
+	let deleteForm: HTMLFormElement;
+	$: console.log(dayjs($formData.date).format('DD-MMMM-YYYY'));
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
@@ -41,13 +50,17 @@
 		</Form.Field>
 		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
-		<a href="/workouts">Go back to workouts</a>
+		<a href={`/workouts/day-view?date=${dayjs(data.workout.date).format(validDate.format)}`}
+			>Go back to workouts</a
+		>
 		<Form.Button type="submit">Save</Form.Button>
 	</div>
 
-	<div class="timeThings">From <TimePicker bind:selectedDate={$formData.startTime} /></div>
-	<div class="timeThings">to <TimePicker bind:selectedDate={$formData.endTime} /></div>
-	<div class="timeThings">on <DatePicker bind:selectedDate={$formData.date} /></div>
+	<div class="timeThings">
+		From <TimePicker bind:selectedTimeString={$formData.startTime} />
+	</div>
+	<div class="timeThings">to <TimePicker bind:selectedTimeString={$formData.endTime} /></div>
+	<div class="timeThings">on <DatePicker bind:selectedDateString={$formData.date} /></div>
 
 	<Textarea name="notes" placeholder="Notes" bind:value={$formData.notes} />
 
@@ -70,8 +83,17 @@
 
 	{#if data.workout.id}
 		<div class="flex gap-2">
-			<form method="POST" action="?delete">
-				<DestructiveButton triggerText="Delete this workout" />
+			<form method="POST" action="?/delete" bind:this={deleteForm}>
+				<input
+					type="hidden"
+					value={dayjs(data.workout.date).format(validDate.format)}
+					name="date"
+				/>
+				<input type="hidden" value={data.workout.id} name="workoutId" />
+				<DestructiveButton
+					triggerText="Delete this workout"
+					on:confirm={() => deleteForm.requestSubmit()}
+				/>
 			</form>
 			<a href={`/editor/workout?workoutId=${data.workout.id}&duplicate=true`}>
 				<Button>Duplicate</Button>

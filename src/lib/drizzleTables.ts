@@ -46,7 +46,7 @@ export const signupTokens = sqliteTable('signupTokens', {
 		.primaryKey()
 		.$defaultFn(() => generateSignupToken()),
 	trainerId: text('trainerId').references(() => trainers.id, { onDelete: 'cascade' }),
-	creationTimeDate: integer('creationTimestamp', { mode: 'timestamp' })
+	creationTimeDate: text('creationTimestamp')
 		.notNull()
 		.default(sql`(CURRENT_TIMESTAMP)`)
 });
@@ -87,9 +87,7 @@ export const activities = sqliteTable('activities', {
 		.references(() => trainers.id, { onDelete: 'cascade' }),
 	title: text('name').notNull(),
 	notes: text('notes'),
-	location: text('location'),
-	startTime: integer('startTime', { mode: 'timestamp' }).notNull(),
-	endTime: integer('endTime', { mode: 'timestamp' }).notNull()
+	location: text('location')
 });
 export type Activity = typeof activities.$inferSelect;
 export type ActivityInsert = typeof activities.$inferInsert;
@@ -107,9 +105,10 @@ export type DailyInsert = typeof dailies.$inferInsert;
 export const workouts = sqliteTable('workouts', {
 	id: integer('id')
 		.references(() => activities.id, { onDelete: 'cascade' })
-		.primaryKey()
-		.notNull(),
-	date: integer('date', { mode: 'timestamp' }).notNull()
+		.primaryKey(),
+	date: text('date').notNull(), // stored as YYYY-MM-DD
+	startTime: text('startTime').notNull(), // stored as HH:MM:ss
+	endTime: text('endTime').notNull()
 });
 export type Workout = typeof workouts.$inferSelect;
 export type WorkoutInsert = typeof workouts.$inferInsert;

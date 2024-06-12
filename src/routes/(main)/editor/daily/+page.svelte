@@ -64,7 +64,7 @@
 	<Form.Field {form} name="startTime">
 		<Form.Control>
 			<Form.Label>Start time</Form.Label>
-			<TimePicker bind:selectedDate={$formData.startTime} />
+			<TimePicker bind:selectedTime={$formData.startTime} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -72,7 +72,7 @@
 	<Form.Field {form} name="endTime">
 		<Form.Control>
 			<Form.Label>End time</Form.Label>
-			<TimePicker bind:selectedDate={$formData.endTime} />
+			<TimePicker bind:selectedTime={$formData.endTime} />
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

@@ -11,8 +11,7 @@ export async function load({ params, url, locals }) {
 	const signupTokenId = params.signupToken;
 	const targetPath = url.searchParams.get('targetPath');
 
-	const db = locals.db;
-	const tokenValidation = await (await asyncTokenSchema(db)).safeParseAsync(signupTokenId);
+	const tokenValidation = await (await asyncTokenSchema(locals.db)).safeParseAsync(signupTokenId);
 	if (!tokenValidation.success) {
 		return redirect(
 			302,
@@ -24,7 +23,7 @@ export async function load({ params, url, locals }) {
 
 	let trainer: User | null = null;
 	const signupToken = (
-		await db
+		await locals.db
 			.select()
 			.from(signupTokens)
 			.limit(1)
@@ -36,7 +35,7 @@ export async function load({ params, url, locals }) {
 	}
 	if (signupToken.trainerId) {
 		trainer = (
-			await db.select().from(users).limit(1).where(eq(users.id, signupToken.trainerId))
+			await locals.db.select().from(users).limit(1).where(eq(users.id, signupToken.trainerId))
 		)[0];
 	}
 
@@ -50,7 +49,7 @@ export async function load({ params, url, locals }) {
 export const actions = {
 	default: async (event) => {
 		const db = event.locals.db;
-		let form = await superValidate(event, zod(formSchema));
+		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
 		const emails = await db
