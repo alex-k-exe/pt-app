@@ -2,7 +2,7 @@
 	import ActivityCard from '$lib/components/ActivityCard.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { dayjs } from '$lib/utils/dates';
-	import { dayOnlyFormat, userTypes } from '$lib/utils/types';
+	import { userTypes, validDate } from '$lib/utils/types';
 
 	export let data;
 	const date = dayjs(data.date);
@@ -15,20 +15,13 @@
 {date.format('D MMMM YYYY')}
 
 {#if data.userType === userTypes.TRAINER}
-	<a href={`/editor/workout?date=${date.format(dayOnlyFormat)}`}
+	<a href={`/editor/workout?date=${date.format(validDate.format)}`}
 		><Button>Make a new workout</Button></a
 	>
 {/if}
 
-<div class="workouts">
+<div class="flex flex-wrap">
 	{#each workouts as workout}
 		<ActivityCard activity={workout} userType={data.userType} />
 	{/each}
 </div>
-
-<style>
-	.workouts {
-		display: flex;
-		flex-wrap: wrap;
-	}
-</style>

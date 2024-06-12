@@ -1,56 +1,48 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
 	import { dayjs } from '$lib/utils/dates';
+	import { validTime } from '$lib/utils/types';
 	import z from 'zod';
+	import Input from './ui/input/input.svelte';
 
-	export let selectedDate = new Date();
+	export let selectedTimeString = dayjs().format(validTime);
+	let selectedTimeDayjs = dayjs(selectedTimeString, validTime);
 
 	const AmOrPm = {
 		AM: 'AM',
 		PM: 'PM'
 	} as const;
+	const hourSchema = z.number().min(0).max(12);
+	const minutesSchema = z.number().min(0).max(59);
 
-	const selectedTime: { hours: string; minutes: string; amOrPm: keyof typeof AmOrPm } = {
-		hours: (selectedDate.getHours() % 12).toString(),
-		minutes: dayjs(selectedDate).format('mm'),
-		amOrPm: selectedDate.getHours() >= 12 ? 'PM' : 'AM'
+	let inputHours = selectedTimeDayjs.hour() % 12;
+	let inputMinutes = selectedTimeDayjs.minute();
+
+	const selectedTime: { hours: number; minutes: number; amOrPm: keyof typeof AmOrPm } = {
+		hours: inputHours,
+		minutes: inputMinutes,
+		amOrPm: selectedTimeDayjs.hour() >= 12 ? 'PM' : 'AM'
 	};
-	$: selectedDate = dayjs(
-		`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
-		'h:mm A'
-	).toDate();
 
-	const hourSchema = z.string().min(1).max(2).regex(/\d+$/);
-	const minutesSchema = z
-		.string()
-		.length(2)
-		.regex(/\d{2}$/);
+	$: {
+		if (hourSchema.safeParse(inputHours)) selectedTime.hours = inputHours;
+		else break $;
 
-	function handleHoursChange(value: unknown, changingHours: boolean) {
-		const validatedValue = (changingHours ? hourSchema : minutesSchema).safeParse(value);
-		if (!validatedValue.success) console.log(validatedValue.error);
-		else console.log(validatedValue.data);
-		if (changingHours) {
-			selectedTime.hours = validatedValue.success ? validatedValue.data : selectedTime.hours;
-		} else {
-			selectedTime.minutes = validatedValue.success ? validatedValue.data : selectedTime.minutes;
-		}
+		if (minutesSchema.safeParse(inputMinutes)) selectedTime.minutes = inputMinutes;
+		else break $;
+
+		selectedTimeDayjs = dayjs(
+			`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
+			'h:mm A'
+		);
+		selectedTimeString = selectedTimeDayjs.format(validTime);
 	}
 </script>
 
 <div class="flex items-center">
-	<Input
-		value={selectedTime.hours}
-		on:change={(value) => handleHoursChange(value, true)}
-		placeholder="9"
-	/>
+	<Input bind:value={inputHours} placeholder="9" class="w-fit" />
 	:
-	<Input
-		value={selectedTime.minutes}
-		on:change={(value) => handleHoursChange(value, false)}
-		placeholder="05"
-	/>
+	<Input bind:value={inputMinutes} placeholder="5" class="w-fit" />
 
 	<Select.Root
 		selected={{ value: selectedTime.amOrPm, label: selectedTime.amOrPm }}

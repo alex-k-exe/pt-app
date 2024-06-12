@@ -7,14 +7,14 @@
 
 	export let activity: Activity & { clientsName: string | null } & (
 			| { activeDays: string }
-			| { date: Date }
+			| { date: string; startTime: string; endTime: string }
 		);
 	export let userType: ObjectValues<typeof userTypes>;
 
 	// TODO: jank
 	const activityType = 'activeDays' in activity ? 'daily' : 'workout';
 
-	let activeDays: { day: string; isActive: boolean }[];
+	let activeDays: { day: string; isActive: boolean }[] = [];
 	if ('activeDays' in activity) {
 		if (!validActiveDays.test(activity.activeDays)) activity.activeDays = '0000000';
 		activeDays = activity.activeDays.split('').map((activeDay, i) => {
@@ -48,10 +48,7 @@
 	<Card.Footer class="flex gap-[5px]">
 		<form method="POST" bind:this={form}>
 			<input type="hidden" name={`${activityType}Id`} value={activity.id} />
-			<DestructiveButton
-				triggerText={`Delete this ${activityType}`}
-				on:confirm={() => form.requestSubmit()}
-			/>
+			<DestructiveButton triggerText={`Delete`} on:confirm={() => form.requestSubmit()} />
 		</form>
 		<a href={`/editor/${activityType}?${activityType}Id=${activity.id}`}>
 			<Button>Edit</Button>

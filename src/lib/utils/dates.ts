@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { dayOnlyFormat } from './types';
+import { validDate } from './types';
 
 dayjs.extend(customParseFormat);
 export { dayjs };
@@ -35,7 +35,7 @@ export function getDaysForCalendar(month: number, year: number | null): dayjs.Da
 export function datesAreSameDay(...dates: dayjs.Dayjs[]) {
 	return dates.every((newDate, i) => {
 		if (i === 0) return true;
-		let previousDate = dates[i - 1];
-		return newDate.format(dayOnlyFormat) === previousDate.format(dayOnlyFormat);
+		const previousDate = dates[i - 1];
+		return newDate.format(validDate.format) === previousDate.format(validDate.format);
 	});
 }

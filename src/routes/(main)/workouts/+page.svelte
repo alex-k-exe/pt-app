@@ -3,17 +3,16 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { dayjs, getDaysForCalendar } from '$lib/utils/dates';
-	import { months } from '$lib/utils/types';
+	import { months, validMonthDate } from '$lib/utils/types';
 	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
 	import MonthGrid from './MonthGrid.svelte';
 
 	export let data;
 
-	// TODO: give this a better name
-	function createThing(month: string, selectedClientId: string | null) {
-		let withoutClientId = `/workouts?month=${dayjs(`${month}-${data.month.getFullYear()}`, 'MMMM-YYYY').format('MM-YYYY')}`;
-		return (withoutClientId += selectedClientId ? `&clientId=${selectedClientId}` : '');
-	}
+	const monthString =
+		dayjs(data.month).month() === dayjs().month()
+			? ''
+			: `?month=${dayjs(data.month).format(validMonthDate.format)}`;
 </script>
 
 <svelte:head>
@@ -36,13 +35,11 @@
 			</Select.Trigger>
 			<Select.Content>
 				<Select.Group>
-					<a href={'/workouts?month=' + dayjs(data.month).format('MM-YYYY')}>
+					<a href={`/workouts${monthString}`}>
 						<Select.Item value="" label="Select all clients">Select all clients</Select.Item>
 					</a>
 					{#each data.clients as client}
-						<a
-							href={`/workouts?month=${dayjs(data.month).format('MM-YYYY')}&clientId=${client.id}`}
-						>
+						<a href={`/workouts?clientId=${client.id}&month=${monthString}`}>
 							<Select.Item value={client.id} label={client.name}>
 								{client.name}
 							</Select.Item>
@@ -72,7 +69,10 @@
 		<Select.Content>
 			<Select.Group>
 				{#each Object.values(months) as month}
-					<a href={createThing(month, data.selectedClientId)}>
+					<a
+						href={`/workouts?month=${dayjs(month, 'MMMM').format('MM')}-${data.month.getFullYear()}` +
+							(data.selectedClientId ? `&clientId=${data.selectedClientId}` : '')}
+					>
 						<Select.Item value={month} label={month}>
 							{month}
 						</Select.Item>

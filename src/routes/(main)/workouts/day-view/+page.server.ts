@@ -1,46 +1,44 @@
 import { activities, clients, users, workouts } from '$lib/drizzleTables';
 import { dayjs } from '$lib/utils/dates';
-import { dayOnlyFormat, userTypes } from '$lib/utils/types';
+import { userTypes, validDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, or } from 'drizzle-orm';
 
 export async function load({ locals, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
-	const date = url.searchParams.get('date')
-		? dayjs(url.searchParams.get('date'), dayOnlyFormat).toDate()
-		: new Date();
+	const date = validDate.regex.test(url.searchParams.get('date') ?? '')
+		? dayjs(url.searchParams.get('date'), validDate.format)
+		: dayjs();
 
-	const db = locals.db;
 	const foundWorkouts = (
-		await db
+		await locals.db
 			.select()
 			.from(activities)
 			.innerJoin(workouts, eq(activities.id, workouts.id))
 			.where(
 				and(
 					or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id)),
-					eq(workouts.date, date)
+					eq(workouts.date, date.format(validDate.format))
 				)
 			)
-			.orderBy(activities.startTime)
+			.orderBy(workouts.startTime)
 	).map((workout) => {
 		return { ...workout.workouts, ...workout.activities };
 	});
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
-		if (foundWorkouts.length === 0) clientsNames = [];
-		else
-			clientsNames = [
-				(
-					await db
-						.select({ name: users.name })
-						.from(users)
-						.innerJoin(clients, eq(clients.id, users.id))
-						.limit(1)
-						.where(eq(users.id, foundWorkouts[0].clientId))
-				)[0].name
-			];
+		clientsNames = await Promise.all(
+			foundWorkouts.map(async (workout) => {
+				const client = await locals.db
+					.select({ name: users.name })
+					.from(users)
+					.innerJoin(clients, eq(clients.id, users.id))
+					.limit(1)
+					.where(eq(users.id, workout.clientId));
+				return client[0].name;
+			})
+		);
 	}
 
 	return {
@@ -52,7 +50,7 @@ export async function load({ locals, url }) {
 }
 
 export const actions = {
-	delete: async ({ locals, request }) => {
+	default: async ({ locals, request }) => {
 		const workoutId = (await request.formData()).get('workoutId');
 		if (!workoutId) return fail(400);
 		await locals.db.delete(activities).where(eq(activities.id, Number(workoutId.toString())));
