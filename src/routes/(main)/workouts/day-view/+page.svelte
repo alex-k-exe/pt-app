@@ -9,7 +9,7 @@
 	const workouts = data.workouts;
 </script>
 
-<a href={`/workouts?month=${date.format('MM-YYYY')}`}>
+<a href={`/workouts?month=${date.format(validDate.format)}`}>
 	<Button variant="outline">Go back to month view</Button>
 </a>
 {date.format('D MMMM YYYY')}

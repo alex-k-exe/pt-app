@@ -26,16 +26,15 @@
 	$: $formData.clientId = selectedClient?.id ?? '';
 	$formData = {
 		...data.workout,
-		date: data.workout.date.format(validDate.format),
-		startTime: data.workout.startTime.format(validTime),
-		endTime: data.workout.endTime.format(validTime)
+		date: dayjs(data.workout.date).format(validDate.format),
+		startTime: dayjs(data.workout.startTime).format(validTime),
+		endTime: dayjs(data.workout.endTime).format(validTime)
 	};
 
 	let selectedLocation: ObjectValues<typeof locations> | null = null;
 	$: $formData.location = selectedLocation;
 
 	let deleteForm: HTMLFormElement;
-	$: console.log(dayjs($formData.date).format('DD-MMMM-YYYY'));
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
@@ -50,9 +49,11 @@
 		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
 		<a href={`/workouts/day-view?date=${dayjs(data.workout.date).format(validDate.format)}`}
-			>Go back to workouts</a
+			><u>Go back to workouts</u></a
 		>
-		<Form.Button type="submit">Save</Form.Button>
+		{#if data.trainersClients && data.trainersClients.length > 0}
+			<Form.Button type="submit">Save</Form.Button>
+		{/if}
 	</div>
 
 	<div class="timeThings">
@@ -91,7 +92,7 @@
 		</form>
 	{/if}
 
-	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />
+	<ExercisesEditor bind:series={$formData.series} />
 </form>
 
 <style>

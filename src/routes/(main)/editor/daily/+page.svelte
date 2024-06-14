@@ -24,7 +24,7 @@
 
 	let selectedClient =
 		data.trainersClients?.find((client) => client.id === data.daily.clientId) ?? null;
-	$: if (selectedClient?.id) $formData.clientId = selectedClient.id;
+	$: $formData.clientId = selectedClient?.id ?? '';
 
 	if (!validActiveDays.test($formData.activeDays)) $formData.activeDays = '0000000';
 	let activeDays = $formData.activeDays.split('').map((active) => active === '1');
@@ -43,9 +43,9 @@
 		</Form.Field>
 		<SelectClient clients={data.trainersClients} bind:selectedClient />
 
-		<a href="/dailies"><Button variant="outline">Go back to dailies</Button></a>
-		{#if data.trainersClients}
-			<Form.Button>Save</Form.Button>
+		<a href="/dailies"><u>Go back to dailies</u></a>
+		{#if data.trainersClients && data.trainersClients.length > 0}
+			<Form.Button type="submit">Save</Form.Button>
 		{/if}
 	</div>
 
@@ -90,5 +90,5 @@
 		</form>
 	{/if}
 
-	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />
+	<ExercisesEditor bind:series={$formData.series} />
 </form>

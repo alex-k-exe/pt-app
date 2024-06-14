@@ -126,10 +126,9 @@ export type SeriesInsert = typeof series.$inferInsert;
 
 export const sets = sqliteTable('sets', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
-	activityId: integer('activityId')
-		.references(() => activities.id, { onDelete: 'cascade' })
+	seriesId: integer('seriesId')
+		.references(() => series.id, { onDelete: 'cascade' })
 		.notNull(),
-	seriesId: integer('seriesId').references(() => series.id, { onDelete: 'cascade' }),
 	index: integer('index').notNull(),
 	exerciseName: text('exerciseName').notNull(),
 	reps: text('reps'),

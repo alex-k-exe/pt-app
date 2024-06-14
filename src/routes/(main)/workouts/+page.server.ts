@@ -95,12 +95,12 @@ export const actions = {
 		if (!form.success) return fail(400);
 
 		const month = event.url.searchParams.get('month');
-		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
+		const monthDate = month ? dayjs(month, validMonthDate.format) : dayjs();
 		const selectedClientId = event.url.searchParams.get('clientId');
 
 		return redirect(
 			302,
-			`/workouts?month=${monthDate.format('MM')}-${form.data}` +
+			`/workouts?month=${form.data}-${monthDate.format('MM')}` +
 				(selectedClientId ? `&clientId=${selectedClientId}` : '')
 		);
 	}

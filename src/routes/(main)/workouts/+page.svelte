@@ -10,9 +10,9 @@
 	export let data;
 
 	const monthString =
-		dayjs(data.month).month() === dayjs().month()
-			? ''
-			: `?month=${dayjs(data.month).format(validMonthDate.format)}`;
+		dayjs(data.month).month() === dayjs().month() && dayjs(data.month).year() === dayjs().year()
+			? null
+			: `month=${dayjs(data.month).format(validMonthDate.format)}`;
 </script>
 
 <svelte:head>
@@ -35,11 +35,11 @@
 			</Select.Trigger>
 			<Select.Content>
 				<Select.Group>
-					<a href={`/workouts${monthString}`}>
+					<a href={`/workouts${monthString ? '?' + monthString : ''}`}>
 						<Select.Item value="" label="Select all clients">Select all clients</Select.Item>
 					</a>
 					{#each data.clients as client}
-						<a href={`/workouts?clientId=${client.id}&month=${monthString}`}>
+						<a href={`/workouts?clientId=${client.id}${monthString ? '&' + monthString : ''}`}>
 							<Select.Item value={client.id} label={client.name}>
 								{client.name}
 							</Select.Item>
@@ -50,7 +50,7 @@
 		</Select.Root>
 	{/if}
 	<a
-		href={`/workouts?month=${dayjs(data.month).subtract(1, 'month').format('MM-YYYY')}` +
+		href={`/workouts?month=${dayjs(data.month).subtract(1, 'month').format(validMonthDate.format)}` +
 			(data.selectedClientId ? `&clientId=${data.selectedClientId}` : '')}
 	>
 		<Button variant="outline" size="icon" style="margin-left: 2%">
@@ -70,8 +70,8 @@
 			<Select.Group>
 				{#each Object.values(months) as month}
 					<a
-						href={`/workouts?month=${dayjs(month, 'MMMM').format('MM')}-${data.month.getFullYear()}` +
-							(data.selectedClientId ? `&clientId=${data.selectedClientId}` : '')}
+						href={`/workouts?month=${data.month.getFullYear()}-${dayjs(month, 'MMMM').format('MM')}` +
+							(data.selectedClientId ? '&clientId=' + data.selectedClientId : '')}
 					>
 						<Select.Item value={month} label={month}>
 							{month}
@@ -82,7 +82,7 @@
 		</Select.Content>
 	</Select.Root>
 	<a
-		href={`/workouts?month=${dayjs(data.month).add(1, 'month').format('MM-YYYY')}` +
+		href={`/workouts?month=${dayjs(data.month).add(1, 'month').format(validMonthDate.format)}` +
 			(data.selectedClientId ? `&clientId=${data.selectedClientId}` : '')}
 	>
 		<Button variant="outline" size="icon" style="margin-right: 2%">

@@ -42,7 +42,7 @@ export async function load({ locals, url }) {
 	}
 
 	return {
-		date,
+		date: date.toDate(),
 		workouts: foundWorkouts.map((workout, i) => {
 			return { ...workout, clientsName: clientsNames ? clientsNames[i] : null };
 		})
