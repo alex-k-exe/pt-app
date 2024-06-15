@@ -6,6 +6,7 @@ import { and, eq, or } from 'drizzle-orm';
 
 export async function load({ locals, url }) {
 	if (!locals.user?.id) return redirect(302, '/login');
+	// TODO: consider making date variable a route parameter
 	const date = validDate.regex.test(url.searchParams.get('date') ?? '')
 		? dayjs(url.searchParams.get('date'), validDate.format)
 		: dayjs();
@@ -25,6 +26,7 @@ export async function load({ locals, url }) {
 	).map((workout) => {
 		return { ...workout.workouts, ...workout.activities };
 	});
+	console.log(foundWorkouts);
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {

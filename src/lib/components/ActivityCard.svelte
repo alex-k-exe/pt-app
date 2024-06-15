@@ -44,6 +44,9 @@
 				<Button variant={isActive ? 'default' : 'outline'} size="icon">{day.charAt(0)}</Button>
 			{/each}
 		</div>
+		{#if 'startTime' in activity && 'endTime' in activity}
+			From {activity.startTime} to {activity.endTime}
+		{/if}
 	</Card.Content>
 	<Card.Footer class="flex gap-[5px]">
 		<form method="POST" bind:this={form}>

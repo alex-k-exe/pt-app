@@ -24,7 +24,8 @@
 
 	$formData = data.workout;
 
-	let selectedClient: { id: string; name: string } | null = null;
+	let selectedClient =
+		data.trainersClients?.find((client) => client.id === data.workout.clientId) ?? null;
 	$: $formData.clientId = selectedClient?.id ?? '';
 
 	let selectedLocation: ObjectValues<typeof locations> | null = null;

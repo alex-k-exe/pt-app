@@ -62,9 +62,12 @@ export async function load({ url, locals }) {
 
 export const actions = {
 	insertOrUpdate: async (event) => {
+		console.log(-1);
 		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
+		console.log(-1);
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
+		console.log(1);
 
 		const db = event.locals.db;
 		console.log(0, form.data);
@@ -82,12 +85,12 @@ export const actions = {
 				db.delete(series).where(eq(series.activityId, dbActivity.id))
 			]);
 		} else {
+			console.log(233);
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db
-				.insert(workouts)
-				.values({ id: dbActivity.id, date: 'Invaldid yeeeh', startTime: 'smdm', endTime: 'smd' });
+			console.log(1, dbActivity);
+			await db.insert(workouts).values({ id: dbActivity.id, ...form.data });
+			console.log(3203203);
 		}
-		console.log(1, dbActivity);
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db
@@ -100,7 +103,7 @@ export const actions = {
 				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
 			});
 		});
-		return redirect(302, '/workouts');
+		return redirect(302, `/workouts/day-view?date=${form.data.date}`);
 	},
 
 	delete: async ({ request, locals }) => {
