@@ -1,6 +1,7 @@
 import { clients, users } from '$lib/drizzleTables';
+import { userTypes } from '$lib/utils/types.js';
 import { fail, redirect, type Cookies } from '@sveltejs/kit';
-import { eq, or } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { Scrypt } from 'lucia';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -62,9 +63,18 @@ export const actions = {
 		const userId = locals.user?.id;
 		if (!userId) return redirect(302, '/login?targetPath=/settings');
 
-		await locals.db
-			.delete(clients)
-			.where(or(eq(clients.id, userId), eq(clients.trainerId, userId)));
+		// TODO: log clients out of their accounts
+		await locals.db.delete(users).where(eq(users.id, userId));
+		if (locals.userType !== userTypes.TRAINER) return await signout(cookies, locals);
+		const foundClients = await locals.db
+			.select()
+			.from(clients)
+			.where(eq(clients.trainerId, userId));
+		await Promise.all(
+			foundClients.map(async (client) => {
+				await locals.db.delete(users).where(eq(users.id, client.id));
+			})
+		);
 
 		return await signout(cookies, locals);
 	}

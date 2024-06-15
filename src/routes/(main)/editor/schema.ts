@@ -4,8 +4,7 @@ import { z } from 'zod';
 
 const setsSchema = createInsertSchema(sets).omit({
 	id: true,
-	seriesId: true,
-	activityId: true
+	seriesId: true
 });
 export type FormSet = z.infer<typeof setsSchema>;
 
@@ -16,7 +15,6 @@ export type FormSeries = z.infer<typeof seriesSchema>;
 
 export const activitySchema = createInsertSchema(activities).extend({
 	series: z.array(seriesSchema),
-	sets: z.array(setsSchema),
 	clientId: z.string().min(1),
 	title: z.string().min(1)
 });

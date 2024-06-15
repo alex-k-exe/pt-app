@@ -8,7 +8,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
 	import { dayjs } from '$lib/utils/dates.ts';
-	import { locations, validDate, validTime, type ObjectValues } from '$lib/utils/types';
+	import { locations, validDate, type ObjectValues } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import ExercisesEditor from '../ExercisesEditor.svelte';
@@ -22,20 +22,16 @@
 	});
 	const { form: formData, enhance } = form;
 
-	let selectedClient: { id: string; name: string } | null = null;
+	$formData = data.workout;
+
+	let selectedClient =
+		data.trainersClients?.find((client) => client.id === data.workout.clientId) ?? null;
 	$: $formData.clientId = selectedClient?.id ?? '';
-	$formData = {
-		...data.workout,
-		date: data.workout.date.format(validDate.format),
-		startTime: data.workout.startTime.format(validTime),
-		endTime: data.workout.endTime.format(validTime)
-	};
 
 	let selectedLocation: ObjectValues<typeof locations> | null = null;
 	$: $formData.location = selectedLocation;
 
 	let deleteForm: HTMLFormElement;
-	$: console.log(dayjs($formData.date).format('DD-MMMM-YYYY'));
 </script>
 
 <form method="POST" action="?/insertOrUpdate" use:enhance>
@@ -50,9 +46,11 @@
 		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
 		<a href={`/workouts/day-view?date=${dayjs(data.workout.date).format(validDate.format)}`}
-			>Go back to workouts</a
+			><u>Go back to workouts</u></a
 		>
-		<Form.Button type="submit">Save</Form.Button>
+		{#if data.trainersClients && data.trainersClients.length > 0}
+			<Form.Button type="submit">Save</Form.Button>
+		{/if}
 	</div>
 
 	<div class="timeThings">
@@ -91,7 +89,7 @@
 		</form>
 	{/if}
 
-	<ExercisesEditor bind:series={$formData.series} bind:sets={$formData.sets} />
+	<ExercisesEditor bind:series={$formData.series} />
 </form>
 
 <style>

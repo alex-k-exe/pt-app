@@ -1,4 +1,4 @@
-import { clients, users } from '$lib/drizzleTables';
+import { clients, trainers, users } from '$lib/drizzleTables';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
@@ -32,8 +32,18 @@ export const actions = {
 		const client = await db
 			.select()
 			.from(clients)
-			.innerJoin(users, eq(users.id, clients.id))
-			.where(eq(users.id, existingUser[0].id));
+			.limit(1)
+			.where(eq(clients.id, existingUser[0].id));
+		const trainer = await db
+			.select()
+			.from(trainers)
+			.limit(1)
+			.where(eq(trainers.id, existingUser[0].id));
+
+		if (client.length === 0 && trainer.length === 0) {
+			await db.delete(users).where(eq(users.id, existingUser[0].id));
+			return redirect(302, '/login?error=Email or password is incorrect');
+		}
 
 		const session = await event.locals.lucia.createSession(existingUser[0].id, {});
 		const sessionCookie = event.locals.lucia.createSessionCookie(session.id);

@@ -2,7 +2,7 @@ import { activities, dailies, series, sets, users, type Activity } from '$lib/dr
 import { getSeries, getTrainersClients } from '$lib/server/dbUtils';
 import { userTypes } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
-import { and, eq, isNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { FormActivity } from '../schema';
@@ -19,8 +19,7 @@ export async function load({ url, locals }) {
 		clientId: '',
 		trainerId: locals.user.id, // only trainers can make a new daily
 		title: '',
-		series: [],
-		sets: []
+		series: []
 	};
 
 	const db = locals.db;
@@ -38,15 +37,9 @@ export async function load({ url, locals }) {
 			).map((daily) => {
 				return { ...daily.activities, activeDays: daily.dailies.activeDays };
 			})[0],
-			series: [],
-			sets: []
+			series: []
 		};
 		daily.series = await getSeries(db, Number(dailyId));
-		daily.sets = await db
-			.select()
-			.from(sets)
-			.orderBy(sets.index)
-			.where(and(eq(sets.id, Number(dailyId)), isNull(sets.seriesId)));
 
 		clientOfDailyName = (
 			await db.select({ name: users.name }).from(users).limit(1).where(eq(users.id, daily.clientId))
@@ -78,6 +71,7 @@ export const actions = {
 		if (!form.valid) return fail(400, { form });
 
 		const db = event.locals.db;
+		console.log(0, form.data);
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
@@ -89,13 +83,13 @@ export const actions = {
 			)[0];
 			await db.batch([
 				db.update(dailies).set(form.data).where(eq(dailies.id, form.data.id)),
-				db.delete(series).where(eq(series.id, dbActivity.id)),
-				db.delete(sets).where(eq(sets.id, dbActivity.id))
+				db.delete(series).where(eq(series.activityId, dbActivity.id))
 			]);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
 			await db.insert(dailies).values({ id: dbActivity.id, activeDays: form.data.activeDays });
 		}
+		console.log(1, dbActivity);
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db
@@ -103,14 +97,10 @@ export const actions = {
 					.values({ ...formSeries, activityId: dbActivity.id })
 					.returning()
 			)[0];
+			console.log('ew', dbSeries);
 			formSeries.sets.map(async (formSet) => {
-				await db
-					.insert(sets)
-					.values({ ...formSet, seriesId: dbSeries.id, activityId: dbActivity.id });
+				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
 			});
-		});
-		form.data.sets.forEach(async (formSet) => {
-			await db.insert(sets).values({ ...formSet, activityId: dbActivity.id });
 		});
 		return redirect(302, '/dailies');
 	},

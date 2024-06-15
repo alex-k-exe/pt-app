@@ -11,7 +11,7 @@
 	const form = superForm(data.form, { validators: zodClient(formSchema) });
 	const { form: formData, enhance } = form;
 
-	let passwordInputType: 'password' | '' = 'password';
+	let showPassword = false;
 </script>
 
 <h2>Sign up</h2>
@@ -23,16 +23,13 @@
 	>.
 </div>
 
-{#if data.trainer}
-	Your trainer's email is <b>{data.trainer?.email}</b> and their name is
-	<b>{data.trainer?.name}</b>.
-{:else}
-	You are a trainer.
-{/if}
-
 <form method="POST" use:enhance>
 	{#if data.trainer}
+		Your trainer's email is <b>{data.trainer?.email}</b> and their name is
+		<b>{data.trainer?.name}</b>.
 		<input type="hidden" name="trainerId" value={data.trainer.id} />
+	{:else}
+		You are a trainer.
 	{/if}
 	<Form.Field {form} name="name">
 		<Form.Control let:attrs>
@@ -49,14 +46,14 @@
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="password">
-		<FormPassword label="Password" bind:value={$formData.password} bind:passwordInputType />
+		<FormPassword label="Password" bind:value={$formData.password} bind:showPassword />
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="confirmPassword">
 		<FormPassword
 			label="Confirm pasword"
 			bind:value={$formData.confirmPassword}
-			bind:passwordInputType
+			bind:showPassword
 		/>
 		<Form.FieldErrors />
 	</Form.Field>

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "07fd3a55-b1c6-4cb7-8a6b-2270080ae9c5",
+  "id": "97010979-2d43-4953-b9c6-ab1d8d7aaf3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activities": {
@@ -412,18 +412,11 @@
           "notNull": true,
           "autoincrement": true
         },
-        "activityId": {
-          "name": "activityId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "seriesId": {
           "name": "seriesId",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "index": {
@@ -471,19 +464,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "sets_activityId_activities_id_fk": {
-          "name": "sets_activityId_activities_id_fk",
-          "tableFrom": "sets",
-          "tableTo": "activities",
-          "columnsFrom": [
-            "activityId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
         "sets_seriesId_series_id_fk": {
           "name": "sets_seriesId_series_id_fk",
           "tableFrom": "sets",

@@ -1,27 +1,55 @@
-import { chats, clients, messages, series, sets, trainers, users } from '$lib/drizzleTables';
-import { userTypes, type ObjectValues } from '$lib/utils/types';
+import {
+	activities,
+	chats,
+	clients,
+	messages,
+	series,
+	sets,
+	trainers,
+	users,
+	workouts
+} from '$lib/drizzleTables';
+import { userTypes, validDate, validTime, type ObjectValues } from '$lib/utils/types';
+import dayjs from 'dayjs';
 import { eq, ne } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
+import type { FormWorkout } from '../../routes/(main)/editor/workout/schema';
 
-export async function getSeries(db: DrizzleD1Database, id: number) {
-	const seriesWithSets = (
-		await db.select().from(series).orderBy(series.index).where(eq(series.id, id))
-	).map((series) => {
-		return { ...series, sets: [] };
-	});
-
-	const setsInSeries = await Promise.all(
-		seriesWithSets.map(async (singleSeries) => {
-			return await db
+export async function getSeries(db: DrizzleD1Database, activityId: number) {
+	return await Promise.all(
+		(
+			await db.select().from(series).orderBy(series.index).where(eq(series.activityId, activityId))
+		).map(async (singleSeries) => {
+			const dbSets = await db
 				.select()
 				.from(sets)
 				.orderBy(sets.index)
 				.where(eq(sets.seriesId, singleSeries.id));
+			return { ...singleSeries, sets: dbSets };
 		})
 	);
-	return seriesWithSets.map((series, i) => {
-		return { ...series, sets: setsInSeries[i] };
-	});
+}
+
+export async function getWorkout(workoutId: string | number | null, db: DrizzleD1Database) {
+	workoutId = Number(workoutId);
+	if (!workoutId) return null;
+	const dbWorkout = await db
+		.select()
+		.from(workouts)
+		.innerJoin(activities, eq(activities.id, workouts.id))
+		.limit(1)
+		.where(eq(workouts.id, workoutId));
+	if (dbWorkout.length === 0) return null;
+	const workout: FormWorkout = {
+		date: dayjs(dbWorkout[0].workouts.date, validDate.format).format(validDate.format),
+		startTime: dayjs(dbWorkout[0].workouts.startTime, validTime).format(validTime),
+		endTime: dayjs(dbWorkout[0].workouts.endTime, validTime).format(validTime),
+		...dbWorkout[0].activities,
+		series: []
+	};
+	workout.series = await getSeries(db, workoutId);
+
+	return workout;
 }
 
 export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {

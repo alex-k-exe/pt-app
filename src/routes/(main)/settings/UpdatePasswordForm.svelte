@@ -11,16 +11,18 @@
 	export let schema: SuperValidated<Schema, any, Schema>;
 	const form = superForm(schema);
 	const { form: formData, enhance } = form;
+
+	let showPassword = false;
 </script>
 
 <form method="POST" action="?/updatePassword" use:enhance class="mt-4">
 	<h2>Change your password</h2>
 	<Form.Field {form} name="oldPassword">
-		<FormPassword label="Your old password" bind:value={$formData.oldPassword} />
+		<FormPassword label="Your old password" bind:value={$formData.oldPassword} bind:showPassword />
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field {form} name="newPassword">
-		<FormPassword label="Your new password" bind:value={$formData.newPassword} />
+		<FormPassword label="Your new password" bind:value={$formData.newPassword} bind:showPassword />
 		<Form.FieldErrors />
 	</Form.Field>
 	<Button type="submit">Update password</Button>

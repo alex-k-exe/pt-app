@@ -1,9 +1,5 @@
+-- Drop existing tables if they exist
 DROP TABLE IF EXISTS `activities`;
-DROP TABLE IF EXISTS `chats`;
-DROP TABLE IF EXISTS `clients`;
-DROP TABLE IF EXISTS `dailies`;
-DROP TABLE IF EXISTS `messages`;
-
 CREATE TABLE `activities` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`clientId` text NOT NULL,
@@ -15,6 +11,8 @@ CREATE TABLE `activities` (
 	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `chats`;
 CREATE TABLE `chats` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`userId1` text NOT NULL,
@@ -23,6 +21,8 @@ CREATE TABLE `chats` (
 	FOREIGN KEY (`userId2`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `clients`;
 CREATE TABLE `clients` (
 	`id` text PRIMARY KEY NOT NULL,
 	`trainerId` text NOT NULL,
@@ -30,12 +30,16 @@ CREATE TABLE `clients` (
 	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `dailies`;
 CREATE TABLE `dailies` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`activeDays` text DEFAULT '0000000' NOT NULL,
 	FOREIGN KEY (`id`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `messages`;
 CREATE TABLE `messages` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`sentTimestamp` text DEFAULT (CURRENT_TIMESTAMP),
@@ -46,13 +50,9 @@ CREATE TABLE `messages` (
 	FOREIGN KEY (`chatId`) REFERENCES `chats`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`senderId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
+--> statement-breakpoint
 
 DROP TABLE IF EXISTS `series`;
-DROP TABLE IF EXISTS `sessions`;
-DROP TABLE IF EXISTS `sets`;
-DROP TABLE IF EXISTS `signupTokens`;
-
---> statement-breakpoint
 CREATE TABLE `series` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`activityId` integer NOT NULL,
@@ -61,6 +61,8 @@ CREATE TABLE `series` (
 	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
@@ -68,31 +70,38 @@ CREATE TABLE `sessions` (
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `sets`;
 CREATE TABLE `sets` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`activityId` integer NOT NULL,
-	`seriesId` integer,
+	`seriesId` integer NOT NULL,
 	`index` integer NOT NULL,
 	`exerciseName` text NOT NULL,
 	`reps` text,
 	`weight` text,
 	`duration` text,
 	`rpe` text,
-	FOREIGN KEY (`activityId`) REFERENCES `activities`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`seriesId`) REFERENCES `series`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `signupTokens`;
 CREATE TABLE `signupTokens` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`trainerId` text,
 	`creationTimestamp` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	FOREIGN KEY (`trainerId`) REFERENCES `trainers`(`id`) ON UPDATE no action ON DELETE cascade
 );
+--> statement-breakpoint
+
+DROP TABLE IF EXISTS `trainers`;
+CREATE TABLE `trainers` (
+	`id` text PRIMARY KEY NOT NULL,
+	FOREIGN KEY (`id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 
 DROP TABLE IF EXISTS `users`;
-DROP TABLE IF EXISTS `workouts`;
-
---> statement-breakpoint
 CREATE TABLE `users` (
 	`id` text PRIMARY KEY NOT NULL,
 	`email` text NOT NULL,
@@ -100,6 +109,8 @@ CREATE TABLE `users` (
 	`name` text NOT NULL
 );
 --> statement-breakpoint
+
+DROP TABLE IF EXISTS `workouts`;
 CREATE TABLE `workouts` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`date` text NOT NULL,
@@ -109,11 +120,5 @@ CREATE TABLE `workouts` (
 );
 --> statement-breakpoint
 
-DROP TABLE IF EXISTS `trainers`;
---> statement-breakpoint
-CREATE TABLE `trainers` (
-	`id` text PRIMARY KEY NOT NULL,
-	FOREIGN KEY (`id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
-);
-
+-- Create unique index for users email
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

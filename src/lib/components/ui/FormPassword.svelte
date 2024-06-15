@@ -5,18 +5,16 @@
 	import { Input } from './input';
 
 	export let value: string | undefined;
-	export let passwordInputType: 'password' | '' = 'password';
+	export let showPassword = false;
 	export let label = 'Password';
 </script>
 
 <Form.Control let:attrs>
 	<Form.Label>{label}</Form.Label>
 	<div class="flex">
-		<Input {...attrs} class="w-fit" type={passwordInputType} bind:value />
-		<Button
-			on:click={() => (passwordInputType = passwordInputType === 'password' ? '' : 'password')}
-		>
-			{#if passwordInputType === 'password'}
+		<Input {...attrs} class="w-fit" type={showPassword ? '' : 'password'} bind:value />
+		<Button on:click={() => (showPassword = !showPassword)}>
+			{#if showPassword}
 				<Eye />
 			{:else}
 				<EyeOff />

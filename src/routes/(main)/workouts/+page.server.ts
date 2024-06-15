@@ -27,8 +27,8 @@ export async function load({ locals, url }) {
 						workouts.date,
 						month.format(validMonthDate.format),
 						month.endOf('month').format(validMonthDate.format)
-					)
-					// eq(activities.clientId, selectedClientId ?? activities.clientId)
+					),
+					eq(activities.clientId, selectedClientId ?? activities.clientId)
 				)
 			)
 			.orderBy(workouts.date)
@@ -40,6 +40,7 @@ export async function load({ locals, url }) {
 			endTime: dayjs(workout.workouts.endTime, validTime)
 		};
 	});
+	console.log(foundWorkouts);
 
 	let clientsInWorkoutsNames: string[] | null = null;
 	let trainersClients: User[] | null = null;
@@ -89,18 +90,17 @@ export async function load({ locals, url }) {
 }
 
 export const actions = {
-	// TODO: make this a <a> in +page.svelte
 	changeYear: async (event) => {
 		const form = yearSchema.safeParse(Number((await event.request.formData()).get('newYear')));
 		if (!form.success) return fail(400);
 
 		const month = event.url.searchParams.get('month');
-		const monthDate = month ? dayjs(month, 'MM-YYYY') : dayjs();
+		const monthDate = month ? dayjs(month, validMonthDate.format) : dayjs();
 		const selectedClientId = event.url.searchParams.get('clientId');
 
 		return redirect(
 			302,
-			`/workouts?month=${monthDate.format('MM')}-${form.data}` +
+			`/workouts?month=${form.data}-${monthDate.format('MM')}` +
 				(selectedClientId ? `&clientId=${selectedClientId}` : '')
 		);
 	}

@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { validDate } from './types';
 
+dayjs.extend(advancedFormat);
 dayjs.extend(customParseFormat);
 export { dayjs };
 
