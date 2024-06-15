@@ -40,7 +40,6 @@ export async function load({ locals, url }) {
 			endTime: dayjs(workout.workouts.endTime, validTime)
 		};
 	});
-	console.log(foundWorkouts);
 
 	let clientsInWorkoutsNames: string[] | null = null;
 	let trainersClients: User[] | null = null;

@@ -71,7 +71,6 @@ export const actions = {
 		if (!form.valid) return fail(400, { form });
 
 		const db = event.locals.db;
-		console.log(0, form.data);
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
@@ -89,7 +88,6 @@ export const actions = {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
 			await db.insert(dailies).values({ id: dbActivity.id, activeDays: form.data.activeDays });
 		}
-		console.log(1, dbActivity);
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db
@@ -97,7 +95,6 @@ export const actions = {
 					.values({ ...formSeries, activityId: dbActivity.id })
 					.returning()
 			)[0];
-			console.log('ew', dbSeries);
 			formSeries.sets.map(async (formSet) => {
 				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
 			});

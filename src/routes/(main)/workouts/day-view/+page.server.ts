@@ -26,7 +26,6 @@ export async function load({ locals, url }) {
 	).map((workout) => {
 		return { ...workout.workouts, ...workout.activities };
 	});
-	console.log(foundWorkouts);
 
 	let clientsNames: string[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {

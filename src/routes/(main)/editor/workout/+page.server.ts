@@ -62,15 +62,11 @@ export async function load({ url, locals }) {
 
 export const actions = {
 	insertOrUpdate: async (event) => {
-		console.log(-1);
 		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
-		console.log(-1);
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
-		console.log(1);
 
 		const db = event.locals.db;
-		console.log(0, form.data);
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
@@ -85,11 +81,8 @@ export const actions = {
 				db.delete(series).where(eq(series.activityId, dbActivity.id))
 			]);
 		} else {
-			console.log(233);
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			console.log(1, dbActivity);
 			await db.insert(workouts).values({ id: dbActivity.id, ...form.data });
-			console.log(3203203);
 		}
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
@@ -98,7 +91,6 @@ export const actions = {
 					.values({ ...formSeries, activityId: dbActivity.id })
 					.returning()
 			)[0];
-			console.log('ew', dbSeries);
 			formSeries.sets.map(async (formSet) => {
 				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
 			});
