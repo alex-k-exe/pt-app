@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Form from '$lib/components/ui/form/index.ts';
 	import { Input } from '$lib/components/ui/input';
+	import { userTypes } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import UpdatePasswordForm from './UpdatePasswordForm.svelte';
 
@@ -29,7 +30,9 @@
 	<form method="POST" action="?/deleteAccount" bind:this={deleteAccountForm}>
 		<DestructiveButton
 			triggerText="Delete your account"
-			description="This will also delete anything related to you or your clients' accounts"
+			description={data.userType === userTypes.TRAINER
+				? "This will also delete anything related to you or your clients' accounts"
+				: ''}
 			on:confirm={() => deleteAccountForm.requestSubmit()}
 		/>
 	</form>

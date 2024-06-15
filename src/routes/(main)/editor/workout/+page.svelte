@@ -8,7 +8,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
 	import { dayjs } from '$lib/utils/dates.ts';
-	import { locations, validDate, validTime, type ObjectValues } from '$lib/utils/types';
+	import { locations, validDate, type ObjectValues } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import ExercisesEditor from '../ExercisesEditor.svelte';
@@ -22,14 +22,10 @@
 	});
 	const { form: formData, enhance } = form;
 
+	$formData = data.workout;
+
 	let selectedClient: { id: string; name: string } | null = null;
 	$: $formData.clientId = selectedClient?.id ?? '';
-	$formData = {
-		...data.workout,
-		date: dayjs(data.workout.date).format(validDate.format),
-		startTime: dayjs(data.workout.startTime).format(validTime),
-		endTime: dayjs(data.workout.endTime).format(validTime)
-	};
 
 	let selectedLocation: ObjectValues<typeof locations> | null = null;
 	$: $formData.location = selectedLocation;

@@ -13,7 +13,7 @@ import { userTypes, validDate, validTime, type ObjectValues } from '$lib/utils/t
 import dayjs from 'dayjs';
 import { eq, ne } from 'drizzle-orm';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
-import type { FormActivity } from '../../routes/(main)/editor/schema';
+import type { FormWorkout } from '../../routes/(main)/editor/workout/schema';
 
 export async function getSeries(db: DrizzleD1Database, activityId: number) {
 	return await Promise.all(
@@ -40,14 +40,10 @@ export async function getWorkout(workoutId: string | number | null, db: DrizzleD
 		.limit(1)
 		.where(eq(workouts.id, workoutId));
 	if (dbWorkout.length === 0) return null;
-	const workout: FormActivity & {
-		date: Date;
-		startTime: Date;
-		endTime: Date;
-	} = {
-		date: dayjs(dbWorkout[0].workouts.date, validDate.format).toDate(),
-		startTime: dayjs(dbWorkout[0].workouts.startTime, validTime).toDate(),
-		endTime: dayjs(dbWorkout[0].workouts.endTime, validTime).toDate(),
+	const workout: FormWorkout = {
+		date: dayjs(dbWorkout[0].workouts.date, validDate.format).format(validDate.format),
+		startTime: dayjs(dbWorkout[0].workouts.startTime, validTime).format(validTime),
+		endTime: dayjs(dbWorkout[0].workouts.endTime, validTime).format(validTime),
 		...dbWorkout[0].activities,
 		series: []
 	};

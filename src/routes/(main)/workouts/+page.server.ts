@@ -27,8 +27,8 @@ export async function load({ locals, url }) {
 						workouts.date,
 						month.format(validMonthDate.format),
 						month.endOf('month').format(validMonthDate.format)
-					)
-					// eq(activities.clientId, selectedClientId ?? activities.clientId)
+					),
+					eq(activities.clientId, selectedClientId ?? activities.clientId)
 				)
 			)
 			.orderBy(workouts.date)
@@ -89,7 +89,6 @@ export async function load({ locals, url }) {
 }
 
 export const actions = {
-	// TODO: make this a <a> in +page.svelte
 	changeYear: async (event) => {
 		const form = yearSchema.safeParse(Number((await event.request.formData()).get('newYear')));
 		if (!form.success) return fail(400);

@@ -5,6 +5,7 @@
 	import z from 'zod';
 	import Input from './ui/input/input.svelte';
 
+	// TODO: name these variables better
 	export let selectedTimeString = dayjs().format(validTime);
 	let selectedTimeDayjs = dayjs(selectedTimeString, validTime);
 
@@ -31,11 +32,8 @@
 		if (minutesSchema.safeParse(inputMinutes)) selectedTime.minutes = inputMinutes;
 		else break $;
 
-		selectedTimeDayjs = dayjs(
-			`${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`,
-			'h:mm A'
-		);
-		selectedTimeString = selectedTimeDayjs.format(validTime);
+		selectedTimeString = `${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`;
+		selectedTimeDayjs = dayjs(selectedTimeString, validTime);
 	}
 </script>
 

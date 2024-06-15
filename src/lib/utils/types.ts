@@ -1,7 +1,7 @@
 // TODO: generalise this
 export const locations = {
-	WEST_END: 'West End',
-	ALBION: 'Albion',
+	LOC1: 'Location 1',
+	LOC2: 'Location 2',
 	REMOTE: 'Remote'
 } as const;
 
@@ -15,7 +15,8 @@ export const validDate = {
 	regex: /(?:19|20)\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])/,
 	format: 'YYYY-MM-DD'
 };
-export const validTime = 'HH:MM:ss';
+// TODO: make a more consisent time format
+export const validTime = 'h:mm a';
 
 export const months = {
 	JANUARY: 'January',

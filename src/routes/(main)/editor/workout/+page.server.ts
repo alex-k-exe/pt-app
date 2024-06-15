@@ -1,39 +1,37 @@
 import { activities, series, sets, users, workouts, type Activity } from '$lib/drizzleTables';
 import { getTrainersClients, getWorkout } from '$lib/server/dbUtils.js';
 import { dayjs } from '$lib/utils/dates';
-import { userTypes, validDate } from '$lib/utils/types';
+import { userTypes, validDate, validTime } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import type { FormActivity } from '../schema.js';
-import { formSchema } from './schema.js';
+import { formSchema, type FormWorkout } from './schema.js';
 
 // If given, use the workoutId to get workout (i.e. Activity) along with its Series and Sets
 // If User is a Trainer, find the names of their clients and attach the name of the client to the workout
 // Otherwise make a new workout
 export async function load({ url, locals }) {
 	if (!locals.user?.id) return redirect(302, '/login');
-	const dateString = url.searchParams.get('date');
-	const date = validDate.regex.test(dateString ?? '')
-		? dayjs(dateString, validDate.format)
-		: dayjs();
+	// TODO: consider putting the date or workoutId as route parameters
+	const dateUrl = url.searchParams.get('date');
+	const dateString =
+		validDate.regex.test(dateUrl ?? '') && dateUrl !== null
+			? dateUrl
+			: dayjs().format(validDate.format);
 
 	const workoutId = url.searchParams.get('workoutId');
-	let clientOfWorkoutName: string | null = null;
-	const workout: FormActivity & {
-		date: Date;
-		startTime: Date;
-		endTime: Date;
-	} = (await getWorkout(workoutId, locals.db)) ?? {
+	const workout: FormWorkout = (await getWorkout(workoutId, locals.db)) ?? {
 		clientId: '',
 		trainerId: locals.user.id, // only trainers can make a new workout
 		title: '',
-		date: date.toDate(),
-		startTime: new Date(),
-		endTime: new Date(),
+		date: dateString,
+		startTime: dayjs().format(validTime),
+		endTime: dayjs().add(1, 'hour').format(validTime),
 		series: []
 	};
+
+	let clientOfWorkoutName: string | null = null;
 	if (workoutId) {
 		clientOfWorkoutName = (
 			await locals.db
@@ -64,14 +62,12 @@ export async function load({ url, locals }) {
 
 export const actions = {
 	insertOrUpdate: async (event) => {
-		console.log('sdmsmd');
 		if (event.locals.userType !== userTypes.TRAINER) return fail(403);
 		const form = await superValidate(event, zod(formSchema));
-		console.log('before');
 		if (!form.valid) return fail(400, { form });
-		console.log('wjsdjdjsdhja dwsbhbzd');
 
 		const db = event.locals.db;
+		console.log(0, form.data);
 		let dbActivity: Activity;
 		if (form.data.id) {
 			dbActivity = (
@@ -83,13 +79,15 @@ export const actions = {
 			)[0];
 			await db.batch([
 				db.update(workouts).set(form.data).where(eq(workouts.id, form.data.id)),
-				db.delete(series).where(eq(series.id, dbActivity.id)),
-				db.delete(sets).where(eq(sets.id, dbActivity.id))
+				db.delete(series).where(eq(series.activityId, dbActivity.id))
 			]);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values(form.data).returning();
+			await db
+				.insert(workouts)
+				.values({ id: dbActivity.id, date: 'Invaldid yeeeh', startTime: 'smdm', endTime: 'smd' });
 		}
+		console.log(1, dbActivity);
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
 				await db
@@ -97,30 +95,19 @@ export const actions = {
 					.values({ ...formSeries, activityId: dbActivity.id })
 					.returning()
 			)[0];
-
-			formSeries.sets.forEach(async (formSet) => {
+			console.log('ew', dbSeries);
+			formSeries.sets.map(async (formSet) => {
 				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
 			});
 		});
-
-		return redirect(
-			302,
-			`/workouts/day-view?date=${dayjs(form.data.date).format(validDate.format)}`
-		);
+		return redirect(302, '/workouts');
 	},
 
-	delete: async ({ locals, request }) => {
-		console.log(29311);
+	delete: async ({ request, locals }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
-		const formData = await request.formData();
+		const id = (await request.formData()).get('id');
+		if (!id) return fail(500);
 
-		const id = formData.get('workoutId');
-		console.log(-12.123);
-		if (!id) return fail(400);
-		console.log(230);
-		await locals.db.delete(activities).where(eq(activities.id, Number(id)));
-		console.log(293823);
-		const date = formData.get('date');
-		return redirect(302, `/workouts/day-view?date=${dayjs(date?.toString(), validDate)}`);
+		await locals.db.delete(activities).where(eq(activities.id, Number(id.toString())));
 	}
 };
