@@ -49,11 +49,11 @@ export async function load({ locals }) {
 export const actions = {
 	deleteClient: async ({ locals, request }) => {
 		const data = await request.formData();
-		const clientId = data.get('clientId')?.toString();
+		const clientId = data.get('clientId');
 		if (!clientId) return fail(400);
 
-		const db = locals.db;
-		db.delete(users).where(eq(users.id, clientId));
+		await locals.db.delete(users).where(eq(users.id, clientId.toString()));
+		return redirect(302, '/clients');
 	},
 
 	transferClient: async ({ locals, request }) => {

@@ -4,11 +4,11 @@ import { userTypes, validDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
 import { and, eq, or } from 'drizzle-orm';
 
-export async function load({ locals, url }) {
+export async function load({ locals, params }) {
 	if (!locals.user?.id) return redirect(302, '/login');
 	// TODO: consider making date variable a route parameter
-	const date = validDate.regex.test(url.searchParams.get('date') ?? '')
-		? dayjs(url.searchParams.get('date'), validDate.format)
+	const date = validDate.regex.test(params.date)
+		? dayjs(params.date, validDate.format)
 		: dayjs();
 
 	const foundWorkouts = (

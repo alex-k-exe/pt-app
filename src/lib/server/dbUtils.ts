@@ -53,13 +53,11 @@ export async function getWorkout(workoutId: string | number | null, db: DrizzleD
 }
 
 export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {
-	return (
-		await db
-			.select()
-			.from(users)
-			.innerJoin(clients, eq(clients.id, users.id))
-			.where(eq(clients.trainerId, trainerId))
-	).map((user) => user.users);
+	return await db
+		.select({ id: users.id, name: users.name })
+		.from(users)
+		.innerJoin(clients, eq(clients.id, users.id))
+		.where(eq(clients.trainerId, trainerId));
 }
 
 /** Gets all chats that the user is in */

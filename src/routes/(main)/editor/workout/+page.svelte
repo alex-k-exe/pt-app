@@ -8,7 +8,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
 	import { dayjs } from '$lib/utils/dates.ts';
-	import { locations, validDate, type ObjectValues } from '$lib/utils/types';
+	import { locations, userTypes, validDate, type ObjectValues } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import ExercisesEditor from '../ExercisesEditor.svelte';
@@ -38,17 +38,16 @@
 	<div class="flex">
 		<Form.Field {form} name="title">
 			<Form.Control let:attrs>
-				<Form.Label>Title</Form.Label>
 				<Input {...attrs} placeholder="Add a title" bind:value={$formData.title} />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 		<SelectClient bind:selectedClient clients={data.trainersClients} />
 
-		<a href={`/workouts/day-view?date=${dayjs(data.workout.date).format(validDate.format)}`}
+		<a href={`/workouts/${dayjs(data.workout.date).format(validDate.format)}`}
 			><u>Go back to workouts</u></a
 		>
-		{#if data.trainersClients && data.trainersClients.length > 0}
+		{#if data.userType === userTypes.TRAINER}
 			<Form.Button type="submit">Save</Form.Button>
 		{/if}
 	</div>
@@ -78,7 +77,7 @@
 		<Select.Input name="location" />
 	</Select.Root>
 
-	{#if data.workout.id}
+	{#if data.workout.id && data.userType === userTypes.TRAINER}
 		<form method="POST" action="?/delete" bind:this={deleteForm}>
 			<input type="hidden" value={dayjs(data.workout.date).format(validDate.format)} name="date" />
 			<input type="hidden" value={data.workout.id} name="workoutId" />

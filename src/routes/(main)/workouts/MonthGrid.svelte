@@ -9,9 +9,9 @@
 		string,
 		(Activity & {
 			clientsName: string | null;
-			date: dayjs.Dayjs;
-			startTime: dayjs.Dayjs;
-			endTime: dayjs.Dayjs;
+			date: string;
+			startTime: string;
+			endTime: string;
 		})[]
 	>;
 </script>

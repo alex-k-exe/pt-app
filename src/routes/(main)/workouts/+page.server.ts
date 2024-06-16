@@ -1,10 +1,9 @@
 import { activities, clients, users, workouts, type Activity } from '$lib/drizzleTables';
 import { getTrainersClients } from '$lib/server/dbUtils.js';
 import { dayjs } from '$lib/utils/dates';
-import { userTypes, validDate, validMonthDate, validTime } from '$lib/utils/types';
+import { userTypes, validDate, validMonthDate } from '$lib/utils/types';
 import { fail, redirect } from '@sveltejs/kit';
-import { and, between, eq, ne, or } from 'drizzle-orm';
-import type { User } from 'lucia';
+import { and, between, eq, or } from 'drizzle-orm';
 import { yearSchema } from './schema.js';
 
 export async function load({ locals, url }) {
@@ -13,8 +12,8 @@ export async function load({ locals, url }) {
 	const month = validMonthDate.regex.test(monthString ?? '')
 		? dayjs(monthString, validMonthDate.format).startOf('month')
 		: dayjs().startOf('month');
-
 	const selectedClientId = url.searchParams.get('clientId');
+
 	const foundWorkouts = (
 		await locals.db
 			.select()
@@ -25,8 +24,8 @@ export async function load({ locals, url }) {
 					or(eq(activities.clientId, locals.user?.id), eq(activities.trainerId, locals.user?.id)),
 					between(
 						workouts.date,
-						month.format(validMonthDate.format),
-						month.endOf('month').format(validMonthDate.format)
+						month.format(validDate.format),
+						month.endOf('month').format(validDate.format)
 					),
 					eq(activities.clientId, selectedClientId ?? activities.clientId)
 				)
@@ -35,14 +34,12 @@ export async function load({ locals, url }) {
 	).map((workout) => {
 		return {
 			...workout.activities,
-			date: dayjs(workout.workouts.date, validDate.format),
-			startTime: dayjs(workout.workouts.startTime, validTime),
-			endTime: dayjs(workout.workouts.endTime, validTime)
+			...workout.workouts
 		};
 	});
 
 	let clientsInWorkoutsNames: string[] | null = null;
-	let trainersClients: User[] | null = null;
+	let trainersClients: { id: string; name: string }[] | null = null;
 	if (locals.userType === userTypes.TRAINER) {
 		clientsInWorkoutsNames = await Promise.all(
 			foundWorkouts.map(async (workout) => {
@@ -51,7 +48,9 @@ export async function load({ locals, url }) {
 					.from(users)
 					.innerJoin(clients, eq(users.id, clients.id))
 					.limit(1)
-					.where(and(eq(clients.id, workout.clientId), ne(clients.id, selectedClientId ?? '')));
+					.where(
+						and(eq(clients.id, workout.clientId), eq(clients.id, selectedClientId ?? clients.id))
+					);
 				return names.length > 0 ? names[0].clientsName : 'No client found';
 			})
 		);
@@ -62,9 +61,9 @@ export async function load({ locals, url }) {
 		string,
 		(Activity & {
 			clientsName: string | null;
-			date: dayjs.Dayjs;
-			startTime: dayjs.Dayjs;
-			endTime: dayjs.Dayjs;
+			date: string;
+			startTime: string;
+			endTime: string;
 		})[]
 	>();
 	foundWorkouts

@@ -82,7 +82,7 @@ export const actions = {
 			]);
 		} else {
 			dbActivity = (await db.insert(activities).values(form.data).returning())[0];
-			await db.insert(workouts).values({ id: dbActivity.id, ...form.data });
+			await db.insert(workouts).values({ ...form.data, id: dbActivity.id });
 		}
 		form.data.series.forEach(async (formSeries) => {
 			const dbSeries = (
@@ -95,7 +95,7 @@ export const actions = {
 				await db.insert(sets).values({ ...formSet, seriesId: dbSeries.id });
 			});
 		});
-		return redirect(302, `/workouts/day-view?date=${form.data.date}`);
+		return redirect(302, `/workouts/${form.data.date}`);
 	},
 
 	delete: async ({ request, locals }) => {

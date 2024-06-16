@@ -5,7 +5,7 @@
 	import { Input } from '$lib/components/ui/input/index.ts';
 	import * as Select from '$lib/components/ui/select';
 	import { Textarea } from '$lib/components/ui/textarea/index.ts';
-	import { daysOfTheWeek, locations, validActiveDays } from '$lib/utils/types';
+	import { daysOfTheWeek, locations, userTypes, validActiveDays } from '$lib/utils/types';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import SelectClient from '../../../../lib/components/SelectClient.svelte';
@@ -44,7 +44,7 @@
 		<SelectClient clients={data.trainersClients} bind:selectedClient />
 
 		<a href="/dailies"><u>Go back to dailies</u></a>
-		{#if data.trainersClients && data.trainersClients.length > 0}
+		{#if data.userType === userTypes.TRAINER}
 			<Form.Button type="submit">Save</Form.Button>
 		{/if}
 	</div>
@@ -80,7 +80,7 @@
 		</Select.Content>
 	</Select.Root>
 
-	{#if data.daily.id}
+	{#if data.daily.id && data.userType === userTypes.TRAINER}
 		<form method="POST" action="?/delete" bind:this={deleteForm}>
 			<input type="hidden" name="id" value={data.daily.id} />
 			<DestructiveButton

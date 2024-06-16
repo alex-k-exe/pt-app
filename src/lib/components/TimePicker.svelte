@@ -3,59 +3,81 @@
 	import { dayjs } from '$lib/utils/dates';
 	import { validTime } from '$lib/utils/types';
 	import z from 'zod';
-	import Input from './ui/input/input.svelte';
+	import { Input, type FormInputEvent } from './ui/input';
 
 	// TODO: name these variables better
 	export let selectedTimeString = dayjs().format(validTime);
 	let selectedTimeDayjs = dayjs(selectedTimeString, validTime);
 
-	const AmOrPm = {
-		AM: 'AM',
-		PM: 'PM'
-	} as const;
-	const hourSchema = z.number().min(0).max(12);
-	const minutesSchema = z.number().min(0).max(59);
+	const hourSchema = z
+		.string()
+		.min(1)
+		.max(2)
+		.refine(
+			(data) => Number(data) > 0 && Number(data) <= 12 && Math.floor(Number(data)) === Number(data)
+		);
+	const minutesSchema = z
+		.string()
+		.length(2)
+		.refine(
+			(data) => Number(data) >= 0 && Number(data) < 60 && Math.floor(Number(data)) === Number(data)
+		);
 
-	let inputHours = selectedTimeDayjs.hour() % 12;
-	let inputMinutes = selectedTimeDayjs.minute();
-
-	const selectedTime: { hours: number; minutes: number; amOrPm: keyof typeof AmOrPm } = {
-		hours: inputHours,
-		minutes: inputMinutes,
-		amOrPm: selectedTimeDayjs.hour() >= 12 ? 'PM' : 'AM'
+	const selectedTime: { hours: string; minutes: string; amOrPm: string } = {
+		hours: selectedTimeDayjs.format('h'),
+		minutes: selectedTimeDayjs.format('mm'),
+		amOrPm: selectedTimeDayjs.format('A')
 	};
 
-	$: {
-		if (hourSchema.safeParse(inputHours)) selectedTime.hours = inputHours;
-		else break $;
+	function updateSelectedTime(event: FormInputEvent<InputEvent>, changingHours: boolean) {
+		console.log('here');
+		selectedTimeDayjs = selectedTimeDayjs;
+		if (!event.target) return;
+		const { value } = event.target as HTMLInputElement;
 
-		if (minutesSchema.safeParse(inputMinutes)) selectedTime.minutes = inputMinutes;
-		else break $;
+		if (changingHours) {
+			if (hourSchema.safeParse(value).success) selectedTime.hours = value;
+			else return;
+		} else {
+			if (minutesSchema.safeParse(value).success) selectedTime.minutes = value;
+			else return;
+		}
 
 		selectedTimeString = `${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`;
-		selectedTimeDayjs = dayjs(selectedTimeString, validTime);
+		selectedTimeDayjs = dayjs(selectedTimeString, 'h:mm A');
 	}
 </script>
 
 <div class="flex items-center">
-	<Input bind:value={inputHours} placeholder="9" class="w-fit" />
+	<Input
+		value={selectedTime.hours}
+		placeholder="9"
+		class="w-fit"
+		on:input={(event) => updateSelectedTime(event, true)}
+	/>
 	:
-	<Input bind:value={inputMinutes} placeholder="5" class="w-fit" />
+	<Input
+		value={selectedTime.minutes}
+		placeholder="05"
+		class="w-fit"
+		on:input={(event) => updateSelectedTime(event, false)}
+	/>
 
 	<Select.Root
 		selected={{ value: selectedTime.amOrPm, label: selectedTime.amOrPm }}
 		onSelectedChange={(event) => {
 			if (!event) return;
 			selectedTime.amOrPm = event.value;
+			selectedTimeString = `${selectedTime.hours}:${selectedTime.minutes} ${selectedTime.amOrPm}`;
+			selectedTimeDayjs = dayjs(selectedTimeString, 'h:mm A');
 		}}
 	>
 		<Select.Trigger>
 			<Select.Value placeholder="AM or PM" />
 		</Select.Trigger>
 		<Select.Content>
-			{#each Object.values(AmOrPm) as value}
-				<Select.Item {value}>{value}</Select.Item>
-			{/each}
+			<Select.Item value="AM">AM</Select.Item>
+			<Select.Item value="PM">PM</Select.Item>
 		</Select.Content>
 	</Select.Root>
 </div>

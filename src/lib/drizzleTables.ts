@@ -107,7 +107,7 @@ export const workouts = sqliteTable('workouts', {
 		.references(() => activities.id, { onDelete: 'cascade' })
 		.primaryKey(),
 	date: text('date').notNull(), // stored as YYYY-MM-DD
-	startTime: text('startTime').notNull(), // stored as HH:MM:ss
+	startTime: text('startTime').notNull(), // stored as h:mm a
 	endTime: text('endTime').notNull()
 });
 export type Workout = typeof workouts.$inferSelect;
