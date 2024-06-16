@@ -14,7 +14,7 @@
 <Card.Root class="basis-full border-2 border-red-400 sm:basis-1/2 md:basis-1/3">
 	<Card.Header>
 		<Card.Description class="flex w-fit"
-			>Repeat <Input placeholder="n" bind:value={series.reps} /> times</Card.Description
+			>Repeat <Input bind:value={series.reps}  placeholder="n" /> times</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>

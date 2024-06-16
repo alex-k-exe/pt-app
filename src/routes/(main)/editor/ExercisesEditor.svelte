@@ -9,13 +9,14 @@
 <Button
 	variant="outline"
 	on:click={() => (series = [...series, { index: series.length, reps: 1, sets: [] }])}
-	>Add a series</Button
->
+	>Add a series
+</Button>
+
 <div class="flex flex-wrap">
 	{#each series as singleSeries, i}
 		<SeriesComponent
 			bind:series={singleSeries}
-			on:delete={() => series = [...series.slice(0, i), ...series.slice(i + 1)]}
+			on:delete={() => (series = [...series.slice(0, i), ...series.slice(i + 1)])}
 		/>
 	{/each}
 </div>
