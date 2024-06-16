@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { handleDeleteElement, type FormSeries } from './schema';
+	import { type FormSeries } from './schema';
 	import SeriesComponent from './SeriesComponent.svelte';
 
 	export let series: FormSeries[];
@@ -12,10 +12,10 @@
 	>Add a series</Button
 >
 <div class="flex flex-wrap">
-	{#each series as singleSeries, j}
+	{#each series as singleSeries, i}
 		<SeriesComponent
 			bind:series={singleSeries}
-			on:delete={() => (series = handleDeleteElement(series, j))}
+			on:delete={() => series = [...series.slice(0, i), ...series.slice(i + 1)]}
 		/>
 	{/each}
 </div>

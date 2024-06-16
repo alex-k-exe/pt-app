@@ -100,9 +100,11 @@ export const actions = {
 
 	delete: async ({ request, locals }) => {
 		if (locals.userType !== userTypes.TRAINER) return fail(403);
-		const id = (await request.formData()).get('id');
-		if (!id) return fail(500);
+		const id = (await request.formData()).get('workoutId');
+		if (!id) return fail(400);
 
 		await locals.db.delete(activities).where(eq(activities.id, Number(id.toString())));
+		await locals.db.delete(workouts).where(eq(workouts.id, Number(id.toString())));
+		return redirect(302, '/workouts');
 	}
 };

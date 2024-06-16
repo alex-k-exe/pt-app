@@ -30,7 +30,6 @@
 	};
 
 	function updateSelectedTime(event: FormInputEvent<InputEvent>, changingHours: boolean) {
-		console.log('here');
 		selectedTimeDayjs = selectedTimeDayjs;
 		if (!event.target) return;
 		const { value } = event.target as HTMLInputElement;

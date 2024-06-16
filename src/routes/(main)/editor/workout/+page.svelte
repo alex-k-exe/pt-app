@@ -79,7 +79,6 @@
 
 	{#if data.workout.id && data.userType === userTypes.TRAINER}
 		<form method="POST" action="?/delete" bind:this={deleteForm}>
-			<input type="hidden" value={dayjs(data.workout.date).format(validDate.format)} name="date" />
 			<input type="hidden" value={data.workout.id} name="workoutId" />
 			<DestructiveButton
 				triggerText="Delete this workout"

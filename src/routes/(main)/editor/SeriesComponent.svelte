@@ -2,10 +2,9 @@
 	import { Button } from '$lib/components/ui/button/index';
 	import * as Card from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
-	import { numberToLetter } from '$lib/utils/other';
 	import { createEventDispatcher } from 'svelte';
 	import SetComponent from './SetComponent.svelte';
-	import { handleAddSet, handleDeleteElement, type FormSeries } from './schema';
+	import { handleAddSet, type FormSeries } from './schema';
 
 	export let series: FormSeries;
 
@@ -14,16 +13,15 @@
 
 <Card.Root class="basis-full border-2 border-red-400 sm:basis-1/2 md:basis-1/3">
 	<Card.Header>
-		<Card.Title>Series {numberToLetter(series.index + 1)}</Card.Title>
 		<Card.Description class="flex w-fit"
 			>Repeat <Input placeholder="n" bind:value={series.reps} /> times</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>
-		{#each series.sets as set, j}
+		{#each series.sets as set, i}
 			<SetComponent
 				bind:set
-				on:delete={() => (series.sets = handleDeleteElement(series.sets, j))}
+				on:delete={() => (series.sets = [...series.sets.slice(0, i), ...series.sets.slice(i + 1)])}
 			/>
 		{/each}
 	</Card.Content>

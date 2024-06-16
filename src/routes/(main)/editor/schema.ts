@@ -24,7 +24,3 @@ export function handleAddSet(sets: FormSet[]) {
 	sets.push({ index: sets.length, exerciseName: 'Example' });
 	return sets;
 }
-export function handleDeleteElement<T>(elements: T[], index: number) {
-	elements.splice(index);
-	return elements;
-}
