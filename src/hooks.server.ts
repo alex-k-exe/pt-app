@@ -40,7 +40,7 @@ export async function handle({ event, resolve }) {
 	const clientCantVisitPage = targetPath.startsWith('/clients');
 	if (event.locals.userType === userTypes.CLIENT && clientCantVisitPage) {
 		return new Response(null, {
-			status: 403,
+			status: 404,
 			headers: { location: `/workouts` }
 		});
 	}

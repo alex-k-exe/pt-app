@@ -11,11 +11,6 @@ export function numberToLetter(n: number) {
 	return String.fromCharCode(n + 64);
 }
 
-// i dont like typescript as much now
-export function arrayToTuple<T>(array: T[]) {
-	return array as [(typeof array)[number], ...(typeof array)[number][]];
-}
-
 export function generateSignupToken() {
 	const min = 100000;
 	const max = 999999;
