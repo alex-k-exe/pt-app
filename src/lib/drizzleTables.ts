@@ -1,14 +1,14 @@
 import { sql } from 'drizzle-orm';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-import { generateId } from 'lucia';
-import { generateSignupToken } from './utils/other';
+import { generateSignupToken, generateUniqueString } from './utils/other';
+import type { InferSelectModel } from 'drizzle-orm';
 
 // Drizzle ensures type safety in the queried data from the DB
 // The tables defined here are converted to SQL code by calling pnpm generate
 export const users = sqliteTable('users', {
 	id: text('id')
 		.primaryKey()
-		.$defaultFn(() => generateId(15)),
+		.$defaultFn(() => generateUniqueString()),
 	email: text('email').notNull().unique(),
 	password: text('password').notNull(),
 	name: text('name').notNull()
@@ -137,3 +137,7 @@ export const sets = sqliteTable('sets', {
 	rpe: text('rpe')
 });
 export type SetInsert = typeof sets.$inferInsert;
+
+export const userTable = sqliteTable('user', {
+	id: integer('id').primaryKey()
+});

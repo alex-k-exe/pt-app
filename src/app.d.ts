@@ -6,21 +6,11 @@ import { Session, User } from 'lucia';
 declare global {
 	namespace App {
 		interface Locals {
-			db: DrizzleD1Database<Record<string, never>>;
+			db: DrizzleD1Database;
 			user: User | null;
-			userType: ObjectValues<typeof userTypes> | null;
+			userType: ObjectValues | null;
 			session: Session | null;
-			lucia: ReturnType<typeof initLucia>;
-		}
-		interface Platform {
-			env: {
-				adminPassword: string;
-				DB: D1Database;
-			};
-			context: {
-				waitUntil(promise: Promise<unknown>): void;
-			};
-			caches: CacheStorage & { default: Cache };
+			lucia: ReturnType;
 		}
 	}
 }
