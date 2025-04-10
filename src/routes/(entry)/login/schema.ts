@@ -1,4 +1,5 @@
-import { validEmail, validPassword } from '$lib/utils/types';
+// not using $lib because it doesn't work when running drizzle studio
+import { validEmail, validPassword } from '../../../lib/utils/types.ts';
 import { z } from 'zod';
 
 export const formSchema = z.object({

@@ -12,10 +12,32 @@ import {
 import { userTypes, validDate, validTime, type ObjectValues } from '$lib/utils/types';
 import dayjs from 'dayjs';
 import { eq, ne } from 'drizzle-orm';
-import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import type { FormWorkout } from '../../routes/(main)/editor/workout/schema';
+import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { Scrypt } from 'lucia';
 
-export async function getSeries(db: DrizzleD1Database, activityId: number) {
+export async function populateDatabase(db: BetterSQLite3Database) {
+	const scrypt = new Scrypt();
+	const [trainer, client] = await db
+		.insert(users)
+		.values([
+			{
+				email: 'arnie@gmail.com',
+				password: await scrypt.hash('uTkOK5#4o3Xmp8'),
+				name: 'Arnold Schwarzenegger'
+			},
+			{
+				email: 'alexkammin@outlook.com',
+				password: await scrypt.hash('JTw*DtS4rFsI1*'),
+				name: 'Alex Kammin'
+			}
+		])
+		.returning();
+	await db.insert(trainers).values({ id: trainer.id });
+	await db.insert(clients).values({ id: client.id, trainerId: trainer.id });
+}
+
+export async function getSeries(db: BetterSQLite3Database, activityId: number) {
 	return await Promise.all(
 		(
 			await db.select().from(series).orderBy(series.index).where(eq(series.activityId, activityId))
@@ -30,7 +52,7 @@ export async function getSeries(db: DrizzleD1Database, activityId: number) {
 	);
 }
 
-export async function getWorkout(workoutId: string | number | null, db: DrizzleD1Database) {
+export async function getWorkout(workoutId: string | number | null, db: BetterSQLite3Database) {
 	workoutId = Number(workoutId);
 	if (!workoutId) return null;
 	const dbWorkout = await db
@@ -52,7 +74,7 @@ export async function getWorkout(workoutId: string | number | null, db: DrizzleD
 	return workout;
 }
 
-export async function getTrainersClients(db: DrizzleD1Database, trainerId: string) {
+export async function getTrainersClients(db: BetterSQLite3Database, trainerId: string) {
 	return await db
 		.select({ id: users.id, name: users.name })
 		.from(users)
@@ -61,7 +83,7 @@ export async function getTrainersClients(db: DrizzleD1Database, trainerId: strin
 }
 
 /** Gets all chats that the user is in */
-export async function getChats(db: DrizzleD1Database, userId: string) {
+export async function getChats(db: BetterSQLite3Database, userId: string) {
 	// get the id of the other user in the chat when the user is user1
 	const user1Chats = await db
 		.select({ id: chats.id, otherUsersId: chats.userId2 })
@@ -85,7 +107,7 @@ export async function getChats(db: DrizzleD1Database, userId: string) {
 	);
 }
 
-async function getOtherUsersName(db: DrizzleD1Database, chat: { otherUsersId: string }) {
+async function getOtherUsersName(db: BetterSQLite3Database, chat: { otherUsersId: string }) {
 	return (
 		await db
 			.select({ name: users.name })
@@ -96,7 +118,7 @@ async function getOtherUsersName(db: DrizzleD1Database, chat: { otherUsersId: st
 }
 
 /** Get the most recent mesage from the chat */
-async function getMostRecentMessage(db: DrizzleD1Database, chat: { id: number }) {
+async function getMostRecentMessage(db: BetterSQLite3Database, chat: { id: number }) {
 	const message = await db
 		.select()
 		.from(messages)
@@ -111,7 +133,7 @@ async function getMostRecentMessage(db: DrizzleD1Database, chat: { id: number })
  * @param userId ID of the current user
  */
 export async function getUsersForNewChat(
-	db: DrizzleD1Database,
+	db: BetterSQLite3Database,
 	chats: { otherUsersId: string }[],
 	userId: string,
 	userType: ObjectValues<typeof userTypes>
@@ -150,7 +172,7 @@ export async function getUsersForNewChat(
 }
 
 /** Get all messages from a chat */
-async function getMessages(db: DrizzleD1Database, chatId: number) {
+async function getMessages(db: BetterSQLite3Database, chatId: number) {
 	const foundMessages = await db
 		.select()
 		.from(messages)
@@ -172,7 +194,7 @@ async function getMessages(db: DrizzleD1Database, chatId: number) {
 }
 
 export async function getChatWithMessages(
-	db: DrizzleD1Database,
+	db: BetterSQLite3Database,
 	chats: { id: number; otherUsersName: string; hasBeenRead: boolean }[],
 	chatId: number
 ) {

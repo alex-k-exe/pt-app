@@ -11,6 +11,9 @@ importers:
       '@internationalized/date':
         specifier: ^3.7.0
         version: 3.7.0
+      '@lucia-auth/adapter-sqlite':
+        specifier: ^3.0.2
+        version: 3.0.2(better-sqlite3@11.9.1)(lucia@3.2.2)
       '@originjs/vite-plugin-commonjs':
         specifier: ^1.0.3
         version: 1.0.3
@@ -37,10 +40,13 @@ importers:
         version: 1.11.13
       drizzle-orm:
         specifier: ^0.31.4
-        version: 0.31.4(@cloudflare/workers-types@4.20250321.0)(better-sqlite3@11.9.1)
+        version: 0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1)
+      drizzle-seed:
+        specifier: ^0.3.1
+        version: 0.3.1(drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1))
       drizzle-zod:
         specifier: ^0.5.1
-        version: 0.5.1(drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(better-sqlite3@11.9.1))(zod@3.24.2)
+        version: 0.5.1(drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1))(zod@3.24.2)
       eslint:
         specifier: ^9.23.0
         version: 9.23.0(jiti@1.21.7)
@@ -87,6 +93,9 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.1.2
         version: 3.1.2(svelte@4.2.18)(vite@5.4.15(@types/node@20.17.28))
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
       '@types/eslint':
         specifier: 8.56.10
         version: 8.56.10
@@ -112,7 +121,7 @@ importers:
         specifier: ^2.46.1
         version: 2.46.1(eslint@9.23.0(jiti@1.21.7))(svelte@4.2.18)
       lucia:
-        specifier: ^3.2.0
+        specifier: ^3.2.2
         version: 3.2.2
       postcss:
         specifier: ^8.5.3
@@ -1318,6 +1327,18 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
+  '@lucia-auth/adapter-sqlite@3.0.2':
+    resolution: {integrity: sha512-UlXpF+2UoFEdm1AsriJii5BOARwqko6SX29rQ8T8Za7rnjj9KLXLaRVQUgBhGmggAyvzCtguJ2+XOZDsfWm6Sw==}
+    peerDependencies:
+      '@libsql/client': ^0.3.0
+      better-sqlite3: 8.x - 11.x
+      lucia: 3.x
+    peerDependenciesMeta:
+      '@libsql/client':
+        optional: true
+      better-sqlite3:
+        optional: true
+
   '@melt-ui/svelte@0.76.2':
     resolution: {integrity: sha512-7SbOa11tXUS95T3fReL+dwDs5FyJtCEqrqG3inRziDws346SYLsxOQ6HmX+4BkIsQh1R8U3XNa+EMmdMt38lMA==}
     peerDependencies:
@@ -1703,6 +1724,9 @@ packages:
 
   '@tybys/wasm-util@0.8.3':
     resolution: {integrity: sha512-Z96T/L6dUFFxgFJ+pQtkPpne9q7i6kIPYCFnQBHSgSPV9idTsKfIhCss0h5iM9irweZCatkrdeP8yi5uM1eX6Q==}
+
+  '@types/better-sqlite3@7.6.13':
+    resolution: {integrity: sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==}
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
@@ -2213,6 +2237,14 @@ packages:
       sql.js:
         optional: true
       sqlite3:
+        optional: true
+
+  drizzle-seed@0.3.1:
+    resolution: {integrity: sha512-F/0lgvfOAsqlYoHM/QAGut4xXIOXoE5VoAdv2FIl7DpGYVXlAzKuJO+IphkKUFK3Dz+rFlOsQLnMNrvoQ0cx7g==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.4'
+    peerDependenciesMeta:
+      drizzle-orm:
         optional: true
 
   drizzle-zod@0.5.1:
@@ -4590,6 +4622,12 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
+  '@lucia-auth/adapter-sqlite@3.0.2(better-sqlite3@11.9.1)(lucia@3.2.2)':
+    dependencies:
+      lucia: 3.2.2
+    optionalDependencies:
+      better-sqlite3: 11.9.1
+
   '@melt-ui/svelte@0.76.2(svelte@4.2.18)':
     dependencies:
       '@floating-ui/core': 1.6.9
@@ -4918,6 +4956,10 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
+
+  '@types/better-sqlite3@7.6.13':
+    dependencies:
+      '@types/node': 20.17.28
 
   '@types/cookie@0.6.0': {}
 
@@ -5361,14 +5403,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(better-sqlite3@11.9.1):
+  drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20250321.0
+      '@types/better-sqlite3': 7.6.13
       better-sqlite3: 11.9.1
 
-  drizzle-zod@0.5.1(drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(better-sqlite3@11.9.1))(zod@3.24.2):
+  drizzle-seed@0.3.1(drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1)):
     dependencies:
-      drizzle-orm: 0.31.4(@cloudflare/workers-types@4.20250321.0)(better-sqlite3@11.9.1)
+      pure-rand: 6.1.0
+    optionalDependencies:
+      drizzle-orm: 0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1)
+
+  drizzle-zod@0.5.1(drizzle-orm@0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1))(zod@3.24.2):
+    dependencies:
+      drizzle-orm: 0.31.4(@cloudflare/workers-types@4.20250321.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@11.9.1)
       zod: 3.24.2
 
   eastasianwidth@0.2.0: {}
@@ -6390,8 +6439,7 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  pure-rand@6.1.0:
-    optional: true
+  pure-rand@6.1.0: {}
 
   queue-microtask@1.2.3: {}
 

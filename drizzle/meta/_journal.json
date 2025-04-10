@@ -1,12 +1,12 @@
 {
-  "version": "5",
+  "version": "7",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
       "version": "6",
-      "when": 1718259397970,
-      "tag": "0000_amused_red_wolf",
+      "when": 1744284330242,
+      "tag": "0000_young_white_queen",
       "breakpoints": true
     }
   ]

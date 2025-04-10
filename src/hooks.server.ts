@@ -1,12 +1,30 @@
 import { initLucia } from '$lib/server/lucia';
 import { userTypes } from '$lib/utils/types';
-import { drizzle } from 'drizzle-orm/d1';
-import sqlite from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+import { type Handle } from '@sveltejs/kit';
+import { seed } from 'drizzle-seed';
+import { populateDatabase } from '$lib/server/dbUtils';
+import { sql } from 'drizzle-orm';
 
-export async function handle({ event, resolve }) {
-	const lucia = initLucia(event.platform);
+export const handle: Handle = async ({ event, resolve }) => {
+	const sqlite = new Database('./local.db');
+	event.locals.sqliteDB = sqlite;
+	const db = drizzle(sqlite);
+	event.locals.db = db;
+
+	const tables = await db
+		.select({ name: sql<string>`name` })
+		.from(sql`sqlite_master`)
+		.where(
+			sql`type = 'table'
+    AND name NOT LIKE 'sqlite_%'`
+		);
+	if (tables.length === 0) {
+		await populateDatabase(db);
+	}
+	const lucia = initLucia(event.locals.sqliteDB);
 	event.locals.lucia = lucia;
-	event.locals.db = drizzle(event.platform.env.DB);
 
 	if (routeIsPublic(event.url.pathname)) return resolve(event);
 	const sessionId = event.cookies.get(lucia.sessionCookieName);
@@ -45,7 +63,7 @@ export async function handle({ event, resolve }) {
 		});
 	}
 	return resolve(event);
-}
+};
 
 export function routeIsPublic(route: string) {
 	route = route.charAt(0) === '/' ? route.substring(1) : route;

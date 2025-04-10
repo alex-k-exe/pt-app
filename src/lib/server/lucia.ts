@@ -1,10 +1,11 @@
 import { dev } from '$app/environment';
-import { D1Adapter } from '@lucia-auth/adapter-sqlite';
+import { BetterSqlite3Adapter } from '@lucia-auth/adapter-sqlite';
 import * as schema from '../drizzleTables';
+import { Lucia } from 'lucia';
+import type { Database } from 'better-sqlite3';
 
-export function initLucia(locals: App.Locals | undefined) {
-	if (!locals?.db) throw new Error('Database is undefined');
-	const luciaAdapter = new D1Adapter(locals.db, {
+export function initLucia(db: Database) {
+	const luciaAdapter = new BetterSqlite3Adapter(db, {
 		user: 'users',
 		session: 'sessions'
 	});
