@@ -1,4 +1,4 @@
-import adapterCloudflare from '@sveltejs/adapter-cloudflare';
+import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -6,9 +6,11 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapterCloudflare(),
-		files: {
-			assets: 'src/lib/assets'
+		adapter: adapter(),
+		csrf: {
+			// in the real app I used a cloudflare D1 database instead of a local sqlite file
+			// so this wasn't needed
+			checkOrigin: false
 		}
 	}
 };

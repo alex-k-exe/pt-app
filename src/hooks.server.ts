@@ -5,7 +5,8 @@ import Database from 'better-sqlite3';
 import { type Handle } from '@sveltejs/kit';
 import { seed } from 'drizzle-seed';
 import { populateDatabase } from '$lib/server/dbUtils';
-import { sql } from 'drizzle-orm';
+import { count, sql } from 'drizzle-orm';
+import { users } from './lib/drizzleTables';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sqlite = new Database('./local.db');
@@ -20,7 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			sql`type = 'table'
     AND name NOT LIKE 'sqlite_%'`
 		);
-	if (tables.length === 0) {
+	if ((await db.select({ count: count() }).from(users))[0].count === 0) {
 		await populateDatabase(db);
 	}
 	const lucia = initLucia(event.locals.sqliteDB);

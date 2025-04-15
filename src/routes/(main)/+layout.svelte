@@ -17,7 +17,7 @@
 
 <div class="container">
 	<nav class="top-0 hidden bg-background md:flex">
-		<img src={'/logo.png'} alt="App logo" style="width: 50px" />
+		<img src="logo.png" alt="App logo" style="width: 50px" />
 		{#each urls as { name: pathName }}
 			<a
 				href={'/' + pathName.toLowerCase()}
