@@ -3,7 +3,6 @@ import { userTypes } from '$lib/utils/types';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 import { type Handle } from '@sveltejs/kit';
-import { seed } from 'drizzle-seed';
 import { populateDatabase } from '$lib/server/dbUtils';
 import { count, sql } from 'drizzle-orm';
 import { users } from './lib/drizzleTables';

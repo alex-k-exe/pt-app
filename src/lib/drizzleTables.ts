@@ -4,7 +4,7 @@ import { generateSignupToken, generateUniqueString } from './utils/other';
 import type { InferSelectModel } from 'drizzle-orm';
 
 // Drizzle ensures type safety in the queried data from the DB
-// The tables defined here are converted to SQL code by calling pnpm generate
+// The tables defined here are converted to SQL code by calling npm run generate
 export const users = sqliteTable('users', {
 	id: text('id')
 		.primaryKey()

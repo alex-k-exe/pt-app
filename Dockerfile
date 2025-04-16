@@ -1,18 +1,21 @@
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:22-alpine AS build
 WORKDIR /app
-COPY package.json ./
-RUN npm install --legacy-peer-deps
+COPY package.json package-lock.json ./
+RUN npm ci --legacy-peer-deps
 COPY . .
-RUN npm run build && npx drizzle-kit generate && npx drizzle-kit migrate
+RUN npm run build && \
+	npm prune --omit-dev --legacy-peer-deps && \
+	npx drizzle-kit generate && \
+	npx drizzle-kit migrate
 
 # Stage 2: Runtime
 FROM node:22-alpine
 WORKDIR /app
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/local.db .
+COPY --from=build /app/build ./build
+COPY --from=build /app/package.json .
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/local.db .
 
 ENV NODE_ENV=dev
 ENV PORT=3000
