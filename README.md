@@ -2,32 +2,36 @@
 # PT App
 
 This is a full-stack web app I made for my Computer Science IA as part of the International Baccalaureate Diploma Program.
+
 I used to host it at pt-app.pages.dev but I've now archived it
 
-![Workouts](https://github.com/user-attachments/assets/963c756c-2fa2-4e45-bb92-37ed05cb4874)
-![Signup](https://github.com/user-attachments/assets/836e9b78-f958-4cae-b122-0227cf5cfd26)
-![Clients](https://github.com/user-attachments/assets/61e55d84-ab71-4a82-9154-97d6bdd4c761)
+<img src="https://github.com/user-attachments/assets/963c756c-2fa2-4e45-bb92-37ed05cb4874" height="450">
+
+<img src="https://github.com/user-attachments/assets/61e55d84-ab71-4a82-9154-97d6bdd4c761" height="450">
 
 ## Tech stack
 
 [Svelte](https://svelte.dev/) - JavaScript framework
+
 Typescript
+
 [Cloudflare Pages](https://pages.cloudflare.com/) and [Cloudflare D1](https://developers.cloudflare.com/d1/)
 - Back when I was properly running the app I hosted it with Cloudflare
 - This let me easily interact with a SQLite database through D1
 
 [Drizzle](https://orm.drizzle.team/) - typesafe ORM that lets me safely query the database
+
 [Lucia](https://v3.lucia-auth.com/) - authentication
 
 4 million libraries that are now all outdated and deprecated because web development ya know?
 
 ## Features
 
-Authentication
-Session management through cookies
-Dark and light mode (it matches the default setting for your OS)
-Responsive and accessible interface
-Data validation
+- Authentication
+- Session management through cookies
+- Dark and light mode (it matches the default setting for your OS)
+- Responsive and accessible interface
+- Data validation
 
 ## Locally using the app
 
