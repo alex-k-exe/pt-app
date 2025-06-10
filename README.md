@@ -1,7 +1,7 @@
 
 # PT App
 
-This is a full-stack web app I made for my Computer Science IA as part of the International Baccalaureate Diploma Program.
+This is a full-stack web app I made for my Computer Science IA as part of the International Baccalaureate Diploma Program. The client was a personal trainer, and the app was made as if they were going to use it (but they didn't because they were already using apps maintained by professional teams)
 
 I used to host it at pt-app.pages.dev but I've now archived it
 
@@ -38,7 +38,7 @@ Typescript
 ### Setup
 Using Docker
 ```
-docker build -t pt-app
+docker build -t pt-app .
 docker run -p 3000:3000 pt-app
 # Open `localhost:3000` in your browser
 ```
